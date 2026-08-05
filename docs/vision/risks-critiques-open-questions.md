@@ -1,0 +1,90 @@
+# Risks, Critiques, and Open Questions
+
+*The red-team ledger for Markdown Checklists: every serious failure mode with likelihood and severity, the narrow version of the project that survives all of them, and the open questions we have deliberately not answered yet.*
+
+This document is the counterweight to [What MDC Could Unlock](what-mdc-could-unlock.md). Nothing here is hypothetical hedging — each failure mode below has already killed at least one named predecessor, and the [standards-adoption research](../research/standards-adoption-lessons.md) and [landscape map](../research/landscape-map.md) supply the body count. Where a design decision in the [format sketch](../spec/mdc-format-sketch.md) or [MVP definition](../planning/mvp-definition.md) exists specifically to dodge one of these, we say so; where the risk remains open, we say that too.
+
+## Risk register
+
+| # | Failure mode | Likelihood | Severity | Status |
+|---|---|---|---|---|
+| 1 | xkcd 927: we become dialect n+1 | Near-certain by default | Fatal to "standard" framing | Open — mitigated only by distribution strategy |
+| 2 | "GFM is good enough" inertia | High | Fatal for broad adoption; survivable in a named niche | Partially mitigated (niche hypothesis chosen, not yet validated) |
+| 3 | `.mdc` extension is already claimed | Certain (collision exists) | High if contested; low if ceded | Mitigated by design (bare extension ceded) |
+| 4 | Spec-first, no killer app | High | Fatal — no surveyed exception | Mitigated in plan; unproven in execution |
+| 5 | Checklists live in apps, not files | Certain for consumer market | Fatal to any "replace task apps" ambition | Mitigated by written non-goals |
+| 6 | Sophisticated users are fleeing markdown for task state | Established, accelerating | Fatal to "source of truth" positioning | Mitigated by projection/graduation framing |
+| 7 | Over-specification and unfunded maintenance | High (visible in our own docs) | Fatal via slow death | Partially mitigated; permanent temptation |
+
+## 1. The xkcd 927 problem: we are not the unifier, we are the fifth dialect
+
+The pitch "one canonical metadata syntax to reconcile emoji signifiers, `[key:: value]`, `@tag(value)`, and trailing tokens" is the literal setup of [xkcd 927](https://xkcd.com/927/), and this exact space has already run the experiment twice: todomd.org and [todo-md](https://github.com/todo-md/todo-md) both tried to standardize markdown TODOs and died with negligible adoption. The incumbents have no incentive to converge — [Obsidian Tasks](https://publish.obsidian.md/tasks/) has millions of installs and zero reason to migrate its users' vaults, and GitLab and [\[x\]it!](https://xit.jotaen.net/) already assign contradictory meanings to `[~]`, so any canonical vocabulary breaks someone's files (see [prior art on checklist formats](../research/prior-art-checklist-formats.md)).
+
+Standards unify only when they arrive with distribution: [CommonMark](https://blog.codinghorror.com/standard-flavored-markdown/) had GitHub, Reddit, and Stack Exchange in the working group; GFM had github.com itself. We have no platform. **Dodge condition:** at least one entity with real distribution — an agent runtime, an editor, a rendered surface — reads *and writes* the format early, or the project honestly repositions as an interchange layer with importers people actually run. This is why the [MVP](../planning/mvp-definition.md) treats the agent-teaching snippet and CLI as the product, and why incumbent dialects are handled by importers rather than absorbed as alternative syntaxes.
+
+## 2. "GFM is good enough": the Djot problem
+
+Every developer already knows `- [ ]`. It renders interactively everywhere, requires zero education and zero tooling, and for the median checklist — five throwaway items in a PR description — it is not merely adequate but optimal. The graveyard proves sufficiency beats superiority: [Djot](https://github.com/jgm/djot), designed by John MacFarlane, the person most qualified on Earth to improve markdown, fixes real defects and sits at ~2k stars because nothing renders it. Formats win on the median case; MDC's advantages appear only in the tail.
+
+**Dodge condition:** a population that hits GFM's ceiling *daily* and feels it acutely enough to change file conventions. The research identifies exactly two candidates: multi-agent task coordination (agents corrupting shared `tasks.md` files) and run-many-times procedural checklists (release, incident, onboarding). If neither is validated by the [experiment plan](../planning/experiment-plan.md) before serious spec investment, this project is Djot with a smaller pedigree. General markdown users are explicitly written off — if the answer to "why not just TODO.md?" takes more than one sentence for a given user, that user is not in the market.
+
+## 3. Extension squatting is real, and we were the squatter
+
+This one is resolved, but it deserves its full weight because the naive version of this project walks straight into it. Bare `.mdc` belongs to Cursor at mainstream scale: [Cursor's docs mandate the extension](https://cursor.com/docs/context/rules) for rules files and silently ignore `.md` in `.cursor/rules` (verified July 2026), backed by a ~38k-star [template ecosystem](https://github.com/PatrickJS/awesome-cursorrules) in exactly our audience. Nuxt's [VS Code extension](https://marketplace.visualstudio.com/items?itemName=Nuxt.mdc) (~299K installs, current under the Comark rebrand) registers `.mdc` as a language. And fatally: GitHub Linguist assigns `.mdc` no language — bare-`.mdc` files get neither highlighting nor rendered markdown, and the [one PR to change that was rejected](https://github.com/github-linguist/linguist/pull/7326). A format whose entire pitch is "renders beautifully on GitHub today" cannot pick the one spelling of its name GitHub refuses to render.
+
+The resolution, per the [extension-conflicts research](../research/extension-naming-conflicts.md): cede bare `.mdc` permanently, use the `*.mdc.md` double extension ([RFC 7764](https://www.rfc-editor.org/rfc/rfc7764)'s variant-prefix pattern), make the in-band `mdc:` frontmatter key the authoritative signal, and register `text/markdown; variant=mdc` in the [IANA Markdown Variants registry](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) before any public artifact. The residual risk is acronym confusion (Cursor "Markdown Cursor", Nuxt "Markdown Components", Google Material MDC) — accepted as survivable on the MDX precedent, but it is a standing SEO tax, which is why every doc leads with the full name "Markdown Checklists." The rename was free at this stage and would have been permanently expensive after the first blog post; sunk-cost attachment to a name is the most predictable way projects like this self-harm.
+
+## 4. Specs follow platforms — never the reverse
+
+The historical record in [standards-adoption-lessons](../research/standards-adoption-lessons.md) is unanimous: GFM had GitHub, MDX had the React docs ecosystem, MyST had Jupyter Book plus funding, front matter had Jekyll, Markdoc had Stripe. Every markdown format without a pulling platform is a museum piece. Spec-first sequencing has a 100% failure rate across the entire surveyed record. The original idea note describes a "research endeavor... to create a new standard" — which is how spec-first efforts describe themselves right before they fail.
+
+**Mitigation in plan:** the [MVP](../planning/mvp-definition.md) inverts the order — executable spec-as-test-corpus, a remark-based reference parser, and a CLI whose `check`/`claim`/`next` verbs are the actual product, distributed through agent skill snippets the way kanban-md distributes itself. The spec is documentation of running code, CommonMark-style. The honest caveat: this is mitigation *on paper*. If resource constraints ever force a choice between spec polish and the working CLI, the spec loses, every time.
+
+## 5. Checklists live in apps, and merge is our weakest inherited limb
+
+For most humans a checklist is a phone-first object: shared, drag-reordered, notifying, real-time. Todoist, Things, Apple Reminders, and Notion own that market, and a git-versioned text file competes on none of the axes it cares about. This is conceded in writing: consumer task management is a permanent non-goal, and any drift toward "replace Todoist" burns credibility with the only audience that could adopt this. Scope is ruthlessly limited to artifacts that live in repos because they are *about* repo work.
+
+The sharper version of this critique is technical: checklist state is precisely what multiple parties mutate concurrently, and "mutate this line" inherits git's weakest area as its central UX. Jupyter needed a decade of [nbdime](https://nbdime.readthedocs.io/)-class retrofits for co-located mutable state. The design answer — the item line as the merge unit, L2 minimal-diff mutations, atomic `claim`, derived-state-never-stored — makes plain git merges *tractable*, not solved. Two agents on two branches checking the same box while one rewords the item is a scenario the [spec](../spec/mdc-format-sketch.md) must eventually answer in one paragraph. Until it can, the "agent-era" positioning is partially marketing. Merge drivers are explicitly deferred from MVP; that deferral is a bet, and it could be wrong.
+
+## 6. The sophisticated market is fleeing markdown for exactly this job
+
+The most damning pattern in the research: everyone who pushed task semantics to the level MDC proposes has recently abandoned markdown-resident state. GitHub built rich tasklist blocks inside markdown and retired them in favor of database-backed [sub-issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/adding-sub-issues). [Taskwarrior moved to SQLite in v3.0](https://taskwarrior.org/docs/upgrade-3/). Steve Yegge's [beads](https://github.com/steveyegge/beads) was built after "605 inscrutable plans" convinced him markdown TODOs are "write-only memory." These are not naive actors — they are the exact users the agent-era pitch depends on, voting with production systems.
+
+**Mitigation by framing:** MDC claims only what structured stores structurally cannot — rendering in any editor, diffing in PRs, human-editability at parity with machine-editability. Every one of those systems still lacks a human-legible, reviewable surface; the L1 canonical JSON model is designed as the projection seam, and relational needs graduate to [.mddb](../spec/mddb-concept-sketch.md) rather than growing `.mdc` syntax. The honest tagline is "the human-review seam for machine task state," not "the database." GitHub's tasklist retirement is treated as the boundary marker for where in-markdown complexity dies — and the [prior art on markdown databases](../research/prior-art-markdown-databases.md) documents the architectural lineage the derived layer would join.
+
+## 7. Over-specification and the unfunded-maintenance death spiral
+
+[todo.txt](https://github.com/todotxt/todo.txt) survived two decades on a handful of rules; [\[x\]it!](https://xit.jotaen.net/) earned real tooling with a tiny spec that explicitly *refuses* assignees, recurrence, and dependencies. Against that discipline, our own research "implications" read like Process Street reimplemented in a text file — and that richness is precisely what killed GitHub's tasklist blocks. The tell is already in our founding note: `.mddb` was named before `.mdc` had a single user. Scope metastasis at the IDEA.md stage.
+
+A spec is also a product with no revenue: conformance-suite upkeep, markdown's pathological parsing corners inherited wholesale, and dialect politics over what `[~]` means. A spec too large to implement twice never gets a second implementation, so it degrades into "whatever the one parser does" — a tool's file format, not a standard. **Mitigations:** the v0 attribute-key set is closed at six; bracket grammar is strictly GFM's two states; the non-goals list is longer than the feature list; the spec is executable so maintenance is mechanical; `.mddb` is constitutionally bounded to a name, a contract, and a framing — nothing more. The standing test for every proposed feature: *would todo.txt have added this?* The temptation is permanent, and this document is part of the defense.
+
+Two cautions attach here. First, do not market the surgical-checklist science as if syntax delivers outcomes: the [Haynes 2009 NEJM study](https://pubmed.ncbi.nlm.nih.gov/19144931/) showed dramatic reductions, but [Urbach's 2014 Ontario study](https://www.nejm.org/doi/full/10.1056/NEJMsa1308261) found no significant improvement when checklists were mandated at scale — format features cannot fix checklist theater, and overclaiming invites justified ridicule. Second, name the second implementer: a standard with one implementation is a file format; with zero, it's a blog post. A second-language parser is a hard gate before any 1.0.
+
+## The steelman: the narrow version that survives
+
+Strip everything above to what remains standing, and the surviving project is deliberately small:
+
+- **Not a new extension in any load-bearing sense.** A profile of plain `.md`, signaled in-band by frontmatter, with `*.mdc.md` as an advisory convention — every file renders, diffs, and previews everywhere on day zero, and no namespace war is ever fought.
+- **A one-page-spirit spec:** two GFM bracket states plus a struck-through cancelled convention, optional human-scale IDs, exactly one metadata serialization, and written non-goals. Everything else is importer mappings or deferred.
+- **Shipped as a tool first:** a CLI (and later MCP wrapper) exposing deterministic single-item mutations with an atomic `claim`, taught to agents via a skill snippet — positioned solely at the agent–human review seam, claiming only what structured stores can't.
+- **IANA variant registration filed before announcement** — free, first-come, and a legitimacy foothold no vendor holds.
+- **A falsifiable success criterion:** two independent agent tools reading *and* writing the profile without coordination, within a defined window after v0.1. If that fails, the project fails cheap — and every artifact produced (CLI, parser, mappings, IANA entry) retains standalone value.
+
+This is, not coincidentally, roughly what the [canonical design](../spec/mdc-format-sketch.md) converged on. The steelman could still fail — the niche may be smaller than it looks — but it fails fast and leaves no wreckage.
+
+## Open questions register
+
+Carried from the design synthesis; each is tagged with what forces a decision.
+
+1. **Assignee autolink hazard.** `@handle` tokens autolink — and can notify real users — when MDC content is pasted into GitHub issues or PRs. Feature or footgun? Needs escaping guidance or a no-mention authoring profile before the OSS-release-checklist use case ships.
+2. **ID collision under concurrency.** Are author-chosen slugs plus lint enough, or does sustained multi-agent writing need spec'd collision rules (actor prefixes, per-file counters)? The counter was rejected for v0 as frontmatter machinery with its own merge problem — revisit with real usage data, before 1.0.
+3. **Cross-file references.** `path#id` is reserved but unresolved. Lock resolution semantics when the linter can check them, or earlier if templates need shared library checklists.
+4. **Promoting `.doing` to a stored state.** Obsidian-migrant demand will be real; doing it without breaking the strict-GFM bracket guarantee is impossible today. Decide whether the answer stays "no" under pressure.
+5. **Canonical-form edge cases.** Exact `fmt` rules (attribute spacing, quote normalization, list-marker and frontmatter normalization) must be fully pinned in the test corpus before L2 byte-determinism is claimable across implementations.
+6. **Governance and sunset.** When does the BDFL spec repo hand off to an implementers' council, and who holds the IANA contact and npm scope meanwhile? Graduation criteria should be pre-committed in writing at v0.1.
+7. **Import fidelity.** Which incumbent mappings (Obsidian Tasks emoji, todo.txt, Dataview, VTODO) are genuinely lossless bidirectionally, and which are lossy-in? Required before marketing any migration story.
+8. **Killer-app sequencing.** Is the first public proof the agent/human shared task file (CLI plus skill snippet) or the merge-gated OSS release checklist (which needs the deferred CI action)? One of them must land visibly, or the format is dismissed as another TODO.md convention.
+9. **`verify=` execution.** Does it stay declarative-only through 1.0, or does `mdc verify <id>` enter the CLI once sandboxing and trust questions for agent-run commands are answered?
+10. **Template `@version` resolution.** `template: path@version` pins the template revision a run was cut from, but what the token resolves against — a git tag or ref, a frontmatter version counter (and who increments it), or a content hash — is deliberately undecided; v0 tools preserve it verbatim and treat it as opaque. Must be locked before any CLI verb instantiates runs from templates, and no later than cross-run history landing in .mddb.
+
+The [experiment plan](../planning/experiment-plan.md) sequences the evidence-gathering that answers 2, 7, and 8; the rest gate on spec milestones. If a future decision contradicts this register, update the register — an honest red-team doc that stops being maintained is just marketing with a skull on it.
