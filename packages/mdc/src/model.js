@@ -1,0 +1,218 @@
+/**
+ * Derived computation over the parsed item tree: blocked / gates / rollups /
+ * actionable / next. Derived state is computed, never stored in the file.
+ */
+
+/** @typedef {import('./parse.js').MdcDocument} MdcDocument */
+/** @typedef {import('./parse.js').MdcItem} MdcItem */
+
+/**
+ * @typedef {Object} MdcStatus
+ * @property {{ open: number, done: number, cancelled: number, total: number }} totals
+ * @property {{ done: number, total: number }} progress Cancelled items excluded from both counts.
+ * @property {string[]} blocked Ids (or `"<line N>"` for id-less items) of blocked items.
+ * @property {string[]} actionable Ids in document order.
+ * @property {string[]} doing Ids of items carrying the `.doing` class.
+ * @property {Array<{ section: string | null, done: number, total: number }>} sections Per-section rollup in document order.
+ */
+
+/** @param {MdcItem} item @returns {boolean} */
+function isTerminal(item) {
+  return item.state === 'done' || item.state === 'cancelled';
+}
+
+/** @param {MdcItem} item @returns {string[]} */
+function needsOf(item) {
+  return Array.isArray(item.attrs.needs) ? item.attrs.needs : [];
+}
+
+/** @param {MdcItem} item @returns {string} */
+function itemKey(item) {
+  return item.id ?? `<line ${item.line}>`;
+}
+
+/**
+ * Depth-first flattening of the item tree in document order (parents precede
+ * their children).
+ *
+ * @param {MdcDocument} doc
+ * @returns {Array<{ item: MdcItem, parent: MdcItem | null, depth: number }>}
+ */
+export function flattenItems(doc) {
+  /** @type {Array<{ item: MdcItem, parent: MdcItem | null, depth: number }>} */
+  const flat = [];
+  /** @param {MdcItem[]} items @param {MdcItem | null} parent @param {number} depth */
+  const walk = (items, parent, depth) => {
+    for (const item of items) {
+      flat.push({ item, parent, depth });
+      walk(item.children, item, depth + 1);
+    }
+  };
+  walk(doc.items, null, 0);
+  return flat;
+}
+
+/**
+ * Items that are members of a `needs` cycle (an item that can reach itself via
+ * resolved `needs=` edges; references resolve to the first occurrence of an id).
+ *
+ * @param {MdcDocument} doc
+ * @returns {Set<MdcItem>}
+ */
+export function needsCycleMembers(doc) {
+  const flat = flattenItems(doc);
+  /** @type {Map<string, MdcItem>} */
+  const byId = new Map();
+  for (const { item } of flat) {
+    if (item.id !== null && !byId.has(item.id)) byId.set(item.id, item);
+  }
+  /** @type {Set<MdcItem>} */
+  const members = new Set();
+  for (const { item } of flat) {
+    if (needsOf(item).length === 0) continue;
+    const stack = [item];
+    const seen = new Set();
+    let found = false;
+    while (stack.length > 0 && !found) {
+      const current = /** @type {MdcItem} */ (stack.pop());
+      for (const target of needsOf(current)) {
+        const resolved = byId.get(target);
+        if (!resolved) continue;
+        if (resolved === item) {
+          found = true;
+          break;
+        }
+        if (!seen.has(resolved)) {
+          seen.add(resolved);
+          stack.push(resolved);
+        }
+      }
+    }
+    if (found) members.add(item);
+  }
+  return members;
+}
+
+/**
+ * Fill `item.computed` (blocked, blockedBy, gatedBy, actionable, progress) for
+ * every item in the tree, applying `needs` edges, `.gate` document-order
+ * gating, parent/child inheritance, and cancelled-exclusion rollups.
+ *
+ * @param {MdcDocument} doc Parsed document whose items lack (or have stale) `computed`.
+ * @returns {MdcDocument} The same document with `computed` populated.
+ */
+export function computeDerived(doc) {
+  const flat = flattenItems(doc);
+  /** @type {Map<string, MdcItem>} */
+  const byId = new Map();
+  for (const { item } of flat) {
+    if (item.id !== null && !byId.has(item.id)) byId.set(item.id, item);
+  }
+  const cycleMembers = needsCycleMembers(doc);
+  const gates = flat.map((f) => f.item).filter((item) => item.classes.includes('gate'));
+  const gateKeys = [...new Set(gates.map(itemKey))];
+
+  for (const { item, parent } of flat) {
+    /** @type {string[]} */
+    const ownBlockedBy = [];
+    for (const target of needsOf(item)) {
+      const resolved = byId.get(target);
+      if (!resolved || !isTerminal(resolved)) ownBlockedBy.push(target);
+    }
+    const inherited = parent ? parent.computed : null;
+    const blockedBy = [...new Set([...ownBlockedBy, ...(inherited?.blockedBy ?? [])])];
+
+    const ownGatedBy = item.classes.includes('optional')
+      ? []
+      : gates.filter((g) => g.line < item.line && !isTerminal(g)).map(itemKey);
+    const gatedKeySet = new Set([...ownGatedBy, ...(inherited?.gatedBy ?? [])]);
+    // .optional is excluded from gating entirely — directly and by inheritance
+    // through a gated parent (DER-3/DER-4 resolved in .optional's favor).
+    const gatedBy = item.classes.includes('optional') ? [] : gateKeys.filter((key) => gatedKeySet.has(key));
+
+    // A needs cycle blocks only its non-terminal members (they are mutually
+    // deadlocked); a done/cancelled cycle member no longer blocks itself or its
+    // dependents. Dangling and non-terminal targets are already in blockedBy.
+    const blocked =
+      blockedBy.length > 0 || (cycleMembers.has(item) && !isTerminal(item)) || (inherited?.blocked ?? false);
+    item.computed = { blocked, blockedBy, gatedBy, actionable: false, progress: null };
+  }
+
+  /**
+   * Done/total over all transitive descendants, cancelled excluded from both.
+   * @param {MdcItem} item
+   * @returns {{ done: number, total: number }}
+   */
+  const countDescendants = (item) => {
+    let done = 0;
+    let total = 0;
+    for (const child of item.children) {
+      if (child.state !== 'cancelled') {
+        total++;
+        if (child.state === 'done') done++;
+      }
+      const sub = countDescendants(child);
+      done += sub.done;
+      total += sub.total;
+    }
+    return { done, total };
+  };
+
+  for (const { item } of flat) {
+    const { blocked, gatedBy } = item.computed;
+    item.computed.actionable =
+      item.state === 'open' && !blocked && gatedBy.length === 0 && item.children.every(isTerminal);
+    item.computed.progress = item.children.length > 0 ? countDescendants(item) : null;
+  }
+  return doc;
+}
+
+/**
+ * Actionable items in document order — the payload of `mdc next --json`.
+ *
+ * @param {MdcDocument} doc Document with `computed` populated.
+ * @returns {MdcItem[]}
+ */
+export function nextItems(doc) {
+  return flattenItems(doc)
+    .map((f) => f.item)
+    .filter((item) => item.computed.actionable);
+}
+
+/**
+ * Aggregate report backing `mdc status`.
+ *
+ * @param {MdcDocument} doc Document with `computed` populated.
+ * @returns {MdcStatus}
+ */
+export function statusReport(doc) {
+  const items = flattenItems(doc).map((f) => f.item);
+  const totals = { open: 0, done: 0, cancelled: 0, total: items.length };
+  const progress = { done: 0, total: 0 };
+  /** @type {string[]} */
+  const blocked = [];
+  /** @type {string[]} */
+  const actionable = [];
+  /** @type {string[]} */
+  const doing = [];
+  /** @type {Map<string | null, { section: string | null, done: number, total: number }>} */
+  const sections = new Map();
+
+  for (const item of items) {
+    totals[item.state]++;
+    if (!sections.has(item.section)) sections.set(item.section, { section: item.section, done: 0, total: 0 });
+    const rollup = /** @type {{ section: string | null, done: number, total: number }} */ (sections.get(item.section));
+    if (item.state !== 'cancelled') {
+      progress.total++;
+      rollup.total++;
+      if (item.state === 'done') {
+        progress.done++;
+        rollup.done++;
+      }
+    }
+    if (item.computed.blocked) blocked.push(itemKey(item));
+    if (item.computed.actionable) actionable.push(itemKey(item));
+    if (item.classes.includes('doing')) doing.push(itemKey(item));
+  }
+  return { totals, progress, blocked, actionable, doing, sections: [...sections.values()] };
+}
