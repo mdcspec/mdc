@@ -1,0 +1,8 @@
+[
+  {
+    "rule": "dangling-needs",
+    "severity": "error",
+    "id": "deploy",
+    "message": "needs references unknown id \"review\""
+  }
+]

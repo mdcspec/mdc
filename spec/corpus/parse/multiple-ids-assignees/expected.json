@@ -1,0 +1,29 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "first",
+      "text": "Two ids and two owners",
+      "state": "open",
+      "assignee": "ann",
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": [
+    { "rule": "multiple-ids", "message": "multiple ids; first (#first) wins" },
+    { "rule": "multiple-assignees", "message": "multiple assignees; first (@ann) wins" }
+  ]
+}

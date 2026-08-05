@@ -1,0 +1,130 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "garage",
+      "text": "Clean the garage",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": "Chores",
+      "children": [
+        {
+          "id": null,
+          "text": "Sort tools",
+          "state": "done",
+          "assignee": null,
+          "classes": [],
+          "attrs": { "done": "2026-07-25" },
+          "section": "Chores",
+          "children": [],
+          "computed": {
+            "blocked": false,
+            "blockedBy": [],
+            "gatedBy": [],
+            "actionable": false,
+            "progress": null
+          }
+        },
+        {
+          "id": null,
+          "text": "Sell the kayak",
+          "state": "cancelled",
+          "assignee": null,
+          "classes": [],
+          "attrs": { "reason": "keeping it" },
+          "section": "Chores",
+          "children": [],
+          "computed": {
+            "blocked": false,
+            "blockedBy": [],
+            "gatedBy": [],
+            "actionable": false,
+            "progress": null
+          }
+        },
+        {
+          "id": null,
+          "text": "Donate old bikes",
+          "state": "open",
+          "assignee": null,
+          "classes": [],
+          "attrs": {},
+          "section": "Chores",
+          "children": [
+            {
+              "id": null,
+              "text": "Find a charity",
+              "state": "done",
+              "assignee": null,
+              "classes": [],
+              "attrs": { "done": "2026-07-25" },
+              "section": "Chores",
+              "children": [],
+              "computed": {
+                "blocked": false,
+                "blockedBy": [],
+                "gatedBy": [],
+                "actionable": false,
+                "progress": null
+              }
+            },
+            {
+              "id": null,
+              "text": "Schedule pickup",
+              "state": "open",
+              "assignee": null,
+              "classes": [],
+              "attrs": {},
+              "section": "Chores",
+              "children": [],
+              "computed": {
+                "blocked": false,
+                "blockedBy": [],
+                "gatedBy": [],
+                "actionable": true,
+                "progress": null
+              }
+            }
+          ],
+          "computed": {
+            "blocked": false,
+            "blockedBy": [],
+            "gatedBy": [],
+            "actionable": false,
+            "progress": { "done": 1, "total": 2 }
+          }
+        }
+      ],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": { "done": 2, "total": 4 }
+      }
+    },
+    {
+      "id": "lawn",
+      "text": "Mow the lawn",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "done": "2026-07-25" },
+      "section": "Chores",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

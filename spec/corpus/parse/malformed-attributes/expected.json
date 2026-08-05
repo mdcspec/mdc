@@ -1,0 +1,28 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": null,
+      "text": "Unbalanced quote {#broken verify=\"npm test}",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": [
+    { "rule": "malformed-attributes", "message": "attribute block does not tokenize; kept as text" }
+  ]
+}

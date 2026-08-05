@@ -1,0 +1,60 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "dup",
+      "text": "First use",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "dup",
+      "text": "Second use",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "user",
+      "text": "Uses the id",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["dup"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["dup"],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

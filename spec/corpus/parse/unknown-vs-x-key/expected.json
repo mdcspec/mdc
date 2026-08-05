@@ -1,0 +1,26 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "cache",
+      "text": "Tune the cache",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "priority": "high", "x-effort": "3" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,26 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "report",
+      "text": "Publish the report",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["review"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["review"],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

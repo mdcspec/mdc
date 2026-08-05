@@ -1,0 +1,14 @@
+[
+  {
+    "rule": "multiple-assignees",
+    "severity": "error",
+    "id": "owner",
+    "message": "multiple assignees; first (@ann) wins"
+  },
+  {
+    "rule": "non-canonical-state",
+    "severity": "warning",
+    "id": "owner",
+    "message": "not in canonical form; fmt would rewrite this line"
+  }
+]

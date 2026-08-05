@@ -1,0 +1,31 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "mix",
+      "text": "~~old part~~ replaced by ~~newer part~~",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": { "blocked": false, "blockedBy": [], "gatedBy": [], "actionable": false, "progress": null }
+    },
+    {
+      "id": "pdf",
+      "text": "Load-test legacy endpoint",
+      "state": "cancelled",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "reason": "endpoint removed" },
+      "section": null,
+      "children": [],
+      "computed": { "blocked": false, "blockedBy": [], "gatedBy": [], "actionable": false, "progress": null }
+    }
+  ],
+  "warnings": []
+}

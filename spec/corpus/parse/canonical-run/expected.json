@@ -1,0 +1,255 @@
+{
+  "mdc": "0.1",
+  "kind": "run",
+  "title": "Release 2.4.0",
+  "frontmatter": {
+    "mdc": "0.1",
+    "kind": "run",
+    "template": "templates/release.mdc.md@5",
+    "title": "Release 2.4.0",
+    "mode": "do-confirm",
+    "started": "2026-07-24"
+  },
+  "items": [
+    {
+      "id": "branch",
+      "text": "Freeze `main`, cut `release/2.4` branch",
+      "state": "done",
+      "assignee": "tim",
+      "classes": [],
+      "attrs": { "done": "2026-07-24" },
+      "section": "Prepare",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "bump",
+      "text": "Bump version and add changelog entry",
+      "state": "done",
+      "assignee": "tim",
+      "classes": [],
+      "attrs": { "done": "2026-07-24" },
+      "section": "Prepare",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "triage",
+      "text": "All open P1 issues fixed or explicitly deferred",
+      "state": "open",
+      "assignee": "maria",
+      "classes": ["gate"],
+      "attrs": { "due": "2026-07-28" },
+      "section": "Prepare",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "ci",
+      "text": "CI green on `release/2.4`",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["branch"], "verify": "npm test" },
+      "section": "Verify",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": ["triage"],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "smoke",
+      "text": "Smoke test on staging",
+      "state": "open",
+      "assignee": "maria",
+      "classes": ["doing"],
+      "attrs": { "needs": ["ci"] },
+      "section": "Verify",
+      "children": [
+        {
+          "id": null,
+          "text": "Login and logout",
+          "state": "open",
+          "assignee": null,
+          "classes": [],
+          "attrs": {},
+          "section": "Verify",
+          "children": [],
+          "computed": {
+            "blocked": true,
+            "blockedBy": ["ci"],
+            "gatedBy": ["triage"],
+            "actionable": false,
+            "progress": null
+          }
+        },
+        {
+          "id": null,
+          "text": "Checkout with a saved card",
+          "state": "open",
+          "assignee": null,
+          "classes": [],
+          "attrs": {},
+          "section": "Verify",
+          "children": [],
+          "computed": {
+            "blocked": true,
+            "blockedBy": ["ci"],
+            "gatedBy": ["triage"],
+            "actionable": false,
+            "progress": null
+          }
+        },
+        {
+          "id": null,
+          "text": "CSV export over 10k rows",
+          "state": "open",
+          "assignee": null,
+          "classes": [],
+          "attrs": {},
+          "section": "Verify",
+          "children": [],
+          "computed": {
+            "blocked": true,
+            "blockedBy": ["ci"],
+            "gatedBy": ["triage"],
+            "actionable": false,
+            "progress": null
+          }
+        }
+      ],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["ci"],
+        "gatedBy": ["triage"],
+        "actionable": false,
+        "progress": { "done": 0, "total": 3 }
+      }
+    },
+    {
+      "id": "pdf",
+      "text": "Load-test legacy PDF endpoint",
+      "state": "cancelled",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "reason": "endpoint removed in 2.4" },
+      "section": "Verify",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": ["triage"],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "tag",
+      "text": "Tag `v2.4.0` and push",
+      "state": "open",
+      "assignee": "tim",
+      "classes": ["gate"],
+      "attrs": { "needs": ["smoke"] },
+      "section": "Ship",
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["smoke"],
+        "gatedBy": ["triage"],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "publish",
+      "text": "Publish package to npm",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["tag"], "verify": "npm publish --dry-run" },
+      "section": "Ship",
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["tag"],
+        "gatedBy": ["triage", "tag"],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "notes",
+      "text": "Publish GitHub release notes",
+      "state": "open",
+      "assignee": "sam",
+      "classes": ["optional"],
+      "attrs": { "due": "2026-07-31", "needs": ["tag"] },
+      "section": "Ship",
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["tag"],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "watch",
+      "text": "Watch error rates for 48 hours",
+      "state": "open",
+      "assignee": "oncall",
+      "classes": [],
+      "attrs": { "needs": ["publish"] },
+      "section": "Follow-up",
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["publish"],
+        "gatedBy": ["triage", "tag"],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "drill",
+      "text": "Restore-from-backup drill",
+      "state": "open",
+      "assignee": "oncall",
+      "classes": [],
+      "attrs": { "repeat": "done+90d" },
+      "section": "Follow-up",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": ["triage", "tag"],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

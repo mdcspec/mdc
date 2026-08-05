@@ -1,0 +1,43 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "beta",
+      "text": "Ship the beta",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "done": "2026-07-20" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "feedback",
+      "text": "Collect feedback",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["beta"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

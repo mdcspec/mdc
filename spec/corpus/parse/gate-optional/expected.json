@@ -1,0 +1,77 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "sec",
+      "text": "Security review sign-off",
+      "state": "open",
+      "assignee": null,
+      "classes": ["gate"],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "deploy",
+      "text": "Deploy to production",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": ["sec"],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "status",
+      "text": "Update the status page",
+      "state": "open",
+      "assignee": null,
+      "classes": ["optional"],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "notify",
+      "text": "Notify customers",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": ["sec"],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

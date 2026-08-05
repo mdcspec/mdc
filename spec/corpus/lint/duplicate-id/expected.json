@@ -1,0 +1,8 @@
+[
+  {
+    "rule": "duplicate-id",
+    "severity": "error",
+    "id": "task",
+    "message": "duplicate id \"task\""
+  }
+]

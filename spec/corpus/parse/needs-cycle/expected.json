@@ -1,0 +1,60 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "chicken",
+      "text": "Chicken",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["egg"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["egg"],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "egg",
+      "text": "Egg",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["chicken"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["chicken"],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "omelette",
+      "text": "Omelette",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["egg"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": true,
+        "blockedBy": ["egg"],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

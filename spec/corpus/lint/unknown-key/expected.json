@@ -1,0 +1,8 @@
+[
+  {
+    "rule": "unknown-key",
+    "severity": "warning",
+    "id": "cache",
+    "message": "unknown key \"priority\"; extension keys must use the x- prefix"
+  }
+]

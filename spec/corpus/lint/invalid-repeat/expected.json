@@ -1,0 +1,8 @@
+[
+  {
+    "rule": "invalid-repeat",
+    "severity": "error",
+    "id": "water",
+    "message": "invalid repeat \"weekly\"; expected (done|due)+<n><d|w|m>"
+  }
+]

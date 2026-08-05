@@ -1,0 +1,20 @@
+[
+  {
+    "rule": "non-canonical-state",
+    "severity": "warning",
+    "id": "ship",
+    "message": "not in canonical form; fmt would rewrite this line"
+  },
+  {
+    "rule": "non-canonical-state",
+    "severity": "warning",
+    "id": "extra",
+    "message": "not in canonical form; fmt would rewrite this line"
+  },
+  {
+    "rule": "non-canonical-state",
+    "severity": "warning",
+    "id": "order",
+    "message": "not in canonical form; fmt would rewrite this line"
+  }
+]

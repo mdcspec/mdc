@@ -1,0 +1,14 @@
+[
+  {
+    "rule": "needs-cycle",
+    "severity": "error",
+    "id": "chicken",
+    "message": "item is in a needs cycle"
+  },
+  {
+    "rule": "needs-cycle",
+    "severity": "error",
+    "id": "egg",
+    "message": "item is in a needs cycle"
+  }
+]

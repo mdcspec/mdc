@@ -1,0 +1,60 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "config",
+      "text": "Set config {timeout: 30} in the file",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "due": "2026-08-01" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": null,
+      "text": "Document the {braces} convention",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": null,
+      "text": "{#orphan}",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

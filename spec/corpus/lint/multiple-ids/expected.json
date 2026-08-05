@@ -1,0 +1,14 @@
+[
+  {
+    "rule": "multiple-ids",
+    "severity": "error",
+    "id": "one",
+    "message": "multiple ids; first (#one) wins"
+  },
+  {
+    "rule": "non-canonical-state",
+    "severity": "warning",
+    "id": "one",
+    "message": "not in canonical form; fmt would rewrite this line"
+  }
+]

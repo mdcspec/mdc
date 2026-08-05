@@ -1,0 +1,8 @@
+[
+  {
+    "rule": "invalid-date",
+    "severity": "error",
+    "id": "ship",
+    "message": "invalid date \"07-24-2026\" for done; expected YYYY-MM-DD"
+  }
+]

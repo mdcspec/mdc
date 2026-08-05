@@ -1,0 +1,98 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "l1",
+      "text": "Level one",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "children": [
+        {
+          "id": null,
+          "text": "Level two",
+          "state": "open",
+          "assignee": null,
+          "classes": [],
+          "attrs": {},
+          "section": null,
+          "children": [
+            {
+              "id": null,
+              "text": "Level three",
+              "state": "open",
+              "assignee": null,
+              "classes": [],
+              "attrs": {},
+              "section": null,
+              "children": [
+                {
+                  "id": null,
+                  "text": "Level four",
+                  "state": "done",
+                  "assignee": null,
+                  "classes": [],
+                  "attrs": { "done": "2026-07-22" },
+                  "section": null,
+                  "children": [
+                    {
+                      "id": null,
+                      "text": "Level five",
+                      "state": "open",
+                      "assignee": null,
+                      "classes": [],
+                      "attrs": {},
+                      "section": null,
+                      "children": [],
+                      "computed": {
+                        "blocked": false,
+                        "blockedBy": [],
+                        "gatedBy": [],
+                        "actionable": true,
+                        "progress": null
+                      }
+                    }
+                  ],
+                  "computed": {
+                    "blocked": false,
+                    "blockedBy": [],
+                    "gatedBy": [],
+                    "actionable": false,
+                    "progress": { "done": 0, "total": 1 }
+                  }
+                }
+              ],
+              "computed": {
+                "blocked": false,
+                "blockedBy": [],
+                "gatedBy": [],
+                "actionable": true,
+                "progress": { "done": 1, "total": 2 }
+              }
+            }
+          ],
+          "computed": {
+            "blocked": false,
+            "blockedBy": [],
+            "gatedBy": [],
+            "actionable": false,
+            "progress": { "done": 1, "total": 3 }
+          }
+        }
+      ],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": { "done": 1, "total": 4 }
+      }
+    }
+  ],
+  "warnings": []
+}

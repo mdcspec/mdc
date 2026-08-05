@@ -1,0 +1,43 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "logo",
+      "text": "Migrate to the new logo",
+      "state": "cancelled",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "reason": "rebrand postponed" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "landing",
+      "text": "Update the landing page",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["logo"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

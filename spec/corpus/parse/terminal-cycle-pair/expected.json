@@ -1,0 +1,31 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "a",
+      "text": "Alpha",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["b"], "done": "2026-07-26" },
+      "section": null,
+      "children": [],
+      "computed": { "blocked": false, "blockedBy": [], "gatedBy": [], "actionable": false, "progress": null }
+    },
+    {
+      "id": "b",
+      "text": "Beta",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["a"], "done": "2026-07-26" },
+      "section": null,
+      "children": [],
+      "computed": { "blocked": false, "blockedBy": [], "gatedBy": [], "actionable": false, "progress": null }
+    }
+  ],
+  "warnings": []
+}

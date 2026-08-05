@@ -1,0 +1,8 @@
+[
+  {
+    "rule": "cancelled-without-reason",
+    "severity": "warning",
+    "id": "mobile",
+    "message": "cancelled item has no reason="
+  }
+]

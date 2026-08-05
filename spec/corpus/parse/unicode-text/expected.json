@@ -1,0 +1,26 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "i18n",
+      "text": "Übersetzung prüfen — 中文文案 and émoji 🚀",
+      "state": "open",
+      "assignee": "jose",
+      "classes": [],
+      "attrs": {},
+      "section": "Déploiement",
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,43 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "rfc",
+      "text": "Write the RFC",
+      "state": "open",
+      "assignee": null,
+      "classes": ["doing"],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "legal",
+      "text": "Legal review of the DPA",
+      "state": "open",
+      "assignee": null,
+      "classes": ["waiting"],
+      "attrs": {},
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

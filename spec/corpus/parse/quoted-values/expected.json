@@ -1,0 +1,43 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "email",
+      "text": "Draft the launch email",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "verify": "npm run lint:email", "x-note": "two words here" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    },
+    {
+      "id": "copy",
+      "text": "Review the copy",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "verify": "quoted" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

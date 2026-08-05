@@ -1,0 +1,14 @@
+[
+  {
+    "rule": "malformed-attributes",
+    "severity": "error",
+    "id": null,
+    "message": "attribute block does not tokenize; kept as text"
+  },
+  {
+    "rule": "malformed-attributes",
+    "severity": "error",
+    "id": null,
+    "message": "attribute block does not tokenize; kept as text"
+  }
+]
