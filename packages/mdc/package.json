@@ -1,0 +1,26 @@
+{
+  "name": "@mdcspec/mdc",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Reference parser and CLI for MDC — Markdown Checklists. Every MDC document is valid GFM; this adds the L1 JSON model and L2 deterministic mutations.",
+  "type": "module",
+  "bin": {
+    "mdc": "./src/cli.js"
+  },
+  "exports": {
+    ".": "./src/parse.js"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.0",
+    "yaml": "^2.4.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

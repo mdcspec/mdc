@@ -1,0 +1,15 @@
+{
+  "name": "mdc-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test \"packages/mdc/test/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
