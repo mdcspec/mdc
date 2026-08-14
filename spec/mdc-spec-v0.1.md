@@ -76,7 +76,7 @@ Every normative rule below cites at least one corpus case by directory name, wri
 ## 6. Template vs. run
 
 - **TPL-1.** `kind: template` documents carry the reusable procedure; `kind: run` documents are instances; `kind: list` (the default) is a plain checklist. All three use identical item grammar. `[parse/canonical-template]` `[parse/canonical-run]` `[parse/minimal]`
-- **TPL-2.** A run pins `template: <path>@<version>`. The `@version` token is reserved syntax with unresolved semantics: v0 tools MUST preserve it verbatim and treat it as opaque. `[parse/canonical-run]`
+- **TPL-2.** A run pins `template: <path>@<version>`, where `<version>` is the token after the **final** `@`. The token is **opaque to v0 tools**: they MUST preserve it verbatim and MUST NOT resolve it. Its blessed interpretation is a **git commit-ish** (tag, branch, or SHA) resolvable in the repository holding the template — deliberately *not* a content hash (an opaque identifier, rejected on the same grounds as opaque item ids) and *not* a mandatory frontmatter counter (per-file increment machinery with its own merge problem). A run MAY be unpinned (bare path, no `@version`) but SHOULD pin one; lint warns `unpinned-template` otherwise (LINT-1). `[parse/canonical-run]` `[lint/unpinned-template]`
 - **TPL-3.** Run state accrues on item lines (`done=` stamps, assignees, `.doing`, cancellations with `reason=`) and in run frontmatter (`template`, `started`); the template carries none of it — compare `#pdf` open in the template and cancelled in the run. `[parse/canonical-template]` `[parse/canonical-run]` `[canonical-template.mdc.md]` `[canonical-run.mdc.md]`
 - **TPL-4.** Cutting a run from a template copies the body byte-for-byte (prose and headings round-trip), writes fresh run frontmatter (`kind: run`, the pinned `template:` reference, an optional `title` override, `started`, and the template's `mode`), and resets every item to a pristine open state — clearing assignees, `done=`/`due=`/`reason=`, the `.doing`/`.waiting` classes, and any cancellation — so a well-formed template is a no-op to reset and a dirty one is cleaned. `[cut/from-canonical-template]` `[cut/strips-run-state]`
 
@@ -144,6 +144,7 @@ Every normative rule below cites at least one corpus case by directory name, wri
   | `unknown-key` | warning | `[lint/unknown-key]` |
   | `non-canonical-state` | warning | `[lint/non-canonical-state]` |
   | `cancelled-without-reason` | warning | `[lint/cancelled-without-reason]` |
+  | `unpinned-template` | warning | `[lint/unpinned-template]` |
 
 - **LINT-2.** A finding is `{ rule, severity, line, id, message }` with `id` the item's id or `null`; messages are normative as fixtured and MUST NOT embed line numbers. Findings are ordered per C-3. A clean document yields `[]`. `[lint/clean]`
 - **LINT-3.** `non-canonical-state` fires exactly when `fmt` would change the line — markers, bracket case, spacing, indent, attribute order or quoting, or dropped duplicate sigils. `[lint/non-canonical-state]` `[lint/multiple-ids]`

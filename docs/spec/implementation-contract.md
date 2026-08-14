@@ -139,7 +139,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 ## Lint rules (closed set for v0)
 
-`duplicate-id`, `dangling-needs`, `needs-cycle`, `malformed-attributes`, `multiple-ids`, `multiple-assignees`, `invalid-date`, `invalid-repeat`, `unknown-key` (warning), `non-canonical-state` (warning: `[X]`, `*`/`+` markers, non-canonical attribute order/spacing — i.e. "fmt would change this line"), `cancelled-without-reason` (warning). Findings JSON: `[{ "rule", "severity": "error"|"warning", "line", "id": null|"…", "message" }]`.
+`duplicate-id`, `dangling-needs`, `needs-cycle`, `malformed-attributes`, `multiple-ids`, `multiple-assignees`, `invalid-date`, `invalid-repeat`, `unknown-key` (warning), `non-canonical-state` (warning: `[X]`, `*`/`+` markers, non-canonical attribute order/spacing — i.e. "fmt would change this line"), `cancelled-without-reason` (warning), `unpinned-template` (warning: a `kind: run` whose `template:` value has no `@version` suffix — token after the final `@` — so it may drift when the template changes). Findings JSON: `[{ "rule", "severity": "error"|"warning", "line", "id": null|"…", "message" }]`.
 
 ## CLI contract
 

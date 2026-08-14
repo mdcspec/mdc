@@ -1,0 +1,3 @@
+[
+  { "rule": "unpinned-template", "severity": "warning", "id": null, "message": "run pins template \"templates/release.mdc.md\" without an @version; it may drift if the template changes" }
+]

@@ -241,8 +241,10 @@ function today() {
  * `cut <template> [--out <file>] [--title …] [--as-version …] [--date …]`:
  * instantiate a run from a template, to `--out` or stdout. The `template:`
  * reference is the source path (relative to `--out`'s directory when given),
- * with `@<version>` appended when `--as-version` is passed. Refuses to
- * overwrite an existing `--out` (exit 2).
+ * with `@<version>` appended when `--as-version` is passed — a git commit-ish
+ * (tag, branch, or SHA) by convention, opaque to the tool (see spec TPL-2).
+ * A run cut without `--as-version` is unpinned and draws a `lint` warning.
+ * Refuses to overwrite an existing `--out` (exit 2).
  * @param {VerbContext} ctx
  * @returns {Promise<number>}
  */

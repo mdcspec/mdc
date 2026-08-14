@@ -11,13 +11,14 @@ import { serializeItemLine } from './fmt.js';
 /**
  * @typedef {'duplicate-id' | 'dangling-needs' | 'needs-cycle' | 'malformed-attributes'
  *         | 'multiple-ids' | 'multiple-assignees' | 'invalid-date' | 'invalid-repeat'
- *         | 'unknown-key' | 'non-canonical-state' | 'cancelled-without-reason'} LintRule
+ *         | 'unknown-key' | 'non-canonical-state' | 'cancelled-without-reason'
+ *         | 'unpinned-template'} LintRule
  */
 
 /**
  * @typedef {Object} LintFinding
  * @property {LintRule} rule
- * @property {'error' | 'warning'} severity `unknown-key`, `non-canonical-state`, and `cancelled-without-reason` are warnings; the rest are errors.
+ * @property {'error' | 'warning'} severity `unknown-key`, `non-canonical-state`, `cancelled-without-reason`, and `unpinned-template` are warnings; the rest are errors.
  * @property {number} line 1-based source line number.
  * @property {string | null} id Id of the item the finding is on, when it has one.
  * @property {string} message
@@ -66,6 +67,17 @@ export function lintDocument(doc, text) {
       add('invalid-date', 'error', startedLine > 0 ? startedLine : 1, null,
         `invalid date "${value}" for started; expected YYYY-MM-DD`);
     }
+  }
+
+  // A run whose `template:` carries no `@version` suffix is unpinned: a later
+  // edit to the template can silently reinterpret this in-flight run. The
+  // version is the token after the final `@` (git-ref by convention, opaque to
+  // v0); a bare path, or a trailing `@` with nothing after it, is unpinned.
+  const templateRef = doc.frontmatter.template;
+  if (doc.kind === 'run' && typeof templateRef === 'string' && !/@[^@]+$/.test(templateRef)) {
+    const templateLine = lines.findIndex((l, i) => i > 0 && /^template:/.test(l)) + 1;
+    add('unpinned-template', 'warning', templateLine > 0 ? templateLine : 1, null,
+      `run pins template "${templateRef}" without an @version; it may drift if the template changes`);
   }
 
   /** @type {Set<string>} */

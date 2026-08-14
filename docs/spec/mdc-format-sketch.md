@@ -78,7 +78,7 @@ byte-for-byte through any conforming tool.
 | --- | --- | --- |
 | `mdc: "0.1"` | frontmatter | The format signature and version. Required; the only thing that makes this an MDC document. |
 | `kind: run` | frontmatter | `template \| run \| list` (default `list`). This document is an instance of a template. |
-| `template: …@5` | frontmatter | The template path and version this run was cut from (runs only). The `@version` token is reserved syntax; its resolution semantics are an [open question](../vision/risks-critiques-open-questions.md). |
+| `template: …@5` | frontmatter | The template path and version this run was cut from (runs only). The `@version` token is opaque to v0 tools (preserved, never resolved); its blessed interpretation is a git commit-ish — see [The `@version` token](#the-version-token). |
 | `mode: do-confirm` | frontmatter | Checklist-science execution mode: `read-do` or `do-confirm` — [Degani & Wiener's distinction](../research/prior-art-checklist-formats.md#family-0-what-checklist-science-demands-of-a-format). |
 | `started:` | frontmatter | Run metadata. ISO 8601. |
 | Free prose | intro paragraph, headings, nested notes | Opaque to tools; round-trips byte-for-byte. |
@@ -179,7 +179,7 @@ A template carries the *procedure*: item text, IDs, `.gate`/`.optional` classes,
 
 ### The `@version` token
 
-The `@5` in `template: templates/release.mdc.md@5` pins the template revision a run was cut from, so later template edits never reinterpret an in-flight run. In v0 the `@<version>` token is **reserved syntax with unresolved semantics**: whether it names a git tag or ref, a frontmatter version counter (and if so, who increments it), or a content hash is deliberately undecided — tracked in the [open questions register](../vision/risks-critiques-open-questions.md). A v0 tool must preserve the token verbatim and treat it as opaque; nothing in v0 resolves it.
+The `@5` in `template: templates/release.mdc.md@5` pins the template revision a run was cut from, so later template edits never reinterpret an in-flight run. The token is the substring after the **final** `@`, and it is **opaque to v0 tools**: they preserve it verbatim and never resolve it. Its blessed interpretation is a **git commit-ish** — a tag, branch, or SHA resolvable in the repository that holds the template. Two alternatives were considered and rejected ([open questions register](../vision/risks-critiques-open-questions.md), OQ #10): a **content hash** is an opaque identifier in source text, which the format rejects for the same reason it rejects opaque item IDs; a **frontmatter version counter** reintroduces the per-file increment-and-merge machinery that ruled out a counter for IDs. A run MAY be unpinned (bare path), but `mdc lint` warns `unpinned-template` because an unpinned run can silently drift when the template changes.
 
 ## Degradation in plain renderers
 
