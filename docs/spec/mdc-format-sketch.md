@@ -190,7 +190,7 @@ L0 is not a compatibility mode; it is the format. In any GFM renderer with no MD
 - Pause points render as ordinary blockquotes; frontmatter renders as a metadata table on GitHub or is hidden.
 - Nothing is lost, nothing is broken, and GitHub's own progress counts remain sane because only real GFM checkboxes exist.
 
-One known hazard: `@assignee` tokens autolink (and can notify real users) when MDC content is pasted into GitHub issue or PR bodies — feature and footgun, tracked in [risks and open questions](../vision/risks-critiques-open-questions.md).
+One known hazard: `@assignee` tokens autolink (and can notify real users) when MDC content is pasted into a GitHub/GitLab issue, PR, or comment body — feature and footgun. An assignee is a file-local coordination handle with no notification semantics in MDC; the autolink is the paste target's behavior. Author with role/agent slugs and fence the paste when you need silence — see [assignees, mentions, and notifications](../adoption/mentions-and-notifications.md).
 
 ## Conformance levels (sketch)
 

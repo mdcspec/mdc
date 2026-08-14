@@ -25,5 +25,5 @@ Record results as a short note per renderer (renderer, date checked, pass/fail p
 
 ## Hazards
 
-- `@handle` tokens autolink in GitHub/GitLab issue and PR bodies and **can notify real accounts**. `file-view.mdc.md` uses the improbable handle `@mdc-nobody-example` and `paste-comment.md` contains no assignee tokens. Do not paste real MDC documents with real handles into public issue bodies during verification.
+- `@handle` tokens autolink in GitHub/GitLab issue and PR bodies and **can notify real accounts** (a rendered *file view* does not autolink them; issue/PR/comment bodies do). `file-view.mdc.md` uses the improbable handle `@mdc-nobody-example` and `paste-comment.md` contains no assignee tokens. Do not paste real MDC documents with real handles into public issue bodies during verification. Authoring guidance for handling this in real documents: [assignees, mentions, and notifications](../../docs/adoption/mentions-and-notifications.md).
 - Use a throwaway issue/MR for the paste fixture; checking boxes in a preview is harmless, but a saved comment edits real state.

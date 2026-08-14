@@ -26,6 +26,8 @@ mdc cancel <file> <id> --reason "…"  # skip a step, on the record (never just 
 mdc status <file>                  # progress, blocked, actionable at a glance
 ```
 
+The `--as <you>` handle is a **file-local coordination label** (use your agent/role slug, e.g. `agent-a`); MDC never resolves or notifies it. Note that if someone later pastes the raw file into a GitHub/GitLab issue or PR body, a handle matching a real account autolinks and may ping it — so prefer role/agent slugs over people's usernames.
+
 If a file is a **template** (`kind: template` in its frontmatter), do not check items on it — instantiate a run first: `mdc cut <template> --out <run-file> --title "…"`, then drive the run.
 
 The golden rule: **claim before you work, check after.** Each mutation rewrites exactly one line, so your edits and a teammate's (human or agent) merge cleanly under plain git, and the git history is the audit trail. Never hand-edit an item's `[ ]`/`[x]` or its metadata when a verb does it — the verbs keep the file canonical.
