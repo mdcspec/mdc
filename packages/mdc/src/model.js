@@ -26,6 +26,21 @@ function needsOf(item) {
   return Array.isArray(item.attrs.needs) ? item.attrs.needs : [];
 }
 
+/**
+ * A `needs=` target of the form `<path>#<id>` is a cross-file reference:
+ * reserved syntax, opaque to v0. A local id can never contain `#` (not a slug
+ * char), so `#` is the unambiguous discriminator. v0 preserves the target
+ * verbatim in `attrs.needs` but excludes it from dependency semantics — it is
+ * neither a blocking edge (v0 cannot know the external item's state) nor a
+ * dangling local id; resolution is a `.mddb`/tooling concern.
+ *
+ * @param {string} target A single `needs=` target.
+ * @returns {boolean}
+ */
+export function isCrossFileRef(target) {
+  return target.includes('#');
+}
+
 /** @param {MdcItem} item @returns {string} */
 function itemKey(item) {
   return item.id ?? `<line ${item.line}>`;
@@ -76,6 +91,7 @@ export function needsCycleMembers(doc) {
     while (stack.length > 0 && !found) {
       const current = /** @type {MdcItem} */ (stack.pop());
       for (const target of needsOf(current)) {
+        if (isCrossFileRef(target)) continue; // cross-file edges never form a local cycle
         const resolved = byId.get(target);
         if (!resolved) continue;
         if (resolved === item) {
@@ -116,6 +132,7 @@ export function computeDerived(doc) {
     /** @type {string[]} */
     const ownBlockedBy = [];
     for (const target of needsOf(item)) {
+      if (isCrossFileRef(target)) continue; // reserved, unresolved in v0 — never a blocking edge
       const resolved = byId.get(target);
       if (!resolved || !isTerminal(resolved)) ownBlockedBy.push(target);
     }

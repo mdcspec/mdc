@@ -1,0 +1,43 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": { "mdc": "0.1" },
+  "items": [
+    {
+      "id": "prep",
+      "text": "Prep locally",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "done": "2026-08-14" },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "ship",
+      "text": "Ship it",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": { "needs": ["prep", "lib/checks.mdc.md#security"] },
+      "section": null,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": true,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

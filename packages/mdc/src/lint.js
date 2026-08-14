@@ -3,7 +3,7 @@
  * Findings are ordered by line, then rule name ascending within a line (C-3).
  */
 import { RESERVED_KEYS } from './attributes.js';
-import { flattenItems, needsCycleMembers } from './model.js';
+import { flattenItems, needsCycleMembers, isCrossFileRef } from './model.js';
 import { serializeItemLine } from './fmt.js';
 
 /** @typedef {import('./parse.js').MdcDocument} MdcDocument */
@@ -12,13 +12,13 @@ import { serializeItemLine } from './fmt.js';
  * @typedef {'duplicate-id' | 'dangling-needs' | 'needs-cycle' | 'malformed-attributes'
  *         | 'multiple-ids' | 'multiple-assignees' | 'invalid-date' | 'invalid-repeat'
  *         | 'unknown-key' | 'non-canonical-state' | 'cancelled-without-reason'
- *         | 'unpinned-template'} LintRule
+ *         | 'unpinned-template' | 'unresolved-cross-file-ref'} LintRule
  */
 
 /**
  * @typedef {Object} LintFinding
  * @property {LintRule} rule
- * @property {'error' | 'warning'} severity `unknown-key`, `non-canonical-state`, `cancelled-without-reason`, and `unpinned-template` are warnings; the rest are errors.
+ * @property {'error' | 'warning'} severity `unknown-key`, `non-canonical-state`, `cancelled-without-reason`, `unpinned-template`, and `unresolved-cross-file-ref` are warnings; the rest are errors.
  * @property {number} line 1-based source line number.
  * @property {string | null} id Id of the item the finding is on, when it has one.
  * @property {string} message
@@ -98,7 +98,10 @@ export function lintDocument(doc, text) {
     }
     if (Array.isArray(attrs.needs)) {
       for (const target of attrs.needs) {
-        if (!knownIds.has(target)) {
+        if (isCrossFileRef(target)) {
+          add('unresolved-cross-file-ref', 'warning', line, id,
+            `needs references cross-file target "${target}"; v0 tooling does not resolve it`);
+        } else if (!knownIds.has(target)) {
           add('dangling-needs', 'error', line, id, `needs references unknown id "${target}"`);
         }
       }

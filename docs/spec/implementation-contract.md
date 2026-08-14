@@ -67,10 +67,10 @@ key     := slug              # reserved (closed set): due, done, repeat, needs, 
 value   := bare | quoted
 bare    := 1*(any char except whitespace, '"', '{', '}')
 quoted  := '"' *(any char except '"') '"'    # no escape sequences in v0
-slug    := 1*(a-z A-Z 0-9 - _ /)             # needs= values may also contain "," and template paths "." "@"
+slug    := 1*(a-z A-Z 0-9 - _ /)             # needs= values may also contain "," and cross-file refs "." "#"; template paths "." "@"
 ```
 
-- `needs=` value is a comma-separated ID list, no spaces (`needs=a,b`). Parsed to an array.
+- `needs=` value is a comma-separated ID list, no spaces (`needs=a,b`). Parsed to an array. A target containing `#` is a cross-file reference (`path#id`): opaque to v0 — preserved verbatim, excluded from blocked/dangling (never a blocking edge, never `dangling-needs`), lint warns `unresolved-cross-file-ref`.
 - Dates (`due`, `done`, `started`) are `YYYY-MM-DD`; violations → lint `invalid-date` (error).
 - `repeat=` must match `(done|due)\+<n><unit>` with unit `d|w|m`; else lint `invalid-repeat` (error). Data only — nothing executes recurrence.
 - A block that does not tokenize (unbalanced quote/brace, empty `{}`) is **not** treated as attributes: the braces stay part of the item text (L0 safety), the parser records a document-level warning, and lint reports `malformed-attributes` (error) at that line.
@@ -131,7 +131,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 ## Derived semantics (computed, never stored)
 
-- **blocked**: any `needs=` target is non-terminal, dangling (unknown ID → also lint error), or the item is a **non-terminal** member of a `needs` cycle (deadlock; cycle → lint `needs-cycle` error). A terminal cycle member — and a dependent whose only unmet target has become terminal — is not blocked.
+- **blocked**: any *local* `needs=` target is non-terminal, dangling (unknown ID → also lint error), or the item is a **non-terminal** member of a `needs` cycle (deadlock; cycle → lint `needs-cycle` error). A terminal cycle member — and a dependent whose only unmet target has become terminal — is not blocked. Cross-file targets (`path#id`) are excluded: never a blocking edge, so an item whose only unmet need is cross-file is actionable.
 - **gates**: for each `.gate` item G, every item *after* G in document order (by line) that is not `.optional` is gated (`gatedBy` includes G's id or `"<line N>"` if G has no id) until G is terminal. Gates apply document-wide regardless of nesting. A gate item itself is gated only by *earlier* gates.
 - **parent/child**: children inherit `blocked`/`gatedBy` from their parent (union), **except** an `.optional` item is exempt from gating entirely — its `gatedBy` is always empty, direct or inherited. A parent with at least one non-terminal child is not actionable — its children are the work.
 - **actionable**: `state == open` ∧ not blocked ∧ not gated ∧ all children terminal. `.doing` / `.waiting` are informational only and do not affect actionability.
@@ -139,7 +139,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 ## Lint rules (closed set for v0)
 
-`duplicate-id`, `dangling-needs`, `needs-cycle`, `malformed-attributes`, `multiple-ids`, `multiple-assignees`, `invalid-date`, `invalid-repeat`, `unknown-key` (warning), `non-canonical-state` (warning: `[X]`, `*`/`+` markers, non-canonical attribute order/spacing — i.e. "fmt would change this line"), `cancelled-without-reason` (warning), `unpinned-template` (warning: a `kind: run` whose `template:` value has no `@version` suffix — token after the final `@` — so it may drift when the template changes). Findings JSON: `[{ "rule", "severity": "error"|"warning", "line", "id": null|"…", "message" }]`.
+`duplicate-id`, `dangling-needs`, `needs-cycle`, `malformed-attributes`, `multiple-ids`, `multiple-assignees`, `invalid-date`, `invalid-repeat`, `unknown-key` (warning), `non-canonical-state` (warning: `[X]`, `*`/`+` markers, non-canonical attribute order/spacing — i.e. "fmt would change this line"), `cancelled-without-reason` (warning), `unpinned-template` (warning: a `kind: run` whose `template:` value has no `@version` suffix — token after the final `@` — so it may drift when the template changes), `unresolved-cross-file-ref` (warning: a `needs=` target of the form `path#id` — opaque to v0, not resolved). Findings JSON: `[{ "rule", "severity": "error"|"warning", "line", "id": null|"…", "message" }]`.
 
 ## CLI contract
 

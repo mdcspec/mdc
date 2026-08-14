@@ -1,0 +1,3 @@
+[
+  { "rule": "unresolved-cross-file-ref", "severity": "warning", "id": "ship", "message": "needs references cross-file target \"lib/checks.mdc.md#security\"; v0 tooling does not resolve it" }
+]
