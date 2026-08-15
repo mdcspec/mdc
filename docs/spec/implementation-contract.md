@@ -75,7 +75,7 @@ slug    := 1*(a-z A-Z 0-9 - _ /)             # needs= values may also contain ",
 - `repeat=` must match `(done|due)\+<n><unit>` with unit `d|w|m`; else lint `invalid-repeat` (error). Data only — nothing executes recurrence.
 - A block that does not tokenize (unbalanced quote/brace, empty `{}`) is **not** treated as attributes: the braces stay part of the item text (L0 safety), the parser records a document-level warning, and lint reports `malformed-attributes` (error) at that line.
 
-**Canonical serialization** (used by `fmt` and by every mutation when it rewrites a line): `{#id .class-a .class-b @assignee key=value}` — order: id, classes (alphabetical), assignee, then keys alphabetical; single spaces; values quoted only if they contain whitespace or `"` cannot appear (a value needing `"` is unrepresentable in v0); `needs` list comma-joined in source order (not sorted — order may be meaningful to readers).
+**Canonical serialization** (used by `fmt` and by every mutation when it rewrites a line): `{#id .class-a .class-b @assignee key=value}` — order: id, classes (alphabetical), assignee, then keys alphabetical; single spaces; a value is quoted iff it contains whitespace or a brace (`{`/`}`) or is empty, else bare (a value containing `"` is unrepresentable in v0); `needs` list comma-joined in source order (not sorted — order may be meaningful to readers).
 
 ## Item grammar and states
 
