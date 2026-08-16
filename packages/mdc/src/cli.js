@@ -15,7 +15,7 @@ import { readFrontmatter, assertMdcDocument } from './frontmatter.js';
 import { lintDocument } from './lint.js';
 import { statusReport, nextItems } from './model.js';
 import { formatDocument } from './fmt.js';
-import { check, uncheck, cancel, claim, addItem, withFileLock, atomicReplace } from './mutate.js';
+import { check, uncheck, cancel, claim, addItem, start, unstart, unclaim, withFileLock, atomicReplace } from './mutate.js';
 import { cutRun } from './cut.js';
 import path from 'node:path';
 
@@ -35,6 +35,9 @@ Mutations (real path required; refusals exit 2):
   uncheck <file> <id>                      done -> open, removes done=
   cancel <file> <id> --reason "..."        -> cancelled, wraps ~~, writes reason=
   claim <file> <id> --as <handle>          sets @handle iff no assignee set
+  unclaim <file> <id> [--from <handle>]    clears the assignee (--from guards the owner)
+  start <file> <id>                        marks in-progress (adds .doing)
+  unstart <file> <id>                      clears .doing
 
 Instantiate:
   cut <template> [--out <file>] [--title <t>] [--as-version <v>] [--date YYYY-MM-DD]
@@ -247,6 +250,24 @@ async function runClaim(ctx) {
   return 0;
 }
 
+/** @param {VerbContext} ctx @returns {Promise<number>} */
+async function runStart(ctx) {
+  await start(ctx.file, /** @type {string} */ (ctx.id));
+  return 0;
+}
+
+/** @param {VerbContext} ctx @returns {Promise<number>} */
+async function runUnstart(ctx) {
+  await unstart(ctx.file, /** @type {string} */ (ctx.id));
+  return 0;
+}
+
+/** @param {VerbContext} ctx @returns {Promise<number>} */
+async function runUnclaim(ctx) {
+  await unclaim(ctx.file, /** @type {string} */ (ctx.id), { from: /** @type {string | undefined} */ (ctx.flags.from) });
+  return 0;
+}
+
 /**
  * Local calendar day, `YYYY-MM-DD` — a run's `started` records the operator's
  * day, not UTC's.
@@ -328,6 +349,9 @@ const VERBS = {
   uncheck: { flags: {}, stdin: 'never', takesId: true, run: runUncheck },
   cancel: { flags: { reason: { type: 'string' } }, stdin: 'never', takesId: true, required: ['reason'], run: runCancel },
   claim: { flags: { as: { type: 'string' } }, stdin: 'never', takesId: true, required: ['as'], run: runClaim },
+  start: { flags: {}, stdin: 'never', takesId: true, run: runStart },
+  unstart: { flags: {}, stdin: 'never', takesId: true, run: runUnstart },
+  unclaim: { flags: { from: { type: 'string' } }, stdin: 'never', takesId: true, run: runUnclaim },
   cut: {
     flags: { out: { type: 'string' }, title: { type: 'string' }, 'as-version': { type: 'string' }, date: { type: 'string' } },
     stdin: 'never',

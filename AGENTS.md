@@ -32,6 +32,8 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 | `uncheck <file> <id>` | done → open |
 | `cancel <file> <id> --reason "…"` | → cancelled |
 | `claim <file> <id> --as <handle>` | set assignee iff none set (atomic) |
+| `unclaim <file> <id> [--from <handle>]` | release the assignee (`--from` guards the owner) |
+| `start <file> <id>` / `unstart <file> <id>` | mark / unmark in-progress (`.doing`) |
 | `cut <template> [--out …] [--title …] [--as-version …]` | instantiate a `kind: run` from a `kind: template` |
 
 **Exit codes are the API: `0` success · `1` usage/IO/parse/not-MDC · `2` domain refusal** (lint error, `fmt --check` drift, mutation precondition failed — e.g. claiming an already-claimed item). Branch on `2`. Machine output goes to stdout; errors and human text go to stderr.

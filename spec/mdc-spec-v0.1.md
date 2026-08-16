@@ -123,12 +123,16 @@ Every normative rule below cites at least one corpus case by directory name, wri
   | `uncheck` | state done | `[x]` → `[ ]`, remove `done=` `[mutate/uncheck]` |
   | `cancel` | not cancelled | `[x]`, wrap text in `~~`, set `reason="…"`, keep all other attributes `[mutate/cancel]` |
   | `claim` | no assignee set | set `@handle` `[mutate/claim]` |
+  | `unclaim` | assignee set (and `--from` matches, if given) | clear `@assignee` `[mutate/unclaim]` |
+  | `start` | state open, not already `.doing` | add `.doing` class `[mutate/start]` |
+  | `unstart` | item is `.doing` | remove `.doing` class `[mutate/unstart]` |
 
-- **MUT-2.** A failed precondition or unknown id is a domain refusal: exit `2`, file byte-untouched. `[mutate/claim-conflict]`
+- **MUT-2.** A failed precondition or unknown id is a domain refusal: exit `2`, file byte-untouched. `[mutate/claim-conflict]` `[mutate/start-terminal-refused]` `[mutate/unclaim-from-mismatch]`
 - **MUT-3.** Every mutation is line surgery: locate the target by ID, regenerate **only that line** in canonical form (section 9) with the mutation applied, copy every other byte through. On a canonical document every mutation is a one-line, byte-deterministic diff. `[mutate/check]`
 - **MUT-4.** When the target line is non-canonical, the mutation also canonicalizes that line — still exactly one changed line. `[mutate/check-noncanonical]`
 - **MUT-5.** Mutations (and `fmt`) take a `<file>.lock` lockfile opened `wx` (a lock older than 10 s is stale), write to `<file>.tmp-<pid>`, and atomically rename over the original. `claim`'s check-and-set inside the lock is the atomicity guarantee; concurrency is asserted by the implementation's claim-race test, which the corpus cannot express. (Informative; the observable byte behavior is normative via `[mutate/claim]` and `[mutate/claim-conflict]`.)
 - **MUT-6.** `add` *creates* rather than rewrites: it appends a new **open** item to the end of the document body in canonical form (section 9) and prints the item's id to stdout. `--id` sets the id and refuses (**exit 2**) on collision with an existing id; when omitted, the id is generated from the item text exactly as `fmt --assign-ids` does (ID-4). `needs` and `class` are comma-separated lists, `as` sets the assignee, `due` is a date. The append preserves the document's line ending and leaves every existing byte untouched — so `fmt` is a no-op and `lint` is clean immediately after. Empty text, a malformed `--id`/`--class` slug, or a bad `--due` is a usage error (**exit 1**). `[add/append-basic]` `[add/generated-id]`
+- **MUT-7.** `start`/`unstart` toggle the informational `.doing` class (STATE-6 — never affects `actionable`), distinguishing "actively working" from merely claimed; the model already carried `.doing`, these expose it. `unclaim` is the inverse of `claim`: `--from <handle>` guards against releasing another agent's claim (refuse **exit 2** on mismatch) and is omitted to release unconditionally. All three regenerate exactly the target line in canonical form, one-line diff. `[mutate/start]` `[mutate/unstart]` `[mutate/unclaim]`
 
 ## 11. Lint
 

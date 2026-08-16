@@ -256,6 +256,71 @@ export async function claim(file, id, options) {
 }
 
 /**
+ * `start`: mark an open item in-progress by adding the reserved `.doing` class.
+ * Informational only — `.doing` never affects `actionable` (STATE-6). Refuses a
+ * terminal item (you cannot start what is done/cancelled) or one already `.doing`.
+ *
+ * @param {string} file Path to the MDC document.
+ * @param {string} id Target item id.
+ * @returns {Promise<void>}
+ * @throws {PreconditionError} Unknown id, item not open, or already `.doing` — exit 2.
+ * @throws {Error} IO / parse / not-MDC — exit 1.
+ */
+export async function start(file, id) {
+  await mutateItem(file, id, (item) => {
+    if (item.state !== 'open') {
+      throw new PreconditionError(`cannot start '#${id}': item is ${item.state}, not open`);
+    }
+    if (item.classes.includes('doing')) {
+      throw new PreconditionError(`cannot start '#${id}': already in progress (.doing)`);
+    }
+    item.classes.push('doing');
+  });
+}
+
+/**
+ * `unstart`: clear the `.doing` class. Refuses an item that is not `.doing`.
+ *
+ * @param {string} file Path to the MDC document.
+ * @param {string} id Target item id.
+ * @returns {Promise<void>}
+ * @throws {PreconditionError} Unknown id or item not `.doing` — exit 2.
+ * @throws {Error} IO / parse / not-MDC — exit 1.
+ */
+export async function unstart(file, id) {
+  await mutateItem(file, id, (item) => {
+    if (!item.classes.includes('doing')) {
+      throw new PreconditionError(`cannot unstart '#${id}': not in progress (no .doing)`);
+    }
+    item.classes = item.classes.filter((cls) => cls !== 'doing');
+  });
+}
+
+/**
+ * `unclaim`: release an item's assignee (the inverse of `claim`). With `from`
+ * set, refuses unless it matches the current owner — a guard against releasing
+ * another agent's claim; omitted, it releases whoever holds it.
+ *
+ * @param {string} file Path to the MDC document.
+ * @param {string} id Target item id.
+ * @param {{ from?: string }} [options] Expected current owner; refuse on mismatch.
+ * @returns {Promise<void>}
+ * @throws {PreconditionError} Unknown id, no assignee set, or `from` mismatch — exit 2.
+ * @throws {Error} IO / parse / not-MDC — exit 1.
+ */
+export async function unclaim(file, id, options = {}) {
+  await mutateItem(file, id, (item) => {
+    if (item.assignee === null) {
+      throw new PreconditionError(`cannot unclaim '#${id}': no assignee set`);
+    }
+    if (options.from !== undefined && item.assignee !== options.from) {
+      throw new PreconditionError(`cannot unclaim '#${id}': claimed by @${item.assignee}, not @${options.from}`);
+    }
+    item.assignee = null;
+  });
+}
+
+/**
  * `add`: append a new **open** item to the end of the document body, serialized
  * in canonical form, and return its id. Unlike the other mutations this creates
  * a line rather than rewriting one — every existing byte is copied through and
