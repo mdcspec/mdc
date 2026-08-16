@@ -27,6 +27,7 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 | `status <file> [--json]` | totals, progress, blocked/actionable/doing |
 | `next <file> [--json]` | actionable items in document order |
 | `fmt <file> [--check] [--assign-ids]` | canonical form in place; `--check` never writes |
+| `add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]` | append a new open item; prints its id |
 | `check <file> <id> [--date YYYY-MM-DD]` | open → done |
 | `uncheck <file> <id>` | done → open |
 | `cancel <file> <id> --reason "…"` | → cancelled |

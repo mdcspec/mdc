@@ -20,11 +20,14 @@ Exit codes are the contract: **`0` success · `1` error/not-MDC · `2` refusal**
 
 ```
 mdc next  <file> --json            # actionable item ids, in order — pick from here
+mdc add   <file> "…" --needs a,b   # record newly-discovered work; prints the new id
 mdc claim <file> <id> --as <you>   # take an item; exit 2 => someone else has it, pick another
 mdc check <file> <id>              # mark done after the work; one-line diff
 mdc cancel <file> <id> --reason "…"  # skip a step, on the record (never just delete it)
 mdc status <file>                  # progress, blocked, actionable at a glance
 ```
+
+When you discover work that is not yet on the list, `add` it rather than hand-editing the file — that keeps the line canonical and mints an id you can immediately `claim`/`check`. Pass `--id <slug>` to choose the id yourself, or let it generate one from the text.
 
 The `--as <you>` handle is a **file-local coordination label** (use your agent/role slug, e.g. `agent-a`); MDC never resolves or notifies it. Note that if someone later pastes the raw file into a GitHub/GitLab issue or PR body, a handle matching a real account autolinks and may ping it — so prefer role/agent slugs over people's usernames.
 

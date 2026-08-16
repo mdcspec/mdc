@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import process from 'node:process';
 import { parseDocument } from './parse.js';
 import { flattenItems } from './model.js';
-import { serializeItemLine } from './fmt.js';
+import { serializeItemLine, slugify } from './fmt.js';
 
 /** A lock older than this may be treated as stale and replaced. */
 export const LOCK_STALE_MS = 10_000;
@@ -252,6 +252,83 @@ export async function claim(file, id, options) {
       throw new PreconditionError(`cannot claim '#${id}': already claimed by @${item.assignee}`);
     }
     item.assignee = options.as;
+  });
+}
+
+/**
+ * `add`: append a new **open** item to the end of the document body, serialized
+ * in canonical form, and return its id. Unlike the other mutations this creates
+ * a line rather than rewriting one — every existing byte is copied through and
+ * exactly one line (plus a trailing newline if needed) is appended, so the diff
+ * stays minimal and `fmt` is a no-op afterward. Placement is end-of-document in
+ * v0; section/relative placement is a planned follow-up.
+ *
+ * @param {string} file Path to the MDC document (never stdin).
+ * @param {string} text Item text; empty (after trim) is a usage error.
+ * @param {{ id?: string, needs?: string, as?: string, due?: string, classes?: string }} [options]
+ *   `id` sets the id explicitly (else generated from the text); `needs`/`classes`
+ *   are comma-separated; `as` sets the assignee; `due` is `YYYY-MM-DD`.
+ * @returns {Promise<string>} The new item's id.
+ * @throws {PreconditionError} `--id` collides with an existing id — exit 2.
+ * @throws {Error} Empty text / bad slug / bad date / IO / not-MDC — exit 1.
+ */
+export async function addItem(file, text, options = {}) {
+  const trimmed = text.trim();
+  if (trimmed === '') throw new Error('add: item text cannot be empty');
+  const wantId = options.id;
+  const assignee = options.as;
+  const due = options.due;
+  if (wantId !== undefined && !HANDLE_RE.test(wantId)) {
+    throw new Error(`add: --id must be a slug (a-z A-Z 0-9 - _ /), got '${wantId}'`);
+  }
+  if (assignee !== undefined && !HANDLE_RE.test(assignee)) {
+    throw new Error(`add: --as must be a slug (a-z A-Z 0-9 - _ /), got '${assignee}'`);
+  }
+  if (due !== undefined && !DATE_RE.test(due)) {
+    throw new Error(`add: --due must be YYYY-MM-DD, got '${due}'`);
+  }
+  const classList = (options.classes ?? '').split(',').map((c) => c.trim()).filter((c) => c !== '');
+  for (const cls of classList) {
+    if (!HANDLE_RE.test(cls)) throw new Error(`add: --class entries must be slugs, got '${cls}'`);
+  }
+  const needsList = (options.needs ?? '').split(',').map((n) => n.trim()).filter((n) => n !== '');
+
+  const target = fs.realpathSync(file);
+  return await withFileLock(target, (ownsLock) => {
+    const src = fs.readFileSync(target, 'utf8');
+    const doc = parseDocument(src); // not-MDC / unsupported version throws → exit 1
+    /** @type {Set<string>} */
+    const existing = new Set();
+    for (const { item } of flattenItems(doc)) {
+      if (item.id !== null) existing.add(item.id);
+    }
+    let id = wantId;
+    if (id !== undefined) {
+      if (existing.has(id)) throw new PreconditionError(`cannot add: id '#${id}' already exists`);
+    } else {
+      const base = slugify(trimmed) || 'item';
+      id = base;
+      for (let n = 2; existing.has(id); n++) id = `${base}-${n}`;
+    }
+    /** @type {Record<string, string | string[]>} */
+    const attrs = {};
+    if (needsList.length > 0) attrs.needs = needsList;
+    if (due !== undefined) attrs.due = due;
+    const item = { id, text: trimmed, state: 'open', assignee: assignee ?? null, classes: classList, attrs };
+    const lineText = serializeItemLine(/** @type {import('./parse.js').MdcItem} */ (item), 0);
+
+    // Append on its own line, preserving the document's line ending. A file that
+    // already ends in a newline needs no separator; one that does not gets one.
+    const nl = src.includes('\r\n') ? '\r\n' : '\n';
+    let out = src;
+    if (out !== '' && !out.endsWith('\n')) out += nl;
+    out += lineText + nl;
+
+    if (!ownsLock()) {
+      throw new Error('add: lock ownership lost before write; aborted to avoid clobbering a concurrent edit');
+    }
+    atomicReplace(target, out);
+    return id;
   });
 }
 

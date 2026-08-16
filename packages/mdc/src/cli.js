@@ -15,7 +15,7 @@ import { readFrontmatter, assertMdcDocument } from './frontmatter.js';
 import { lintDocument } from './lint.js';
 import { statusReport, nextItems } from './model.js';
 import { formatDocument } from './fmt.js';
-import { check, uncheck, cancel, claim, withFileLock, atomicReplace } from './mutate.js';
+import { check, uncheck, cancel, claim, addItem, withFileLock, atomicReplace } from './mutate.js';
 import { cutRun } from './cut.js';
 import path from 'node:path';
 
@@ -29,6 +29,8 @@ Read verbs ("-" reads stdin):
   fmt <file> [--check] [--assign-ids]      canonical form in place; --check never writes
 
 Mutations (real path required; refusals exit 2):
+  add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]
+                                           append a new open item; prints its id
   check <file> <id> [--date YYYY-MM-DD]    open -> done, stamps done=
   uncheck <file> <id>                      done -> open, removes done=
   cancel <file> <id> --reason "..."        -> cancelled, wraps ~~, writes reason=
@@ -45,6 +47,7 @@ Exit codes: 0 success · 1 usage/IO/parse/not-MDC · 2 domain refusal
  * @typedef {Object} VerbContext
  * @property {string} file Target path, or "-" for stdin on read verbs.
  * @property {string | undefined} id Target item id (mutation verbs only).
+ * @property {string | undefined} text Free-text positional (`add` only).
  * @property {Record<string, string | boolean | undefined>} flags
  */
 
@@ -202,6 +205,24 @@ async function runFmt(ctx) {
   });
 }
 
+/**
+ * `add <file> "<text>" [flags]`: append a new open item and print its id to
+ * stdout so the agent can immediately claim/check/reference it.
+ * @param {VerbContext} ctx
+ * @returns {Promise<number>}
+ */
+async function runAdd(ctx) {
+  const id = await addItem(ctx.file, /** @type {string} */ (ctx.text), {
+    id: /** @type {string | undefined} */ (ctx.flags.id),
+    needs: /** @type {string | undefined} */ (ctx.flags.needs),
+    as: /** @type {string | undefined} */ (ctx.flags.as),
+    due: /** @type {string | undefined} */ (ctx.flags.due),
+    classes: /** @type {string | undefined} */ (ctx.flags.class),
+  });
+  process.stdout.write(`#${id}\n`);
+  return 0;
+}
+
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runCheck(ctx) {
   await check(ctx.file, /** @type {string} */ (ctx.id), { date: /** @type {string | undefined} */ (ctx.flags.date) });
@@ -280,6 +301,7 @@ async function runCut(ctx) {
  *   flags: Record<string, { type: 'boolean' | 'string' }>,
  *   stdin: 'always' | 'check-flag' | 'never',
  *   takesId?: boolean,
+ *   takesText?: boolean,
  *   required?: string[],
  *   run: (ctx: VerbContext) => Promise<number>,
  * }>}
@@ -290,6 +312,18 @@ const VERBS = {
   status: { flags: { json: { type: 'boolean' } }, stdin: 'always', run: runStatus },
   next: { flags: { json: { type: 'boolean' } }, stdin: 'always', run: runNext },
   fmt: { flags: { check: { type: 'boolean' }, 'assign-ids': { type: 'boolean' } }, stdin: 'check-flag', run: runFmt },
+  add: {
+    flags: {
+      id: { type: 'string' },
+      needs: { type: 'string' },
+      as: { type: 'string' },
+      due: { type: 'string' },
+      class: { type: 'string' },
+    },
+    stdin: 'never',
+    takesText: true,
+    run: runAdd,
+  },
   check: { flags: { date: { type: 'string' } }, stdin: 'never', takesId: true, run: runCheck },
   uncheck: { flags: {}, stdin: 'never', takesId: true, run: runUncheck },
   cancel: { flags: { reason: { type: 'string' } }, stdin: 'never', takesId: true, required: ['reason'], run: runCancel },
@@ -356,6 +390,8 @@ async function dispatch(argv) {
   if (!file) throw usageError(`${verb}: missing <file>`);
   const id = spec.takesId ? positionals.shift() : undefined;
   if (spec.takesId && !id) throw usageError(`${verb}: missing <id>`);
+  const text = spec.takesText ? positionals.shift() : undefined;
+  if (spec.takesText && text === undefined) throw usageError(`${verb}: missing "<text>"`);
   if (positionals.length > 0) throw usageError(`${verb}: unexpected argument '${positionals[0]}'`);
 
   if (file === '-') {
@@ -366,7 +402,7 @@ async function dispatch(argv) {
     if (parsed.values[flag] === undefined) throw usageError(`${verb}: --${flag} is required`);
   }
 
-  return await spec.run({ file, id, flags: parsed.values });
+  return await spec.run({ file, id, text, flags: parsed.values });
 }
 
 /**
