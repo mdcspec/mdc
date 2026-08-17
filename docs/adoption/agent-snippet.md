@@ -20,6 +20,8 @@ Exit codes are the contract: **`0` success · `1` error/not-MDC · `2` refusal**
 
 ```
 mdc next  <file> --json            # actionable item ids, in order — pick from here
+mdc next  <file> --as <you>        # …just the ones you can act on (yours + unclaimed)
+mdc report <file>                  # standup: who's doing what, what's ready, what's blocked
 mdc add   <file> "…" --needs a,b   # record newly-discovered work; prints the new id
 mdc claim <file> <id> --as <you>   # take an item; exit 2 => someone else has it, pick another
 mdc start <file> <id>              # signal you're actively working on it (adds .doing)

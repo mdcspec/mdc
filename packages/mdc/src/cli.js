@@ -13,7 +13,7 @@ import { pathToFileURL } from 'node:url';
 import { parseDocument } from './parse.js';
 import { readFrontmatter, assertMdcDocument } from './frontmatter.js';
 import { lintDocument } from './lint.js';
-import { statusReport, nextItems } from './model.js';
+import { statusReport, nextItems, reportData } from './model.js';
 import { formatDocument } from './fmt.js';
 import { check, uncheck, cancel, claim, addItem, start, unstart, unclaim, withFileLock, atomicReplace } from './mutate.js';
 import { cutRun } from './cut.js';
@@ -25,7 +25,8 @@ Read verbs ("-" reads stdin):
   parse <file> --json                      L1 document model to stdout
   lint <file> [--json] [--strict]          findings; exit 2 on errors
   status <file> [--json]                   totals, progress, blocked/actionable
-  next <file> [--json]                     ordered actionable items
+  next <file> [--json] [--as <handle>]     ordered actionable items (--as: for one agent)
+  report <file> [--json]                   standup: done/in-progress/ready/blocked, per-assignee
   fmt <file> [--check] [--assign-ids]      canonical form in place; --check never writes
 
 Mutations (real path required; refusals exit 2):
@@ -153,6 +154,47 @@ async function runStatus(ctx) {
 }
 
 /**
+ * `report [--json]`: a standup view — done, in-progress, ready, blocked (with
+ * cause), cancelled, and per-assignee load. Pure read. Exit 0; 1 on error.
+ * @param {VerbContext} ctx
+ * @returns {Promise<number>}
+ */
+async function runReport(ctx) {
+  const doc = parseDocument(await readInput(ctx.file));
+  const r = reportData(doc);
+  if (ctx.flags.json === true) {
+    emitJson(r);
+    return 0;
+  }
+  const who = (/** @type {string | null} */ a) => (a !== null ? ` @${a}` : '');
+  const lines = [`Report: ${r.title ?? ctx.file} — ${r.progress.done}/${r.progress.total} done`];
+  /** @param {string} label @param {import('./model.js').ReportEntry[]} entries @param {(e: import('./model.js').ReportEntry) => string} fmt */
+  const section = (label, entries, fmt) => {
+    if (entries.length === 0) return;
+    lines.push(`${label} (${entries.length}):`);
+    for (const e of entries) lines.push(`  #${e.id}${who(e.assignee)} — ${e.text}${fmt(e)}`);
+  };
+  section('In progress', r.inProgress, () => '');
+  section('Ready', r.ready, () => '');
+  section('Blocked', r.blocked, (e) => {
+    const cause = e.blockedBy?.length
+      ? ` [needs: ${e.blockedBy.join(', ')}]`
+      : e.gatedBy?.length
+        ? ` [gated by: ${e.gatedBy.join(', ')}]`
+        : ' [children pending]';
+    return cause;
+  });
+  section('Done', r.done, (e) => (e.done ? ` (${e.done})` : ''));
+  section('Cancelled', r.cancelled, (e) => (e.reason ? ` (${e.reason})` : ''));
+  if (r.byAssignee.length > 0) {
+    lines.push('By assignee:');
+    for (const a of r.byAssignee) lines.push(`  @${a.assignee}: ${a.done} done, ${a.doing} doing, ${a.open} open`);
+  }
+  process.stdout.write(`${lines.join('\n')}\n`);
+  return 0;
+}
+
+/**
  * `next [--json]`: ordered actionable items — full array as JSON, first item
  * with the rest summarized in human form. Exit 0 even if empty; 1 on error.
  * @param {VerbContext} ctx
@@ -160,7 +202,13 @@ async function runStatus(ctx) {
  */
 async function runNext(ctx) {
   const doc = parseDocument(await readInput(ctx.file));
-  const items = nextItems(doc);
+  let items = nextItems(doc);
+  const as = /** @type {string | undefined} */ (ctx.flags.as);
+  if (as !== undefined) {
+    // "what can <as> do next": their own claimed actionable items plus the
+    // unclaimed ones they could pick up. Items owned by someone else are theirs.
+    items = items.filter((item) => item.assignee === as || item.assignee === null);
+  }
   if (ctx.flags.json === true) {
     emitJson(items);
     return 0;
@@ -331,7 +379,8 @@ const VERBS = {
   parse: { flags: { json: { type: 'boolean' } }, stdin: 'always', run: runParse },
   lint: { flags: { json: { type: 'boolean' }, strict: { type: 'boolean' } }, stdin: 'always', run: runLint },
   status: { flags: { json: { type: 'boolean' } }, stdin: 'always', run: runStatus },
-  next: { flags: { json: { type: 'boolean' } }, stdin: 'always', run: runNext },
+  next: { flags: { json: { type: 'boolean' }, as: { type: 'string' } }, stdin: 'always', run: runNext },
+  report: { flags: { json: { type: 'boolean' } }, stdin: 'always', run: runReport },
   fmt: { flags: { check: { type: 'boolean' }, 'assign-ids': { type: 'boolean' } }, stdin: 'check-flag', run: runFmt },
   add: {
     flags: {

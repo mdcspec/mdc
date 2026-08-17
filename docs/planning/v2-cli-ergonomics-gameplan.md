@@ -25,7 +25,7 @@ Every new verb MUST hold the invariants that make the existing ones trustworthy:
 
 Ordered by leverage. `add` is first because it unblocks the others (you cannot reassign, annotate, or start a task the CLI could not create).
 
-**Status:** `add`, `start`/`unstart`, and `unclaim` have shipped (spec MUT-6/MUT-7, corpus, tests). Remaining: `note` (needs its own encoding design pass) and the read filters (`next --as`, `report`).
+**Status:** `add`, `start`/`unstart`, `unclaim`, and the read filters (`next --as`, `report`) have shipped (spec MUT-6/MUT-7, corpus, tests). Remaining: `note` — held for its own encoding design pass.
 
 ### 1. `add` — create a discovered item  *(building now)*
 

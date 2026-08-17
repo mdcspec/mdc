@@ -122,12 +122,57 @@ test('next --json exits 0 with an empty array when nothing is actionable', async
   assert.deepStrictEqual(JSON.parse(r.stdout), []);
 });
 
+const BOARD_DOC = `---
+mdc: "0.1"
+title: Board
+---
+
+- [x] Design {#design @ana done=2026-08-14}
+- [ ] Build {#build .doing @bob needs=design}
+- [ ] Docs {#docs @ana needs=design}
+- [ ] Frontend {#fe needs=design}
+- [ ] Ship {#ship .gate needs=build,docs,fe}
+- [x] ~~Shim~~ {#shim reason="not needed"}
+`;
+
+test('next --as filters to an agent\'s claimed plus unclaimed actionable items', async () => {
+  const ana = await runCli(['next', '-', '--as', 'ana', '--json'], { input: BOARD_DOC });
+  assert.strictEqual(ana.code, 0, ana.stderr);
+  assert.deepStrictEqual(JSON.parse(ana.stdout).map(idOf), ['docs', 'fe'], 'ana sees her #docs and the unclaimed #fe, not bob\'s #build');
+  const bob = await runCli(['next', '-', '--as', 'bob', '--json'], { input: BOARD_DOC });
+  assert.deepStrictEqual(JSON.parse(bob.stdout).map(idOf), ['build', 'fe'], 'bob sees his #build and the unclaimed #fe');
+});
+
+test('report --json sorts every item into exactly one bucket, with blocked cause and per-assignee load', async () => {
+  const r = await runCli(['report', '-', '--json'], { input: BOARD_DOC });
+  assert.strictEqual(r.code, 0, r.stderr);
+  const rep = JSON.parse(r.stdout);
+  assert.deepStrictEqual(rep.done.map(idOf), ['design']);
+  assert.deepStrictEqual(rep.inProgress.map(idOf), ['build']);
+  assert.deepStrictEqual(rep.ready.map(idOf), ['docs', 'fe']);
+  assert.deepStrictEqual(rep.blocked.map(idOf), ['ship']);
+  assert.deepStrictEqual(rep.blocked[0].blockedBy, ['build', 'docs', 'fe'], 'blocked entries carry their cause');
+  assert.deepStrictEqual(rep.cancelled.map(idOf), ['shim']);
+  assert.deepStrictEqual(rep.progress, { done: 1, total: 5 }, 'cancelled excluded from progress');
+  const ana = rep.byAssignee.find((/** @type {{assignee:string}} */ a) => a.assignee === 'ana');
+  assert.deepStrictEqual(ana, { assignee: 'ana', done: 1, doing: 0, open: 1 });
+});
+
+test('report human output is non-empty and names the buckets', async () => {
+  const r = await runCli(['report', '-'], { input: BOARD_DOC });
+  assert.strictEqual(r.code, 0, r.stderr);
+  assert.match(r.stdout, /In progress \(1\)/);
+  assert.match(r.stdout, /Blocked \(1\)/);
+  assert.match(r.stdout, /needs: build, docs, fe/, 'blocked cause is shown');
+});
+
 test('every read verb refuses a non-MDC document with exit 1', async () => {
   const invocations = [
     ['parse', '-', '--json'],
     ['lint', '-'],
     ['status', '-'],
     ['next', '-'],
+    ['report', '-'],
     ['fmt', '-', '--check'],
   ];
   for (const argv of invocations) {

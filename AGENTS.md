@@ -25,7 +25,8 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 | `parse <file> --json` | L1 model to stdout (`-` reads stdin) |
 | `lint <file> [--json] [--strict]` | structural findings |
 | `status <file> [--json]` | totals, progress, blocked/actionable/doing |
-| `next <file> [--json]` | actionable items in document order |
+| `next <file> [--json] [--as <handle>]` | actionable items in document order; `--as` filters to one agent's own + unclaimed |
+| `report <file> [--json]` | standup view: done / in-progress / ready / blocked-with-cause / cancelled, per-assignee load |
 | `fmt <file> [--check] [--assign-ids]` | canonical form in place; `--check` never writes |
 | `add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]` | append a new open item; prints its id |
 | `check <file> <id> [--date YYYY-MM-DD]` | open → done |

@@ -150,7 +150,8 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `parse --json` | L1 model to stdout | 0; 1 on error/not-MDC |
 | `lint [--json]` | findings report | 0 clean (warnings allowed unless `--strict`); 2 findings with severity error; 1 error |
 | `status [--json]` | totals, progress (cancelled excluded), blocked/actionable/doing lists, per-section rollup | 0; 1 |
-| `next [--json]` | ordered actionable items | 0 (even if empty); 1 |
+| `next [--json] [--as <handle>]` | ordered actionable items; `--as` keeps only that handle's own + unclaimed items | 0 (even if empty); 1 |
+| `report [--json]` | standup buckets (done / in-progress / ready / blocked-with-cause / cancelled) + per-assignee load | 0; 1 |
 | `fmt [--check] [--assign-ids]` | canonical form in place; `--check` exits without writing | 0 unchanged/success; 2 `--check` found drift; 1 error |
 | `add "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]` | append a new open item in canonical form; prints its id | 0; 2 `--id` collides with an existing id; 1 empty text / bad slug / bad date / not-MDC |
 | `check <id> [--date YYYY-MM-DD]` | open → done, writes `done=` stamp (default: today) | 0; 2 unknown id or already terminal; 1 |

@@ -197,6 +197,91 @@ export function nextItems(doc) {
 }
 
 /**
+ * @typedef {Object} ReportEntry
+ * @property {string} id Item id, or `"<line N>"` when id-less.
+ * @property {string} text
+ * @property {string | null} assignee
+ * @property {string[]} [blockedBy] Present in the `blocked` bucket when needs/cycle block it.
+ * @property {string[]} [gatedBy] Present in the `blocked` bucket when a `.gate` blocks it.
+ * @property {boolean} [pendingChildren] In `blocked` with no needs/gate cause: waiting on children.
+ * @property {string | null} [done] `done=` date, in the `done` bucket.
+ * @property {string | null} [reason] `reason=`, in the `cancelled` bucket.
+ */
+
+/**
+ * Standup-shaped view backing `mdc report`: every item sorted into exactly one
+ * bucket — done, in-progress (`.doing`), ready (actionable), blocked (open but
+ * not ready, with its cause), or cancelled — plus a per-assignee load rollup.
+ * Pure read over the computed model; writes nothing.
+ *
+ * @param {MdcDocument} doc Document with `computed` populated.
+ * @returns {{
+ *   title: string | null,
+ *   progress: { done: number, total: number },
+ *   done: ReportEntry[], inProgress: ReportEntry[], ready: ReportEntry[],
+ *   blocked: ReportEntry[], cancelled: ReportEntry[],
+ *   byAssignee: Array<{ assignee: string, done: number, doing: number, open: number }>,
+ * }}
+ */
+export function reportData(doc) {
+  /** @type {ReportEntry[]} */
+  const done = [];
+  /** @type {ReportEntry[]} */
+  const inProgress = [];
+  /** @type {ReportEntry[]} */
+  const ready = [];
+  /** @type {ReportEntry[]} */
+  const blocked = [];
+  /** @type {ReportEntry[]} */
+  const cancelled = [];
+  /** @type {Map<string, { assignee: string, done: number, doing: number, open: number }>} */
+  const load = new Map();
+  const bump = (/** @type {string | null} */ who, /** @type {'done'|'doing'|'open'} */ key) => {
+    if (who === null) return;
+    if (!load.has(who)) load.set(who, { assignee: who, done: 0, doing: 0, open: 0 });
+    /** @type {any} */ (load.get(who))[key]++;
+  };
+
+  for (const { item } of flattenItems(doc)) {
+    const base = { id: itemKey(item), text: item.text, assignee: item.assignee };
+    if (item.state === 'cancelled') {
+      const reason = item.attrs.reason;
+      cancelled.push({ ...base, reason: typeof reason === 'string' ? reason : null });
+    } else if (item.state === 'done') {
+      const d = item.attrs.done;
+      done.push({ ...base, done: typeof d === 'string' ? d : null });
+      bump(item.assignee, 'done');
+    } else if (item.classes.includes('doing')) {
+      inProgress.push(base);
+      bump(item.assignee, 'doing');
+    } else if (item.computed.actionable) {
+      ready.push(base);
+      bump(item.assignee, 'open');
+    } else {
+      const { blockedBy, gatedBy } = item.computed;
+      /** @type {ReportEntry} */
+      const entry = { ...base };
+      if (blockedBy.length > 0) entry.blockedBy = blockedBy;
+      if (gatedBy.length > 0) entry.gatedBy = gatedBy;
+      if (blockedBy.length === 0 && gatedBy.length === 0) entry.pendingChildren = true;
+      blocked.push(entry);
+      bump(item.assignee, 'open');
+    }
+  }
+
+  return {
+    title: doc.title ?? null,
+    progress: { done: done.length, total: done.length + inProgress.length + ready.length + blocked.length },
+    done,
+    inProgress,
+    ready,
+    blocked,
+    cancelled,
+    byAssignee: [...load.values()],
+  };
+}
+
+/**
  * Aggregate report backing `mdc status`.
  *
  * @param {MdcDocument} doc Document with `computed` populated.
