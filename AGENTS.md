@@ -33,6 +33,7 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 | `uncheck <file> <id>` | done → open |
 | `cancel <file> <id> --reason "…"` | → cancelled |
 | `claim <file> <id> --as <handle>` | set assignee iff none set (atomic) |
+| `note <file> <id> "<text>" [--as <handle>]` | attach a dated note (nested prose; invisible to the task model) |
 | `unclaim <file> <id> [--from <handle>]` | release the assignee (`--from` guards the owner) |
 | `start <file> <id>` / `unstart <file> <id>` | mark / unmark in-progress (`.doing`) |
 | `cut <template> [--out …] [--title …] [--as-version …]` | instantiate a `kind: run` from a `kind: template` |

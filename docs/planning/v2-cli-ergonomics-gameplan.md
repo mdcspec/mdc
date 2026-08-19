@@ -25,7 +25,11 @@ Every new verb MUST hold the invariants that make the existing ones trustworthy:
 
 Ordered by leverage. `add` is first because it unblocks the others (you cannot reassign, annotate, or start a task the CLI could not create).
 
-**Status:** `add`, `start`/`unstart`, `unclaim`, and the read filters (`next --as`, `report`) have shipped (spec MUT-6/MUT-7, corpus, tests). Remaining: `note` — held for its own encoding design pass.
+**Status: the V2 verb set is complete.** `add`, `start`/`unstart`, `unclaim`, `note`, and the read filters (`next --as`, `report`) have all shipped (spec MUT-6/MUT-7/MUT-8, `add/`/`note/` corpus categories, tests).
+
+`note` (MUT-8) shipped as the **nested prose bullet** encoding (`  - note @who date: msg`), chosen for the merge story. Two honest findings from building it:
+- **The clean-merge claim needed correcting.** Notes on *different* items never conflict, and each note is line-granular in diffs/blame — but two agents noting the *same* item both append at the same anchor, so git *does* conflict there. The conflict resolves trivially (keep both lines), and it is strictly better than a single-line log (intra-line contention on every note) — but it is not conflict-free. The spec (MUT-8) and code comments state this accurately.
+- **Notes are write-but-not-model-queried by design.** Per the chosen encoding, a note is prose (ITEM-5) — invisible to the L1 model, so `parse`/`report` do not surface it; agents read notes in-file (they render right under the item). Structured note queries are a deliberate `.mddb` concern. If in-file reading proves insufficient for agent-to-agent consumption, a read-only note-surfacing pass (attaching notes to items in `parse --json` without changing derived semantics) is the follow-up — but it is a model change and gets its own decision.
 
 ### 1. `add` — create a discovered item  *(building now)*
 

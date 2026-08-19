@@ -158,6 +158,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `uncheck <id>` | done → open, removes `done=` | 0; 2 unknown id or not done; 1 |
 | `cancel <id> --reason "…"` | any non-cancelled → cancelled, wraps `~~`, writes `reason=` | 0; 2 unknown id or already cancelled; 1 |
 | `claim <id> --as <handle>` | sets `@handle` **iff no assignee set** | 0; 2 unknown id or assignee already set; 1 |
+| `note <id> "<text>" [--as <handle>] [--date <date>]` | append a nested prose note `  - note @who date: text` under the item; invisible to the model | 0; 2 unknown id; 1 empty/multiline text or bad flag |
 | `unclaim <id> [--from <handle>]` | clears `@assignee`; `--from` refuses on owner mismatch | 0; 2 unknown id, no assignee, or `--from` mismatch; 1 |
 | `start <id>` / `unstart <id>` | add / remove the `.doing` class (informational; STATE-6) | 0; 2 unknown id, not open / already `.doing` (start), or not `.doing` (unstart); 1 |
 | `cut <template> [--out <file>] [--title …] [--as-version <v>] [--date …]` | instantiate a run from a template; to `--out` or stdout | 0; 2 `--out` exists (no overwrite); 1 not-MDC / not a template |

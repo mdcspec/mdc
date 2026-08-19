@@ -15,7 +15,7 @@ import { readFrontmatter, assertMdcDocument } from './frontmatter.js';
 import { lintDocument } from './lint.js';
 import { statusReport, nextItems, reportData } from './model.js';
 import { formatDocument } from './fmt.js';
-import { check, uncheck, cancel, claim, addItem, start, unstart, unclaim, withFileLock, atomicReplace } from './mutate.js';
+import { check, uncheck, cancel, claim, addItem, start, unstart, unclaim, note, withFileLock, atomicReplace } from './mutate.js';
 import { cutRun } from './cut.js';
 import path from 'node:path';
 
@@ -36,6 +36,7 @@ Mutations (real path required; refusals exit 2):
   uncheck <file> <id>                      done -> open, removes done=
   cancel <file> <id> --reason "..."        -> cancelled, wraps ~~, writes reason=
   claim <file> <id> --as <handle>          sets @handle iff no assignee set
+  note <file> <id> "<text>" [--as <handle>]  attach a dated note (nested prose bullet)
   unclaim <file> <id> [--from <handle>]    clears the assignee (--from guards the owner)
   start <file> <id>                        marks in-progress (adds .doing)
   unstart <file> <id>                      clears .doing
@@ -299,6 +300,15 @@ async function runClaim(ctx) {
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
+async function runNote(ctx) {
+  await note(ctx.file, /** @type {string} */ (ctx.id), /** @type {string} */ (ctx.text), {
+    as: /** @type {string | undefined} */ (ctx.flags.as),
+    date: /** @type {string | undefined} */ (ctx.flags.date),
+  });
+  return 0;
+}
+
+/** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runStart(ctx) {
   await start(ctx.file, /** @type {string} */ (ctx.id));
   return 0;
@@ -398,6 +408,7 @@ const VERBS = {
   uncheck: { flags: {}, stdin: 'never', takesId: true, run: runUncheck },
   cancel: { flags: { reason: { type: 'string' } }, stdin: 'never', takesId: true, required: ['reason'], run: runCancel },
   claim: { flags: { as: { type: 'string' } }, stdin: 'never', takesId: true, required: ['as'], run: runClaim },
+  note: { flags: { as: { type: 'string' }, date: { type: 'string' } }, stdin: 'never', takesId: true, takesText: true, run: runNote },
   start: { flags: {}, stdin: 'never', takesId: true, run: runStart },
   unstart: { flags: {}, stdin: 'never', takesId: true, run: runUnstart },
   unclaim: { flags: { from: { type: 'string' } }, stdin: 'never', takesId: true, run: runUnclaim },

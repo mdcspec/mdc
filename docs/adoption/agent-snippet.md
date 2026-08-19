@@ -26,6 +26,7 @@ mdc add   <file> "…" --needs a,b   # record newly-discovered work; prints the 
 mdc claim <file> <id> --as <you>   # take an item; exit 2 => someone else has it, pick another
 mdc start <file> <id>              # signal you're actively working on it (adds .doing)
 mdc check <file> <id>              # mark done after the work; one-line diff
+mdc note  <file> <id> "…" --as <you>  # leave a durable note on an item (renders under it)
 mdc unclaim <file> <id> --from <you>  # hand an item back if you can't finish it
 mdc cancel <file> <id> --reason "…"  # skip a step, on the record (never just delete it)
 mdc status <file>                  # progress, blocked, actionable at a glance

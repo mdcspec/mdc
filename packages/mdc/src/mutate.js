@@ -320,6 +320,69 @@ export async function unclaim(file, id, options = {}) {
   });
 }
 
+/** Matches an existing note line at a given indent, for chronological insertion. */
+const NOTE_LINE_RE = /^- note( @[A-Za-z0-9_/-]+)? \d{4}-\d{2}-\d{2}: /;
+
+/**
+ * `note`: attach a durable, timestamped annotation to an item as a nested prose
+ * bullet — `  - note @<who> <date>: <message>` — one indent level below the
+ * item. Notes are the format's communication seam. Each is its **own line**, so
+ * notes diff and blame per-line; notes on *different* items never conflict, and
+ * a same-item concurrent-note conflict resolves trivially by keeping both lines
+ * — strictly better than a single-line log where every note contends intra-line
+ * on one value. Being a non-task bullet (ITEM-5) a note is invisible to the task
+ * model — it never affects progress, actionable, or any derived state. New notes
+ * append after the item's existing notes (chronological order).
+ *
+ * @param {string} file Path to the MDC document.
+ * @param {string} id Target item id.
+ * @param {string} message Single-line note body.
+ * @param {{ as?: string, date?: string }} [options] `as` is the author handle; `date` defaults to today.
+ * @returns {Promise<void>}
+ * @throws {PreconditionError} Unknown id — exit 2.
+ * @throws {Error} Empty/multiline message, bad `--as`/`--date`, IO, not-MDC — exit 1.
+ */
+export async function note(file, id, message, options = {}) {
+  const msg = message.trim();
+  if (msg === '') throw new Error('note: message cannot be empty');
+  if (/[\r\n]/.test(msg)) throw new Error('note: message must be a single line (no newlines)');
+  const author = options.as;
+  if (author !== undefined && !HANDLE_RE.test(author)) {
+    throw new Error(`note: --as must be a slug (a-z A-Z 0-9 - _ /), got '${author}'`);
+  }
+  const date = options.date ?? localToday();
+  if (!DATE_RE.test(date)) throw new Error(`note: --date must be YYYY-MM-DD, got '${date}'`);
+
+  const target = fs.realpathSync(file);
+  await withFileLock(target, (ownsLock) => {
+    const src = fs.readFileSync(target, 'utf8');
+    const doc = parseDocument(src);
+    const located = flattenItems(doc).find(({ item }) => item.id === id);
+    if (located === undefined) throw new PreconditionError(`unknown id '#${id}'`);
+    const srcDepth = /** @type {{ _srcDepth?: number }} */ (located.item)._srcDepth ?? located.depth;
+    const indent = '  '.repeat(srcDepth + 1);
+    const authorPart = author !== undefined ? ` @${author}` : '';
+    const noteLine = `${indent}- note${authorPart} ${date}: ${msg}`;
+
+    const lines = src.split('\n');
+    const cr = (lines[located.item.line - 1] ?? '').endsWith('\r') ? '\r' : '';
+    // Insert after the item's line and any existing notes already under it, so
+    // notes read top-to-bottom in the order they were written.
+    let at = located.item.line; // 0-based index of the line just after the item
+    while (at < lines.length) {
+      const line = (lines[at] ?? '').replace(/\r$/, '');
+      if (line.startsWith(indent) && NOTE_LINE_RE.test(line.slice(indent.length))) at++;
+      else break;
+    }
+    lines.splice(at, 0, noteLine + cr);
+
+    if (!ownsLock()) {
+      throw new Error('note: lock ownership lost before write; aborted to avoid clobbering a concurrent edit');
+    }
+    atomicReplace(target, lines.join('\n'));
+  });
+}
+
 /**
  * `add`: append a new **open** item to the end of the document body, serialized
  * in canonical form, and return its id. Unlike the other mutations this creates
