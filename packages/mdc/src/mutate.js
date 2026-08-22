@@ -397,21 +397,24 @@ export async function note(file, id, message, options = {}) {
 }
 
 /**
- * `add`: append a new **open** item to the end of the document body, serialized
- * in canonical form, and return its id. Unlike the other mutations this creates
- * a line rather than rewriting one — every existing byte is copied through and
- * exactly one line (plus a trailing newline if needed) is appended, so the diff
- * stays minimal and `fmt` is a no-op afterward. Placement is end-of-document in
- * v0; section/relative placement is a planned follow-up.
+ * `add`: create a new **open** item, serialized in canonical form, and return
+ * its id. Unlike the other mutations this creates a line rather than rewriting
+ * one — every existing byte is copied through — so the diff stays minimal and
+ * `fmt` is a no-op afterward. Placement: end-of-document by default, or
+ * `--after <id>` (as the next sibling of that item, past its subtree, at the
+ * same depth) or `--section <heading>` (at the end of that heading's section,
+ * top level). Placement matters because `.gate`/document order are semantic — a
+ * blind append can trap an item behind a later gate.
  *
  * @param {string} file Path to the MDC document (never stdin).
  * @param {string} text Item text; empty (after trim) is a usage error.
- * @param {{ id?: string, needs?: string, as?: string, due?: string, classes?: string }} [options]
+ * @param {{ id?: string, needs?: string, as?: string, due?: string, classes?: string, after?: string, section?: string }} [options]
  *   `id` sets the id explicitly (else generated from the text); `needs`/`classes`
- *   are comma-separated; `as` sets the assignee; `due` is `YYYY-MM-DD`.
+ *   are comma-separated; `as` sets the assignee; `due` is `YYYY-MM-DD`; `after`
+ *   and `section` (mutually exclusive) control placement.
  * @returns {Promise<string>} The new item's id.
- * @throws {PreconditionError} `--id` collides with an existing id — exit 2.
- * @throws {Error} Empty text / bad slug / bad date / IO / not-MDC — exit 1.
+ * @throws {PreconditionError} `--id` collides, or `--after`/`--section` target is unknown — exit 2.
+ * @throws {Error} Empty text / bad slug / bad date / both placement flags / IO / not-MDC — exit 1.
  */
 export async function addItem(file, text, options = {}) {
   const trimmed = text.trim();
@@ -433,6 +436,9 @@ export async function addItem(file, text, options = {}) {
     if (!HANDLE_RE.test(cls)) throw new Error(`add: --class entries must be slugs, got '${cls}'`);
   }
   const needsList = (options.needs ?? '').split(',').map((n) => n.trim()).filter((n) => n !== '');
+  if (options.after !== undefined && options.section !== undefined) {
+    throw new Error('add: use only one of --after / --section');
+  }
 
   const target = fs.realpathSync(file);
   return await withFileLock(target, (ownsLock) => {
@@ -456,21 +462,70 @@ export async function addItem(file, text, options = {}) {
     if (needsList.length > 0) attrs.needs = needsList;
     if (due !== undefined) attrs.due = due;
     const item = { id, text: trimmed, state: 'open', assignee: assignee ?? null, classes: classList, attrs };
-    const lineText = serializeItemLine(/** @type {import('./parse.js').MdcItem} */ (item), 0);
 
-    // Append on its own line, preserving the document's line ending. A file that
-    // already ends in a newline needs no separator; one that does not gets one.
+    // Work with clean lines (endings stripped) and rejoin with the document's
+    // detected ending, so a CRLF document stays CRLF and an LF one stays LF.
     const nl = src.includes('\r\n') ? '\r\n' : '\n';
-    let out = src;
-    if (out !== '' && !out.endsWith('\n')) out += nl;
-    out += lineText + nl;
+    const endsWithNl = /\n$/.test(src);
+    const lines = src.split(/\r?\n/);
+    if (endsWithNl) lines.pop(); // drop the trailing '' so lines are content lines
+    const { index, depth } = placeAdd(lines, doc, options);
+    lines.splice(index, 0, serializeItemLine(/** @type {import('./parse.js').MdcItem} */ (item), depth));
 
     if (!ownsLock()) {
       throw new Error('add: lock ownership lost before write; aborted to avoid clobbering a concurrent edit');
     }
-    atomicReplace(target, out);
+    atomicReplace(target, lines.join(nl) + (endsWithNl ? nl : ''));
     return id;
   });
+}
+
+/**
+ * Compute where a new item goes and at what depth, given `--after`/`--section`
+ * (or neither → end of document). Operates on the document's lines (trailing
+ * newline already stripped by the caller) and the parsed model.
+ *
+ * @param {string[]} lines Document lines, no trailing empty element.
+ * @param {import('./parse.js').MdcDocument} doc
+ * @param {{ after?: string, section?: string }} options
+ * @returns {{ index: number, depth: number }} 0-based splice index and item depth.
+ */
+function placeAdd(lines, doc, options) {
+  const HEADING_RE = /^#{1,6}\s+/;
+  const indentOf = (/** @type {string} */ s) => {
+    const bare = s.replace(/\r$/, '');
+    return bare.length - bare.replace(/^ +/, '').length;
+  };
+  if (options.after !== undefined) {
+    const located = flattenItems(doc).find(({ item }) => item.id === options.after);
+    if (located === undefined) throw new PreconditionError(`cannot add: --after target '#${options.after}' not found`);
+    const depth = /** @type {{ _srcDepth?: number }} */ (located.item)._srcDepth ?? located.depth;
+    // Insert as the next sibling: after the target's line and its whole subtree
+    // (all following, more-indented lines; blank lines don't extend it).
+    let at = located.item.line; // 0-based index of the line after the target
+    let end = at;
+    while (at < lines.length) {
+      const raw = (lines[at] ?? '').replace(/\r$/, '');
+      if (raw.trim() === '') { at++; continue; }
+      if (indentOf(raw) > depth * 2) { at++; end = at; continue; }
+      break;
+    }
+    return { index: end, depth };
+  }
+  if (options.section !== undefined) {
+    const headingIdx = lines.findIndex(
+      (l) => HEADING_RE.test(l.replace(/\r$/, '')) && l.replace(/\r$/, '').replace(HEADING_RE, '').trim() === options.section,
+    );
+    if (headingIdx < 0) throw new PreconditionError(`cannot add: --section heading '${options.section}' not found`);
+    // End of the section = just after its last non-blank line, before the next heading.
+    let end = headingIdx + 1;
+    for (let i = headingIdx + 1; i < lines.length; i++) {
+      if (HEADING_RE.test(lines[i].replace(/\r$/, ''))) break;
+      if (lines[i].replace(/\r$/, '').trim() !== '') end = i + 1;
+    }
+    return { index: end, depth: 0 };
+  }
+  return { index: lines.length, depth: 0 };
 }
 
 /**

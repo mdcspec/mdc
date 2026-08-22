@@ -46,6 +46,31 @@ test('add prints the new id and appends exactly one item line', async () => {
   assert.strictEqual(after, `${before}- [ ] Second thing {#second}\n`, 'exactly one canonical item line appended');
 });
 
+test('add --section places into a section (not appended past a later gate)', async () => {
+  const file = tmpDoc('---\nmdc: "0.1"\n---\n\n# Docs\n- [ ] Refresh {#docs}\n\n# Release\n- [ ] Ship {#ship .gate}\n');
+  await runCli(['add', file, 'Validate links', '--id', 'links', '--needs', 'docs', '--section', 'Docs']);
+  const text = fs.readFileSync(file, 'utf8');
+  assert.match(text, /# Docs\n- \[ \] Refresh \{#docs\}\n- \[ \] Validate links \{#links needs=docs\}\n/, 'lands inside # Docs');
+  // The whole point: it is NOT gated by the later #ship gate.
+  const report = JSON.parse((await runCli(['report', file, '--json'])).stdout);
+  assert.ok(!report.blocked.some((/** @type {{id:string,gatedBy?:string[]}} */ e) => e.id === 'links' && e.gatedBy), '#links is not gated by #ship');
+});
+
+test('add --after inserts as the next sibling, past the target subtree', async () => {
+  const file = tmpDoc('---\nmdc: "0.1"\n---\n\n- [ ] Parent {#parent}\n  - [ ] Child {#child}\n- [ ] Sib {#sib}\n');
+  await runCli(['add', file, 'Inserted', '--id', 'ins', '--after', 'parent']);
+  assert.match(fs.readFileSync(file, 'utf8'), /  - \[ \] Child \{#child\}\n- \[ \] Inserted \{#ins\}\n- \[ \] Sib/, 'after the subtree, at parent depth');
+});
+
+test('add rejects unknown --after/--section (exit 2) and both placement flags (exit 1)', async () => {
+  const input = '---\nmdc: "0.1"\n---\n\n- [ ] A {#a}\n';
+  const file = tmpDoc(input);
+  assert.strictEqual((await runCli(['add', file, 'x', '--after', 'nope'])).code, 2);
+  assert.strictEqual((await runCli(['add', file, 'x', '--section', 'Nope'])).code, 2);
+  assert.strictEqual((await runCli(['add', file, 'x', '--after', 'a', '--section', 'S'])).code, 1);
+  assert.strictEqual(fs.readFileSync(file, 'utf8'), input, 'file untouched on every placement refusal');
+});
+
 test('add generates an id from the text when --id is omitted', async () => {
   const file = tmpDoc('---\nmdc: "0.1"\n---\n\n- [ ] Anchor {#anchor}\n');
   const r = await runCli(['add', file, 'Deploy the new service']);

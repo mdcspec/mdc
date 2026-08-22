@@ -28,7 +28,7 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 | `next <file> [--json] [--as <handle>]` | actionable items in document order; `--as` filters to one agent's own + unclaimed |
 | `report <file> [--json]` | standup view: done / in-progress / ready / blocked-with-cause / cancelled, per-assignee load |
 | `fmt <file> [--check] [--assign-ids]` | canonical form in place; `--check` never writes |
-| `add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]` | append a new open item; prints its id |
+| `add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>] [--after <id> \| --section <heading>]` | new open item (end, or after an item / in a section); prints its id |
 | `check <file> <id> [--date YYYY-MM-DD]` | open → done |
 | `uncheck <file> <id>` | done → open |
 | `cancel <file> <id> --reason "…"` | → cancelled |

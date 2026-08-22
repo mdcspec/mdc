@@ -32,7 +32,7 @@ mdc cancel <file> <id> --reason "…"  # skip a step, on the record (never just 
 mdc status <file>                  # progress, blocked, actionable at a glance
 ```
 
-When you discover work that is not yet on the list, `add` it rather than hand-editing the file — that keeps the line canonical and mints an id you can immediately `claim`/`check`. Pass `--id <slug>` to choose the id yourself, or let it generate one from the text.
+When you discover work that is not yet on the list, `add` it rather than hand-editing the file — that keeps the line canonical and mints an id you can immediately `claim`/`check`. Pass `--id <slug>` to choose the id yourself, or let it generate one from the text. By default `add` appends at the end of the file; because a later `.gate` blocks everything after it in document order, use `--section <heading>` or `--after <id>` to place a discovered task where it belongs instead of trapping it behind a gate.
 
 The `--as <you>` handle is a **file-local coordination label** (use your agent/role slug, e.g. `agent-a`); MDC never resolves or notifies it. Note that if someone later pastes the raw file into a GitHub/GitLab issue or PR body, a handle matching a real account autolinks and may ping it — so prefer role/agent slugs over people's usernames.
 

@@ -31,7 +31,7 @@ Read verbs ("-" reads stdin):
 
 Mutations (real path required; refusals exit 2):
   add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]
-                                           append a new open item; prints its id
+      [--after <id> | --section <heading>] new open item (placed at end, or after an item / in a section); prints its id
   check <file> <id> [--date YYYY-MM-DD]    open -> done, stamps done=
   uncheck <file> <id>                      done -> open, removes done=
   cancel <file> <id> --reason "..."        -> cancelled, wraps ~~, writes reason=
@@ -270,6 +270,8 @@ async function runAdd(ctx) {
     as: /** @type {string | undefined} */ (ctx.flags.as),
     due: /** @type {string | undefined} */ (ctx.flags.due),
     classes: /** @type {string | undefined} */ (ctx.flags.class),
+    after: /** @type {string | undefined} */ (ctx.flags.after),
+    section: /** @type {string | undefined} */ (ctx.flags.section),
   });
   process.stdout.write(`#${id}\n`);
   return 0;
@@ -409,6 +411,8 @@ const VERBS = {
       as: { type: 'string' },
       due: { type: 'string' },
       class: { type: 'string' },
+      after: { type: 'string' },
+      section: { type: 'string' },
     },
     stdin: 'never',
     takesText: true,

@@ -153,7 +153,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `next [--json] [--as <handle>]` | ordered actionable items; `--as` keeps only that handle's own + unclaimed items | 0 (even if empty); 1 |
 | `report [--json]` | standup buckets (done / in-progress / ready / blocked-with-cause / cancelled) + per-assignee load | 0; 1 |
 | `fmt [--check] [--assign-ids]` | canonical form in place; `--check` exits without writing | 0 unchanged/success; 2 `--check` found drift; 1 error |
-| `add "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]` | append a new open item in canonical form; prints its id | 0; 2 `--id` collides with an existing id; 1 empty text / bad slug / bad date / not-MDC |
+| `add "<text>" […flags] [--after <id> \| --section <heading>]` | new open item, canonical, placed at end / after an item / in a section; prints its id | 0; 2 `--id` collision or unknown `--after`/`--section`; 1 empty text / bad slug / bad date / both placement flags / not-MDC |
 | `check <id> [--date YYYY-MM-DD]` | open → done, writes `done=` stamp (default: today), clears `.doing`/`.waiting` | 0; 2 unknown id or already terminal; 1 |
 | `uncheck <id>` | done → open, removes `done=` | 0; 2 unknown id or not done; 1 |
 | `cancel <id> --reason "…"` | any non-cancelled → cancelled, wraps `~~`, writes `reason=`, clears `.doing`/`.waiting` | 0; 2 unknown id or already cancelled; 1 |

@@ -97,7 +97,7 @@ mdc report <file> [--json]           # standup view: done / in-progress / ready 
 
 ## Deferred (named, not silently dropped)
 
-- **Placement flags** for `add` (`--section`, `--after <id>`) — the follow-up to end-append.
+- ~~**Placement flags** for `add` (`--section`, `--after <id>`)~~ — **shipped** after both fresh-dogfood agents hit the append-past-a-gate hazard (MUT-6, `add/after-sibling`, `add/into-section`).
 - **`.waiting` verbs**, `--force` reassignment semantics — gated on the ownership-guard decision.
 - **Bulk / scripted ops** (`check a,b,c`) — no dogfood signal yet; agents loop fine.
 - **Installed `mdc` bin** — an ergonomics paper cut (agents invoke `node …/cli.js`); a packaging task, tracked with the M0 npm-scope work, not here.
