@@ -10,9 +10,9 @@
  * @typedef {Object} MdcStatus
  * @property {{ open: number, done: number, cancelled: number, total: number }} totals
  * @property {{ done: number, total: number }} progress Cancelled items excluded from both counts.
- * @property {string[]} blocked Ids (or `"<line N>"` for id-less items) of blocked items.
- * @property {string[]} actionable Ids in document order.
- * @property {string[]} doing Ids of items carrying the `.doing` class.
+ * @property {string[]} blocked Open items that are not ready — needs-blocked, gated, or waiting on children (and not `.doing`).
+ * @property {string[]} actionable Open, ready, non-`.doing` items in document order.
+ * @property {string[]} doing Open items carrying the `.doing` class.
  * @property {Array<{ section: string | null, done: number, total: number }>} sections Per-section rollup in document order.
  */
 
@@ -312,9 +312,15 @@ export function statusReport(doc) {
         rollup.done++;
       }
     }
-    if (item.computed.blocked) blocked.push(itemKey(item));
-    if (item.computed.actionable) actionable.push(itemKey(item));
-    if (item.classes.includes('doing')) doing.push(itemKey(item));
+    // Every OPEN item lands in exactly one of doing / actionable / blocked —
+    // the same mutually-exclusive scheme reportData uses, so the two verbs can
+    // never disagree and no open item (e.g. a gated-but-not-needs-blocked one)
+    // vanishes from the summary. `blocked` here means "open but not ready".
+    if (item.state === 'open') {
+      if (item.classes.includes('doing')) doing.push(itemKey(item));
+      else if (item.computed.actionable) actionable.push(itemKey(item));
+      else blocked.push(itemKey(item));
+    }
   }
   return { totals, progress, blocked, actionable, doing, sections: [...sections.values()] };
 }

@@ -158,6 +158,17 @@ test('report --json sorts every item into exactly one bucket, with blocked cause
   assert.deepStrictEqual(ana, { assignee: 'ana', done: 1, doing: 0, open: 1 });
 });
 
+test('status and report agree on blocked; no open item vanishes (gated-but-not-needs-blocked)', async () => {
+  // #after is open and gated by #gate, but has no needs= — it must appear in
+  // status.blocked (not vanish) and status/report must agree on the count.
+  const doc = '---\nmdc: "0.1"\n---\n\n- [ ] Gate {#gate .gate}\n- [ ] After {#after}\n';
+  const status = JSON.parse((await runCli(['status', '-', '--json'], { input: doc })).stdout);
+  assert.ok(status.blocked.includes('after'), '#after is visible in status.blocked, not dropped');
+  assert.ok(!status.actionable.includes('after'), '#after is not actionable (it is gated)');
+  const report = JSON.parse((await runCli(['report', '-', '--json'], { input: doc })).stdout);
+  assert.strictEqual(status.blocked.length, report.blocked.length, 'status and report agree on blocked count');
+});
+
 test('report human output is non-empty and names the buckets', async () => {
   const r = await runCli(['report', '-'], { input: BOARD_DOC });
   assert.strictEqual(r.code, 0, r.stderr);

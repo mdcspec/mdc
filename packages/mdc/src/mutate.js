@@ -131,6 +131,13 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const HANDLE_RE = /^[A-Za-z0-9_/-]+$/;
 
 /**
+ * Soft, in-flight status classes. A terminal item (done/cancelled) is no longer
+ * "in progress" or "waiting", so `check`/`cancel` strip these — otherwise a done
+ * item keeps `.doing` and reads as still-in-flight in `status`/`report`.
+ */
+const SOFT_CLASSES = ['doing', 'waiting'];
+
+/**
  * Line surgery under the lock: read, parse, locate the target by ID (never by
  * text or line number), let `apply` check its precondition and mutate the
  * item, regenerate exactly that item's line in canonical form, and atomically
@@ -185,6 +192,7 @@ export async function check(file, id, options = {}) {
     }
     item.state = 'done';
     item.attrs.done = date;
+    item.classes = item.classes.filter((cls) => !SOFT_CLASSES.includes(cls));
   });
 }
 
@@ -228,6 +236,7 @@ export async function cancel(file, id, options) {
     }
     item.state = 'cancelled';
     item.attrs.reason = options.reason;
+    item.classes = item.classes.filter((cls) => !SOFT_CLASSES.includes(cls));
   });
 }
 

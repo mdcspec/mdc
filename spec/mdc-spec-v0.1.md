@@ -119,9 +119,9 @@ Every normative rule below cites at least one corpus case by directory name, wri
 
   | Verb | Precondition | Effect on the target line |
   |---|---|---|
-  | `check` | state open | `[ ]` → `[x]`, set `done=<date>` `[mutate/check]` |
+  | `check` | state open | `[ ]` → `[x]`, set `done=<date>`, clear `.doing`/`.waiting` `[mutate/check]` `[mutate/check-clears-doing]` |
   | `uncheck` | state done | `[x]` → `[ ]`, remove `done=` `[mutate/uncheck]` |
-  | `cancel` | not cancelled | `[x]`, wrap text in `~~`, set `reason="…"`, keep all other attributes `[mutate/cancel]` |
+  | `cancel` | not cancelled | `[x]`, wrap text in `~~`, set `reason="…"`, clear `.doing`/`.waiting`, keep other attributes `[mutate/cancel]` |
   | `claim` | no assignee set | set `@handle` `[mutate/claim]` |
   | `unclaim` | assignee set (and `--from` matches, if given) | clear `@assignee` `[mutate/unclaim]` |
   | `start` | state open, not already `.doing` | add `.doing` class `[mutate/start]` |

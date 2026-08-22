@@ -154,9 +154,9 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `report [--json]` | standup buckets (done / in-progress / ready / blocked-with-cause / cancelled) + per-assignee load | 0; 1 |
 | `fmt [--check] [--assign-ids]` | canonical form in place; `--check` exits without writing | 0 unchanged/success; 2 `--check` found drift; 1 error |
 | `add "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]` | append a new open item in canonical form; prints its id | 0; 2 `--id` collides with an existing id; 1 empty text / bad slug / bad date / not-MDC |
-| `check <id> [--date YYYY-MM-DD]` | open → done, writes `done=` stamp (default: today) | 0; 2 unknown id or already terminal; 1 |
+| `check <id> [--date YYYY-MM-DD]` | open → done, writes `done=` stamp (default: today), clears `.doing`/`.waiting` | 0; 2 unknown id or already terminal; 1 |
 | `uncheck <id>` | done → open, removes `done=` | 0; 2 unknown id or not done; 1 |
-| `cancel <id> --reason "…"` | any non-cancelled → cancelled, wraps `~~`, writes `reason=` | 0; 2 unknown id or already cancelled; 1 |
+| `cancel <id> --reason "…"` | any non-cancelled → cancelled, wraps `~~`, writes `reason=`, clears `.doing`/`.waiting` | 0; 2 unknown id or already cancelled; 1 |
 | `claim <id> --as <handle>` | sets `@handle` **iff no assignee set** | 0; 2 unknown id or assignee already set; 1 |
 | `note <id> "<text>" [--as <handle>] [--date <date>]` | append a nested prose note `  - note @who date: text` under the item; invisible to the model | 0; 2 unknown id; 1 empty/multiline text or bad flag |
 | `unclaim <id> [--from <handle>]` | clears `@assignee`; `--from` refuses on owner mismatch | 0; 2 unknown id, no assignee, or `--from` mismatch; 1 |
