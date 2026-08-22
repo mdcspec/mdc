@@ -38,7 +38,13 @@ The `--as <you>` handle is a **file-local coordination label** (use your agent/r
 
 If a file is a **template** (`kind: template` in its frontmatter), do not check items on it — instantiate a run first: `mdc cut <template> --out <run-file> --title "…"`, then drive the run.
 
+Every mutation **prints the resulting canonical line to stdout**, so you can see exactly what changed without a follow-up read. `check`/`cancel` also clear the `.doing` marker automatically (a finished item is no longer in progress).
+
+Other verbs you have: `uncheck <id>` (undo a check), `unstart <id>` (clear `.doing`), `unclaim <id> [--from <you>]` (release/hand back an item), `report` (a standup view), and read-only `parse`/`lint`/`fmt` for the model, structural checks, and canonical formatting. `add` also takes `--as <handle>`, `--due <date>`, and `--class <c,d>`.
+
 The golden rule: **claim before you work, check after.** Each mutation rewrites exactly one line, so your edits and a teammate's (human or agent) merge cleanly under plain git, and the git history is the audit trail. Never hand-edit an item's `[ ]`/`[x]` or its metadata when a verb does it — the verbs keep the file canonical.
+
+Note: `.gate` and `needs=` shape what `next` shows you, but they do not *stop* you from checking an out-of-order item — the graph is advisory. Consult `next`/`report` before acting rather than relying on the tool to refuse. "Actionable" means dependency-ready and gate-clear; it does not mean unclaimed, so filter with `next --as <you>` to see what is actually yours to pick up.
 
 ### A complete example
 

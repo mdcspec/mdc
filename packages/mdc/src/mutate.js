@@ -147,7 +147,8 @@ const SOFT_CLASSES = ['doing', 'waiting'];
  * @param {string} file Path to the MDC document (never stdin).
  * @param {string} id Target item id.
  * @param {(item: import('./parse.js').MdcItem) => void} apply
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line (no trailing newline),
+ *   so callers can echo what changed.
  * @throws {PreconditionError} Unknown id or `apply`'s precondition failed — exit 2.
  * @throws {Error} IO / parse / not-MDC — exit 1.
  */
@@ -157,7 +158,7 @@ async function mutateItem(file, id, apply) {
   // real document untouched. realpathSync throws ENOENT on a missing file — the
   // right exit-1 outcome for a mutation.
   const target = fs.realpathSync(file);
-  await withFileLock(target, (ownsLock) => {
+  return await withFileLock(target, (ownsLock) => {
     const text = fs.readFileSync(target, 'utf8');
     const doc = parseDocument(text);
     const located = flattenItems(doc).find(({ item }) => item.id === id);
@@ -165,11 +166,13 @@ async function mutateItem(file, id, apply) {
     apply(located.item);
     const lines = text.split('\n');
     const cr = (lines[located.item.line - 1] ?? '').endsWith('\r') ? '\r' : '';
-    lines[located.item.line - 1] = serializeItemLine(located.item, located.depth) + cr;
+    const serialized = serializeItemLine(located.item, located.depth);
+    lines[located.item.line - 1] = serialized + cr;
     if (!ownsLock()) {
       throw new Error('mutate: lock ownership lost before write; aborted to avoid clobbering a concurrent edit');
     }
     atomicReplace(target, lines.join('\n'));
+    return serialized;
   });
 }
 
@@ -179,14 +182,14 @@ async function mutateItem(file, id, apply) {
  * @param {string} file Path to the MDC document (never stdin).
  * @param {string} id Target item id.
  * @param {{ date?: string }} [options] Stamp date `YYYY-MM-DD`; defaults to today.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id or item already terminal — exit 2.
  * @throws {Error} IO / parse / not-MDC — exit 1.
  */
 export async function check(file, id, options = {}) {
   const date = options.date ?? localToday();
   if (!DATE_RE.test(date)) throw new Error(`check: --date must be YYYY-MM-DD, got '${date}'`);
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (item.state !== 'open') {
       throw new PreconditionError(`cannot check '#${id}': already ${item.state}`);
     }
@@ -201,12 +204,12 @@ export async function check(file, id, options = {}) {
  *
  * @param {string} file Path to the MDC document.
  * @param {string} id Target item id.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id or item not done — exit 2.
  * @throws {Error} IO / parse / not-MDC — exit 1.
  */
 export async function uncheck(file, id) {
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (item.state !== 'done') {
       throw new PreconditionError(`cannot uncheck '#${id}': not done (state is ${item.state})`);
     }
@@ -222,7 +225,7 @@ export async function uncheck(file, id) {
  * @param {string} file Path to the MDC document.
  * @param {string} id Target item id.
  * @param {{ reason: string }} options Machine-readable reason; required.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id or already cancelled — exit 2.
  * @throws {Error} IO / parse / not-MDC / unrepresentable reason — exit 1.
  */
@@ -230,7 +233,7 @@ export async function cancel(file, id, options) {
   if (/["\n\r]/.test(options.reason)) {
     throw new Error('cancel: --reason cannot contain \'"\' or newlines (unrepresentable in v0)');
   }
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (item.state === 'cancelled') {
       throw new PreconditionError(`cannot cancel '#${id}': already cancelled`);
     }
@@ -248,7 +251,7 @@ export async function cancel(file, id, options) {
  * @param {string} file Path to the MDC document.
  * @param {string} id Target item id.
  * @param {{ as: string }} options Handle to assign; required.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id or assignee already set — exit 2.
  * @throws {Error} IO / parse / not-MDC / invalid handle — exit 1.
  */
@@ -256,7 +259,7 @@ export async function claim(file, id, options) {
   if (!HANDLE_RE.test(options.as)) {
     throw new Error(`claim: --as must be a slug (a-z A-Z 0-9 - _ /), got '${options.as}'`);
   }
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (item.assignee !== null) {
       throw new PreconditionError(`cannot claim '#${id}': already claimed by @${item.assignee}`);
     }
@@ -271,12 +274,12 @@ export async function claim(file, id, options) {
  *
  * @param {string} file Path to the MDC document.
  * @param {string} id Target item id.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id, item not open, or already `.doing` — exit 2.
  * @throws {Error} IO / parse / not-MDC — exit 1.
  */
 export async function start(file, id) {
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (item.state !== 'open') {
       throw new PreconditionError(`cannot start '#${id}': item is ${item.state}, not open`);
     }
@@ -292,12 +295,12 @@ export async function start(file, id) {
  *
  * @param {string} file Path to the MDC document.
  * @param {string} id Target item id.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id or item not `.doing` — exit 2.
  * @throws {Error} IO / parse / not-MDC — exit 1.
  */
 export async function unstart(file, id) {
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (!item.classes.includes('doing')) {
       throw new PreconditionError(`cannot unstart '#${id}': not in progress (no .doing)`);
     }
@@ -313,12 +316,12 @@ export async function unstart(file, id) {
  * @param {string} file Path to the MDC document.
  * @param {string} id Target item id.
  * @param {{ from?: string }} [options] Expected current owner; refuse on mismatch.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The rewritten canonical item line.
  * @throws {PreconditionError} Unknown id, no assignee set, or `from` mismatch — exit 2.
  * @throws {Error} IO / parse / not-MDC — exit 1.
  */
 export async function unclaim(file, id, options = {}) {
-  await mutateItem(file, id, (item) => {
+  return await mutateItem(file, id, (item) => {
     if (item.assignee === null) {
       throw new PreconditionError(`cannot unclaim '#${id}': no assignee set`);
     }
@@ -347,7 +350,7 @@ const NOTE_LINE_RE = /^- note( @[A-Za-z0-9_/-]+)? \d{4}-\d{2}-\d{2}: /;
  * @param {string} id Target item id.
  * @param {string} message Single-line note body.
  * @param {{ as?: string, date?: string }} [options] `as` is the author handle; `date` defaults to today.
- * @returns {Promise<void>}
+ * @returns {Promise<string>} The inserted note line (no trailing newline), so the caller can echo it.
  * @throws {PreconditionError} Unknown id — exit 2.
  * @throws {Error} Empty/multiline message, bad `--as`/`--date`, IO, not-MDC — exit 1.
  */
@@ -363,7 +366,7 @@ export async function note(file, id, message, options = {}) {
   if (!DATE_RE.test(date)) throw new Error(`note: --date must be YYYY-MM-DD, got '${date}'`);
 
   const target = fs.realpathSync(file);
-  await withFileLock(target, (ownsLock) => {
+  return await withFileLock(target, (ownsLock) => {
     const src = fs.readFileSync(target, 'utf8');
     const doc = parseDocument(src);
     const located = flattenItems(doc).find(({ item }) => item.id === id);
@@ -389,6 +392,7 @@ export async function note(file, id, message, options = {}) {
       throw new Error('note: lock ownership lost before write; aborted to avoid clobbering a concurrent edit');
     }
     atomicReplace(target, lines.join('\n'));
+    return noteLine;
   });
 }
 

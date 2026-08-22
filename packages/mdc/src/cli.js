@@ -275,54 +275,64 @@ async function runAdd(ctx) {
   return 0;
 }
 
+/**
+ * Every line-rewriting/inserting mutation echoes the resulting canonical line to
+ * stdout, so an agent sees exactly what changed without a follow-up read (this
+ * is the "one-line diff" the agent docs promise).
+ * @param {string} line
+ */
+function emitMutation(line) {
+  process.stdout.write(`${line}\n`);
+}
+
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runCheck(ctx) {
-  await check(ctx.file, /** @type {string} */ (ctx.id), { date: /** @type {string | undefined} */ (ctx.flags.date) });
+  emitMutation(await check(ctx.file, /** @type {string} */ (ctx.id), { date: /** @type {string | undefined} */ (ctx.flags.date) }));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runUncheck(ctx) {
-  await uncheck(ctx.file, /** @type {string} */ (ctx.id));
+  emitMutation(await uncheck(ctx.file, /** @type {string} */ (ctx.id)));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runCancel(ctx) {
-  await cancel(ctx.file, /** @type {string} */ (ctx.id), { reason: /** @type {string} */ (ctx.flags.reason) });
+  emitMutation(await cancel(ctx.file, /** @type {string} */ (ctx.id), { reason: /** @type {string} */ (ctx.flags.reason) }));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runClaim(ctx) {
-  await claim(ctx.file, /** @type {string} */ (ctx.id), { as: /** @type {string} */ (ctx.flags.as) });
+  emitMutation(await claim(ctx.file, /** @type {string} */ (ctx.id), { as: /** @type {string} */ (ctx.flags.as) }));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runNote(ctx) {
-  await note(ctx.file, /** @type {string} */ (ctx.id), /** @type {string} */ (ctx.text), {
+  emitMutation(await note(ctx.file, /** @type {string} */ (ctx.id), /** @type {string} */ (ctx.text), {
     as: /** @type {string | undefined} */ (ctx.flags.as),
     date: /** @type {string | undefined} */ (ctx.flags.date),
-  });
+  }));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runStart(ctx) {
-  await start(ctx.file, /** @type {string} */ (ctx.id));
+  emitMutation(await start(ctx.file, /** @type {string} */ (ctx.id)));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runUnstart(ctx) {
-  await unstart(ctx.file, /** @type {string} */ (ctx.id));
+  emitMutation(await unstart(ctx.file, /** @type {string} */ (ctx.id)));
   return 0;
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runUnclaim(ctx) {
-  await unclaim(ctx.file, /** @type {string} */ (ctx.id), { from: /** @type {string | undefined} */ (ctx.flags.from) });
+  emitMutation(await unclaim(ctx.file, /** @type {string} */ (ctx.id), { from: /** @type {string | undefined} */ (ctx.flags.from) }));
   return 0;
 }
 

@@ -165,6 +165,8 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 Exit-code law: `0` success · `1` usage / IO / parse / not-MDC errors · `2` domain refusal (lint errors, `fmt --check` drift, mutation precondition failed, `cut --out` would overwrite). Agents branch on `2`. Errors go to stderr; machine output to stdout only.
 
+Every line-mutating verb (`check`/`uncheck`/`cancel`/`claim`/`unclaim`/`start`/`unstart`/`note`) echoes the resulting canonical line to stdout on success, so a caller sees the exact change without a follow-up read; `add` echoes the new item's id. Nothing is written to stdout on a refusal or error.
+
 ## Cut algorithm (template → run)
 
 `cut` reads a `kind: template` (not stdin — it needs the source path for the `template:` reference) and emits a `kind: run`:

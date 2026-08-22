@@ -158,6 +158,23 @@ test('report --json sorts every item into exactly one bucket, with blocked cause
   assert.deepStrictEqual(ana, { assignee: 'ana', done: 1, doing: 0, open: 1 });
 });
 
+test('mutations echo the resulting canonical line to stdout', async () => {
+  const os = await import('node:os');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdc-echo-'));
+  const file = path.join(dir, 'e.mdc.md');
+  fs.writeFileSync(file, '---\nmdc: "0.1"\n---\n\n- [ ] Ship it {#ship}\n');
+  const claim = await runCli(['claim', file, 'ship', '--as', 'ana']);
+  assert.strictEqual(claim.stdout, '- [ ] Ship it {#ship @ana}\n', 'claim echoes the new line');
+  await runCli(['start', file, 'ship']);
+  const check = await runCli(['check', file, 'ship', '--date', '2026-08-22']);
+  // The echo shows the terminal transition AND the cleared .doing in one line.
+  assert.strictEqual(check.stdout, '- [x] Ship it {#ship @ana done=2026-08-22}\n');
+  const note = await runCli(['note', file, 'ship', 'shipped', '--as', 'ana', '--date', '2026-08-22']);
+  assert.strictEqual(note.stdout, '  - note @ana 2026-08-22: shipped\n', 'note echoes the inserted line');
+});
+
 test('status and report agree on blocked; no open item vanishes (gated-but-not-needs-blocked)', async () => {
   // #after is open and gated by #gate, but has no needs= — it must appear in
   // status.blocked (not vanish) and status/report must agree on the count.
