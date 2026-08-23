@@ -412,7 +412,7 @@ export async function note(file, id, message, options = {}) {
  *   `id` sets the id explicitly (else generated from the text); `needs`/`classes`
  *   are comma-separated; `as` sets the assignee; `due` is `YYYY-MM-DD`; `after`
  *   and `section` (mutually exclusive) control placement.
- * @returns {Promise<string>} The new item's id.
+ * @returns {Promise<{ id: string, line: string }>} The new item's id and its canonical line.
  * @throws {PreconditionError} `--id` collides, or `--after`/`--section` target is unknown — exit 2.
  * @throws {Error} Empty text / bad slug / bad date / both placement flags / IO / not-MDC — exit 1.
  */
@@ -470,13 +470,14 @@ export async function addItem(file, text, options = {}) {
     const lines = src.split(/\r?\n/);
     if (endsWithNl) lines.pop(); // drop the trailing '' so lines are content lines
     const { index, depth } = placeAdd(lines, doc, options);
-    lines.splice(index, 0, serializeItemLine(/** @type {import('./parse.js').MdcItem} */ (item), depth));
+    const line = serializeItemLine(/** @type {import('./parse.js').MdcItem} */ (item), depth);
+    lines.splice(index, 0, line);
 
     if (!ownsLock()) {
       throw new Error('add: lock ownership lost before write; aborted to avoid clobbering a concurrent edit');
     }
     atomicReplace(target, lines.join(nl) + (endsWithNl ? nl : ''));
-    return id;
+    return { id, line };
   });
 }
 

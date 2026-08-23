@@ -153,7 +153,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `next [--json] [--as <handle>]` | ordered actionable items; `--as` keeps only that handle's own + unclaimed items | 0 (even if empty); 1 |
 | `report [--json]` | standup buckets (done / in-progress / ready / blocked-with-cause / cancelled) + per-assignee load | 0; 1 |
 | `fmt [--check] [--assign-ids]` | canonical form in place; `--check` exits without writing | 0 unchanged/success; 2 `--check` found drift; 1 error |
-| `add "<text>" […flags] [--after <id> \| --section <heading>]` | new open item, canonical, placed at end / after an item / in a section; prints its id | 0; 2 `--id` collision or unknown `--after`/`--section`; 1 empty text / bad slug / bad date / both placement flags / not-MDC |
+| `add "<text>" […flags] [--after <id> \| --section <heading>]` | new open item, canonical, placed at end / after an item / in a section; echoes its line | 0; 2 `--id` collision or unknown `--after`/`--section`; 1 empty text / bad slug / bad date / both placement flags / not-MDC |
 | `check <id> [--date YYYY-MM-DD]` | open → done, writes `done=` stamp (default: today), clears `.doing`/`.waiting` | 0; 2 unknown id or already terminal; 1 |
 | `uncheck <id>` | done → open, removes `done=` | 0; 2 unknown id or not done; 1 |
 | `cancel <id> --reason "…"` | any non-cancelled → cancelled, wraps `~~`, writes `reason=`, clears `.doing`/`.waiting` | 0; 2 unknown id or already cancelled; 1 |
@@ -165,7 +165,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 Exit-code law: `0` success · `1` usage / IO / parse / not-MDC errors · `2` domain refusal (lint errors, `fmt --check` drift, mutation precondition failed, `cut --out` would overwrite). Agents branch on `2`. Errors go to stderr; machine output to stdout only.
 
-Every line-mutating verb (`check`/`uncheck`/`cancel`/`claim`/`unclaim`/`start`/`unstart`/`note`) echoes the resulting canonical line to stdout on success, so a caller sees the exact change without a follow-up read; `add` echoes the new item's id. Nothing is written to stdout on a refusal or error.
+Every mutating verb (`add`/`check`/`uncheck`/`cancel`/`claim`/`unclaim`/`start`/`unstart`/`note`) echoes the resulting canonical line to stdout on success, so a caller sees the exact change without a follow-up read. For `add`, the new item's id is the `#…` token in that line. Nothing is written to stdout on a refusal or error.
 
 ## Cut algorithm (template → run)
 

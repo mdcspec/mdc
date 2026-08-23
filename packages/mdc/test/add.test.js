@@ -40,7 +40,7 @@ test('add prints the new id and appends exactly one item line', async () => {
   const before = fs.readFileSync(file, 'utf8');
   const r = await runCli(['add', file, 'Second thing', '--id', 'second']);
   assert.strictEqual(r.code, 0, r.stderr);
-  assert.strictEqual(r.stdout, '#second\n', 'prints #<id> to stdout');
+  assert.strictEqual(r.stdout, '- [ ] Second thing {#second}\n', 'echoes the resulting canonical line');
   const after = fs.readFileSync(file, 'utf8');
   assert.ok(after.startsWith(before), 'existing bytes are preserved verbatim');
   assert.strictEqual(after, `${before}- [ ] Second thing {#second}\n`, 'exactly one canonical item line appended');
@@ -75,7 +75,7 @@ test('add generates an id from the text when --id is omitted', async () => {
   const file = tmpDoc('---\nmdc: "0.1"\n---\n\n- [ ] Anchor {#anchor}\n');
   const r = await runCli(['add', file, 'Deploy the new service']);
   assert.strictEqual(r.code, 0, r.stderr);
-  assert.strictEqual(r.stdout, '#deploy-the-new\n', 'first three slugified words');
+  assert.strictEqual(r.stdout, '- [ ] Deploy the new service {#deploy-the-new}\n', 'echoes the line; id is the first three slugified words');
 });
 
 test('add refuses an --id collision with exit 2 and leaves the file untouched', async () => {

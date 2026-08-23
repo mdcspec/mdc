@@ -31,7 +31,7 @@ Read verbs ("-" reads stdin):
 
 Mutations (real path required; refusals exit 2):
   add <file> "<text>" [--id <slug>] [--needs <a,b>] [--as <handle>] [--due <date>] [--class <c,d>]
-      [--after <id> | --section <heading>] new open item (placed at end, or after an item / in a section); prints its id
+      [--after <id> | --section <heading>] new open item (end, or after an item / in a section); echoes its line
   check <file> <id> [--date YYYY-MM-DD]    open -> done, stamps done=
   uncheck <file> <id>                      done -> open, removes done=
   cancel <file> <id> --reason "..."        -> cancelled, wraps ~~, writes reason=
@@ -258,13 +258,14 @@ async function runFmt(ctx) {
 }
 
 /**
- * `add <file> "<text>" [flags]`: append a new open item and print its id to
- * stdout so the agent can immediately claim/check/reference it.
+ * `add <file> "<text>" [flags]`: create a new open item and echo its resulting
+ * canonical line to stdout — uniform with every other mutation. The new id is
+ * the `#…` token in that line (immediately usable to claim/check/reference).
  * @param {VerbContext} ctx
  * @returns {Promise<number>}
  */
 async function runAdd(ctx) {
-  const id = await addItem(ctx.file, /** @type {string} */ (ctx.text), {
+  const { line } = await addItem(ctx.file, /** @type {string} */ (ctx.text), {
     id: /** @type {string | undefined} */ (ctx.flags.id),
     needs: /** @type {string | undefined} */ (ctx.flags.needs),
     as: /** @type {string | undefined} */ (ctx.flags.as),
@@ -273,7 +274,7 @@ async function runAdd(ctx) {
     after: /** @type {string | undefined} */ (ctx.flags.after),
     section: /** @type {string | undefined} */ (ctx.flags.section),
   });
-  process.stdout.write(`#${id}\n`);
+  emitMutation(line);
   return 0;
 }
 
