@@ -15,7 +15,7 @@ import { readFrontmatter, assertMdcDocument } from './frontmatter.js';
 import { lintDocument } from './lint.js';
 import { statusReport, nextItems, reportData } from './model.js';
 import { formatDocument } from './fmt.js';
-import { check, uncheck, cancel, claim, addItem, start, unstart, unclaim, note, withFileLock, atomicReplace } from './mutate.js';
+import { check, uncheck, cancel, claim, addItem, edit, start, unstart, unclaim, note, withFileLock, atomicReplace } from './mutate.js';
 import { cutRun } from './cut.js';
 import path from 'node:path';
 
@@ -37,6 +37,8 @@ Mutations (real path required; refusals exit 2):
   cancel <file> <id> --reason "..."        -> cancelled, wraps ~~, writes reason=
   claim <file> <id> --as <handle>          sets @handle iff no assignee set
   note <file> <id> "<text>" [--as <handle>]  attach a dated note (nested prose bullet)
+  edit <file> <id> [--text <t>] [--needs <a,b> | --add-needs <x> --rm-needs <y>] [--add-class <c>] [--rm-class <c>] [--due <date>]
+                                           amend an existing item (deps, text, classes, due)
   unclaim <file> <id> [--from <handle>]    clears the assignee (--from guards the owner)
   start <file> <id>                        marks in-progress (adds .doing)
   unstart <file> <id>                      clears .doing
@@ -313,6 +315,20 @@ async function runClaim(ctx) {
 }
 
 /** @param {VerbContext} ctx @returns {Promise<number>} */
+async function runEdit(ctx) {
+  emitMutation(await edit(ctx.file, /** @type {string} */ (ctx.id), {
+    text: /** @type {string | undefined} */ (ctx.flags.text),
+    needs: /** @type {string | undefined} */ (ctx.flags.needs),
+    addNeeds: /** @type {string | undefined} */ (ctx.flags['add-needs']),
+    rmNeeds: /** @type {string | undefined} */ (ctx.flags['rm-needs']),
+    addClass: /** @type {string | undefined} */ (ctx.flags['add-class']),
+    rmClass: /** @type {string | undefined} */ (ctx.flags['rm-class']),
+    due: /** @type {string | undefined} */ (ctx.flags.due),
+  }));
+  return 0;
+}
+
+/** @param {VerbContext} ctx @returns {Promise<number>} */
 async function runNote(ctx) {
   emitMutation(await note(ctx.file, /** @type {string} */ (ctx.id), /** @type {string} */ (ctx.text), {
     as: /** @type {string | undefined} */ (ctx.flags.as),
@@ -424,6 +440,20 @@ const VERBS = {
   cancel: { flags: { reason: { type: 'string' } }, stdin: 'never', takesId: true, required: ['reason'], run: runCancel },
   claim: { flags: { as: { type: 'string' } }, stdin: 'never', takesId: true, required: ['as'], run: runClaim },
   note: { flags: { as: { type: 'string' }, date: { type: 'string' } }, stdin: 'never', takesId: true, takesText: true, run: runNote },
+  edit: {
+    flags: {
+      text: { type: 'string' },
+      needs: { type: 'string' },
+      'add-needs': { type: 'string' },
+      'rm-needs': { type: 'string' },
+      'add-class': { type: 'string' },
+      'rm-class': { type: 'string' },
+      due: { type: 'string' },
+    },
+    stdin: 'never',
+    takesId: true,
+    run: runEdit,
+  },
   start: { flags: {}, stdin: 'never', takesId: true, run: runStart },
   unstart: { flags: {}, stdin: 'never', takesId: true, run: runUnstart },
   unclaim: { flags: { from: { type: 'string' } }, stdin: 'never', takesId: true, run: runUnclaim },

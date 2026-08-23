@@ -332,6 +332,57 @@ export async function unclaim(file, id, options = {}) {
   });
 }
 
+/**
+ * `edit`: amend an existing item's metadata in one canonical-line rewrite —
+ * text, dependency edges (`needs`), classes, and `due`. Deliberately cannot
+ * change state (`check`/`uncheck`/`cancel`), assignee (`claim`/`unclaim`), the
+ * soft `.doing`/`.waiting` classes (`start`/`unstart`), or the item's id (which
+ * would break every `needs=` reference to it). `needs` may be replaced wholesale
+ * (`needs`) or edited incrementally (`addNeeds`/`rmNeeds`, comma lists); the two
+ * modes are mutually exclusive. Requires at least one field.
+ *
+ * @param {string} file Path to the MDC document.
+ * @param {string} id Target item id.
+ * @param {{ text?: string, needs?: string, addNeeds?: string, rmNeeds?: string, addClass?: string, rmClass?: string, due?: string }} [options]
+ * @returns {Promise<string>} The rewritten canonical item line.
+ * @throws {PreconditionError} Unknown id — exit 2.
+ * @throws {Error} No field given, conflicting needs flags, empty text, bad slug/date, soft-class edit, IO, not-MDC — exit 1.
+ */
+export async function edit(file, id, options = {}) {
+  const { text, needs, addNeeds, rmNeeds, addClass, rmClass, due } = options;
+  if ([text, needs, addNeeds, rmNeeds, addClass, rmClass, due].every((v) => v === undefined)) {
+    throw new Error('edit: nothing to change (give at least one of --text/--needs/--add-needs/--rm-needs/--add-class/--rm-class/--due)');
+  }
+  if (needs !== undefined && (addNeeds !== undefined || rmNeeds !== undefined)) {
+    throw new Error('edit: --needs (replace) cannot be combined with --add-needs/--rm-needs');
+  }
+  if (text !== undefined && text.trim() === '') throw new Error('edit: --text cannot be empty');
+  if (due !== undefined && !DATE_RE.test(due)) throw new Error(`edit: --due must be YYYY-MM-DD, got '${due}'`);
+  const parseList = (/** @type {string | undefined} */ s) => (s ?? '').split(',').map((x) => x.trim()).filter((x) => x !== '');
+  const addClassList = parseList(addClass);
+  const rmClassList = parseList(rmClass);
+  for (const cls of [...addClassList, ...rmClassList]) {
+    if (!HANDLE_RE.test(cls)) throw new Error(`edit: class names must be slugs, got '${cls}'`);
+    if (SOFT_CLASSES.includes(cls)) throw new Error(`edit: '.${cls}' is managed by start/unstart, not edit`);
+  }
+  const replaceNeeds = needs !== undefined ? parseList(needs) : undefined;
+  const addNeedsList = parseList(addNeeds);
+  const rmNeedsList = parseList(rmNeeds);
+
+  return await mutateItem(file, id, (item) => {
+    if (text !== undefined) item.text = text.trim();
+    let n = Array.isArray(item.attrs.needs) ? [...item.attrs.needs] : [];
+    if (replaceNeeds !== undefined) n = replaceNeeds;
+    for (const t of addNeedsList) if (!n.includes(t)) n.push(t);
+    if (rmNeedsList.length > 0) n = n.filter((t) => !rmNeedsList.includes(t));
+    if (n.length > 0) item.attrs.needs = n;
+    else delete item.attrs.needs;
+    for (const cls of addClassList) if (!item.classes.includes(cls)) item.classes.push(cls);
+    if (rmClassList.length > 0) item.classes = item.classes.filter((cls) => !rmClassList.includes(cls));
+    if (due !== undefined) item.attrs.due = due;
+  });
+}
+
 /** Matches an existing note line at a given indent, for chronological insertion. */
 const NOTE_LINE_RE = /^- note( @[A-Za-z0-9_/-]+)? \d{4}-\d{2}-\d{2}: /;
 

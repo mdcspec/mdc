@@ -32,3 +32,13 @@ Minor: no installed `mdc` bin (agents invoke `node …/cli.js`); hand-authored b
 ## Conclusion
 
 For executing a defined plan across agents, MDC already beats plain markdown. For managing and communicating around an evolving plan it is ~60% there: the graph is excellent, but an agent repeatedly reaches for `add`, `note`, and `unclaim` and falls back to hand-editing — exactly what the format is designed to prevent. Closing that verb gap is what keeps the primary user inside the tool. The [V2 gameplan](v2-cli-ergonomics-gameplan.md) sequences it, `add` first.
+
+## Round 2 — re-dogfood against the fixed tool
+
+After the V2 verbs and the round-1 fixes shipped, the same two-agent protocol (fresh Claude + Codex, identical harness, this time with the **updated** `AGENTS.md`) was re-run.
+
+**Fixes validated.** Every round-1 convergent finding was gone from both critiques, with explicit confirmation: mutations echo their line ("as promised"), `check` auto-clears `.doing`, `status`/`report` no longer disagree, and both agents *used* `add --after`/`--section` to place follow-ups correctly ("`--after` solved document placement"). Both drove clean, canonical, coordinated boards from the snippet alone. The re-run confirmed the fixes under an independent, non-Claude tool.
+
+**New convergent finding — no way to edit an existing item.** With the round-1 friction cleared, both agents independently hit the *next* layer and named it their single biggest gap and only genuine hand-edit temptation: there was no verb to amend an existing item's `needs=`/text. It even caused a correctness failure — an item that could not get its `needs=` recorded showed as "Ready" in `next`/`report` while a note beneath it said it was blocked, i.e. the tool's own authoritative view contradicted reality. Resolved by the **`edit` verb** (MUT-8a): `edit <id> --add-needs/--rm-needs/--needs/--text/--add-class/--rm-class/--due`, one canonical-line rewrite, echoing the result. Also fixed the self-introduced `add`-echo inconsistency (both agents caught `add` printing only `#id` against the "every mutation echoes its line" promise) — `add` now echoes its line too.
+
+**Still deliberately open** (design decisions, not omissions): mutation verbs (`check`/`start`) don't enforce ownership — "claim before you work" stays advisory, and gates/`needs` shape `next` without stopping an out-of-order `check`. Both are documented in `AGENTS.md` as the intended (mechanical, graph-advisory) model.

@@ -158,6 +158,38 @@ test('report --json sorts every item into exactly one bucket, with blocked cause
   assert.deepStrictEqual(ana, { assignee: 'ana', done: 1, doing: 0, open: 1 });
 });
 
+test('edit --add-needs wires a real dependency so next/report reflect it', async () => {
+  const os = await import('node:os');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdc-edit-'));
+  const file = path.join(dir, 'e.mdc.md');
+  fs.writeFileSync(file, '---\nmdc: "0.1"\n---\n\n- [ ] Migrate DB {#db}\n- [ ] Write guide {#guide}\n');
+  // Before: #guide has no deps, so it is actionable.
+  let ids = JSON.parse((await runCli(['next', file, '--json'])).stdout).map(idOf);
+  assert.ok(ids.includes('guide'), 'guide starts actionable');
+  const r = await runCli(['edit', file, 'guide', '--add-needs', 'db']);
+  assert.strictEqual(r.stdout, '- [ ] Write guide {#guide needs=db}\n', 'echoes the amended line');
+  // After: #guide is blocked by #db — the graph now matches reality.
+  ids = JSON.parse((await runCli(['next', file, '--json'])).stdout).map(idOf);
+  assert.ok(!ids.includes('guide'), 'guide is no longer actionable (blocked by db)');
+});
+
+test('edit rejects no-op, conflicting needs flags, soft classes, and unknown id', async () => {
+  const os = await import('node:os');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdc-edit2-'));
+  const file = path.join(dir, 'e.mdc.md');
+  const input = '---\nmdc: "0.1"\n---\n\n- [ ] A {#a}\n';
+  fs.writeFileSync(file, input);
+  assert.strictEqual((await runCli(['edit', file, 'a'])).code, 1, 'no fields → usage error');
+  assert.strictEqual((await runCli(['edit', file, 'a', '--needs', 'x', '--add-needs', 'y'])).code, 1, 'replace+incremental conflict');
+  assert.strictEqual((await runCli(['edit', file, 'a', '--add-class', 'doing'])).code, 1, 'soft class is start/unstart territory');
+  assert.strictEqual((await runCli(['edit', file, 'nope', '--text', 'x'])).code, 2, 'unknown id → refusal');
+  assert.strictEqual(fs.readFileSync(file, 'utf8'), input, 'no edit touched the file');
+});
+
 test('mutations echo the resulting canonical line to stdout', async () => {
   const os = await import('node:os');
   const fs = await import('node:fs');

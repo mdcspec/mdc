@@ -40,7 +40,9 @@ If a file is a **template** (`kind: template` in its frontmatter), do not check 
 
 Every mutation **prints the resulting canonical line to stdout**, so you can see exactly what changed without a follow-up read. `check`/`cancel` also clear the `.doing` marker automatically (a finished item is no longer in progress).
 
-Other verbs you have: `uncheck <id>` (undo a check), `unstart <id>` (clear `.doing`), `unclaim <id> [--from <you>]` (release/hand back an item), `report` (a standup view), and read-only `parse`/`lint`/`fmt` for the model, structural checks, and canonical formatting. `add` also takes `--as <handle>`, `--due <date>`, and `--class <c,d>`.
+Other verbs you have: `uncheck <id>` (undo a check), `unstart <id>` (clear `.doing`), `unclaim <id> [--from <you>]` (release/hand back an item), `edit <id>` (amend an *existing* item — see below), `report` (a standup view), and read-only `parse`/`lint`/`fmt` for the model, structural checks, and canonical formatting. `add` also takes `--as <handle>`, `--due <date>`, and `--class <c,d>`.
+
+When an existing item needs to change — you discover it actually depends on other work, or its text has a typo — use `edit <id>`, never a hand-edit: `--add-needs <a,b>`/`--rm-needs <a,b>` (or `--needs <a,b>` to replace the whole list) to fix dependencies, `--text "…"` to reword, `--add-class`/`--rm-class` for classes, `--due <date>` for a deadline. This matters: if a task really is blocked but you never record the `needs=`, `next`/`report` will keep calling it "actionable" and another agent will pick it up and stall. Keep the graph honest with `edit`. (State, assignee, and `.doing` are *not* edited here — use check/uncheck/cancel, claim/unclaim, and start/unstart.)
 
 The golden rule: **claim before you work, check after.** Each mutation rewrites exactly one line, so your edits and a teammate's (human or agent) merge cleanly under plain git, and the git history is the audit trail. Never hand-edit an item's `[ ]`/`[x]` or its metadata when a verb does it — the verbs keep the file canonical.
 

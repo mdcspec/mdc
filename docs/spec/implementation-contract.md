@@ -159,6 +159,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `cancel <id> --reason "…"` | any non-cancelled → cancelled, wraps `~~`, writes `reason=`, clears `.doing`/`.waiting` | 0; 2 unknown id or already cancelled; 1 |
 | `claim <id> --as <handle>` | sets `@handle` **iff no assignee set** | 0; 2 unknown id or assignee already set; 1 |
 | `note <id> "<text>" [--as <handle>] [--date <date>]` | append a nested prose note `  - note @who date: text` under the item; invisible to the model | 0; 2 unknown id; 1 empty/multiline text or bad flag |
+| `edit <id> [--text …] [--needs a,b \| --add-needs x --rm-needs y] [--add-class c] [--rm-class c] [--due <date>]` | amend an existing item's text/needs/classes/due (not state, assignee, `.doing`, or id) | 0; 2 unknown id; 1 no field, conflicting needs flags, soft-class edit, or bad slug/date |
 | `unclaim <id> [--from <handle>]` | clears `@assignee`; `--from` refuses on owner mismatch | 0; 2 unknown id, no assignee, or `--from` mismatch; 1 |
 | `start <id>` / `unstart <id>` | add / remove the `.doing` class (informational; STATE-6) | 0; 2 unknown id, not open / already `.doing` (start), or not `.doing` (unstart); 1 |
 | `cut <template> [--out <file>] [--title …] [--as-version <v>] [--date …]` | instantiate a run from a template; to `--out` or stdout | 0; 2 `--out` exists (no overwrite); 1 not-MDC / not a template |

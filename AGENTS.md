@@ -34,6 +34,7 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 | `cancel <file> <id> --reason "…"` | → cancelled |
 | `claim <file> <id> --as <handle>` | set assignee iff none set (atomic) |
 | `note <file> <id> "<text>" [--as <handle>]` | attach a dated note (nested prose; invisible to the task model) |
+| `edit <file> <id> [--text …] [--needs a,b \| --add-needs x --rm-needs y] [--add-class c] [--rm-class c] [--due …]` | amend an existing item's deps/text/classes/due |
 | `unclaim <file> <id> [--from <handle>]` | release the assignee (`--from` guards the owner) |
 | `start <file> <id>` / `unstart <file> <id>` | mark / unmark in-progress (`.doing`) |
 | `cut <template> [--out …] [--title …] [--as-version …]` | instantiate a `kind: run` from a `kind: template` |
