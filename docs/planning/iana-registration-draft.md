@@ -2,6 +2,19 @@
 
 *A ready-to-submit registration for the `mdc` variant of `text/markdown`, plus the companion namespace actions. This is the M0 milestone: complete it before any public announcement, so the format's identity is secured the way CommonMark's late rename taught the ecosystem to do.*
 
+## ⚠️ NEEDS OWNER DECISION
+
+Every technical field below is finalized from the spec and repo. Only the following require a personal or ownership decision from the project owner before the template can be sent. Each maps to a placeholder in the template block (search for `<OWNER: …>`); nothing here is invented.
+
+| # | Field(s) in template | What is needed | Recommended default |
+|---|---|---|---|
+| 1 | **Person & email address to contact** | A maintainer name and a contact email, **written as plain text — never a mailto link**. Prefer a role/project address (e.g. a `spec@…` or `maintainers@…` alias on the project domain from M0) over a personal inbox, so the registry entry survives a maintainer change. | Name = the MDC project maintainer; email = a project-domain alias once the M0 domain is acquired. |
+| 2 | **Author** | The named author/originator of the variant. May be the maintainer's own name or the project name. | "The MDC project" (or the owner's own name if a personal attribution is preferred). |
+| 3 | **Change controller** | Who controls future changes to this registration. IANA needs a durable answer, not a personal inbox that may lapse. | The MDC project's stewardship body — i.e. "The MDC project maintainers" now, updatable to a formal governance body/foundation later. |
+| 4 | **Published specification URL** | A **public, resolving** URL for MDC Specification v0.1. This is blocked on the spec repo going public (M0 repository action). The source of record is `spec/mdc-spec-v0.1.md`. | A stable URL to `spec/mdc-spec-v0.1.md` on the public repo (or on the M0 docs domain), pinned to the v0.1 tag/commit so the link is immutable. |
+
+Decisions 1–3 are pure ownership calls. Decision 4 is **gated on publishing the repo** — do that first, then paste the resolved URL in. See [`m0-namespace-checklist.md`](m0-namespace-checklist.md) for the ordered execution steps and blocking relationships.
+
 ## What is being registered
 
 [RFC 7763](https://www.rfc-editor.org/rfc/rfc7763) defines the `text/markdown` media type with a required `variant` parameter, and [RFC 7764](https://www.rfc-editor.org/rfc/rfc7764) establishes the **Markdown Variants** registry that enumerates the legal `variant` values. Registration is **First Come First Served** — no standards-track document is required, only a completed template sent to the designated list. Registering `variant=mdc` gives MDC a legitimate, citable identity in the one namespace neither Cursor's `.mdc` rules files nor Nuxt's MDC components have claimed.
@@ -10,7 +23,7 @@ Registry: <https://www.iana.org/assignments/markdown-variants/markdown-variants.
 
 ## Registration template
 
-Per RFC 7764 Section 6. Bracketed fields marked TODO are for the project owner to finalize before submission.
+Per RFC 7764 Section 6. Every field is finalized except the four `<OWNER: …>` placeholders, which correspond to the numbered decisions in the "⚠️ NEEDS OWNER DECISION" block above. Fill those four in and the block is ready to send verbatim.
 
 ```
 Identifier:
@@ -56,8 +69,9 @@ Interoperability considerations:
   item model.
 
 Published specification:
-  MDC Specification v0.1. [TODO: public URL once the spec repo is published;
-  the source of record is spec/mdc-spec-v0.1.md in the project repository.]
+  MDC Specification v0.1.
+  <OWNER: public URL — decision #4; must resolve before submission. Source of
+  record is spec/mdc-spec-v0.1.md in the project repository.>
 
 Applications that use this media type:
   Checklist and task tooling, CI/release gating, ops runbooks, and AI coding
@@ -67,7 +81,8 @@ Fragment identifier considerations:
   See "Additional information" above.
 
 Person & email address to contact for further information:
-  [TODO: maintainer name] — [TODO: contact email, written as plain text]
+  <OWNER: maintainer name — decision #1> — <OWNER: contact email, plain text,
+  no mailto — decision #1>
 
 Intended usage:
   COMMON
@@ -76,15 +91,17 @@ Restrictions on usage:
   None.
 
 Author:
-  [TODO: maintainer / project name]
+  <OWNER: author name or project name — decision #2>
 
 Change controller:
-  [TODO: maintainer or governing body]
+  <OWNER: stewardship body — decision #3>
+  Recommended: "The MDC project maintainers" (updatable to a formal
+  governance body later).
 ```
 
 ## Submission steps
 
-1. Fill every `[TODO]` field. The published-specification URL should resolve before submission; if the spec repo is not yet public, host `spec/mdc-spec-v0.1.md` at a stable URL first.
+1. Supply the four `<OWNER: …>` values (decisions #1–#4 in the block at the top). **Decision #4 is blocked on the spec repo being public** — publish it first so the Published-specification URL resolves; a registration citing a dead link should not be sent.
 2. Send the completed template to the registry's designated contact as described on the [Markdown Variants registry page](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) (First Come First Served; no Expert Review gate).
 3. Record the assigned entry back in this file once confirmed.
 
