@@ -11,6 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { runCli, corpusRoot, deepEqualIgnoringLines, assertBytesEqual } from './corpus.js';
 
 const manifest = JSON.parse(fs.readFileSync(path.join(corpusRoot, 'manifest.json'), 'utf8'));
@@ -60,6 +61,19 @@ for (const c of manifest.cases) {
     }
   });
 }
+
+test('the language-agnostic Python runner passes against the reference CLI (portability proof)', (t) => {
+  // A second, non-JS process consuming only manifest.json + the CLI contract.
+  // If Python isn't available (some CI), skip rather than fail.
+  try {
+    execFileSync('python3', ['--version'], { stdio: 'ignore' });
+  } catch {
+    return t.skip('python3 not available');
+  }
+  const runner = path.join(corpusRoot, '..', 'conformance', 'run.py');
+  // Throws on non-zero exit (i.e. any case fails), failing this test.
+  execFileSync('python3', [runner], { stdio: 'pipe' });
+});
 
 test('spec citation integrity: every [family/case] and [file.mdc.md] cited in the spec resolves', () => {
   const specPath = path.join(corpusRoot, '..', 'mdc-spec-v0.1.md');

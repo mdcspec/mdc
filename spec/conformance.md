@@ -71,4 +71,13 @@ See spec [§12](mdc-spec-v0.1.md) for the normative statements. In brief, an imp
 
 ## Bootstrapping a second implementation
 
-The corpus (`corpus/`) is MIT-licensed precisely so it can be vendored verbatim into another implementation's test suite. A reference conformance runner that consumes only this contract + the manifest + a CLI command path — re-pointable from the JS `mdc` to any other binary — is the proof that the contract is portable; it is the concrete deliverable behind the spec's "a second-language parser is a hard gate before 1.0."
+The corpus (`corpus/`) is MIT-licensed precisely so it can be vendored verbatim into another implementation's test suite.
+
+A reference conformance runner ships at [`conformance/run.py`](conformance/run.py): a standalone, standard-library-only Python program that consumes only this contract + `corpus/manifest.json` + a CLI command path. It drives the reference JS CLI by default and is re-pointable at any other binary with `--cli` (the toml-test `-decoder` model):
+
+```
+python3 spec/conformance/run.py                          # the reference JS CLI
+python3 spec/conformance/run.py --cli "./target/release/mdc" --level L1
+```
+
+That a non-JavaScript process can judge any implementation against the corpus is the proof the contract is portable — the concrete artifact behind the spec's "a second-language parser is a hard gate before 1.0." A second implementation earns a conformance class by passing `run.py` pointed at its own binary.
