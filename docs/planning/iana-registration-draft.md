@@ -2,18 +2,18 @@
 
 *A ready-to-submit registration for the `mdc` variant of `text/markdown`, plus the companion namespace actions. This is the M0 milestone: complete it before any public announcement, so the format's identity is secured the way CommonMark's late rename taught the ecosystem to do.*
 
-## ⚠️ NEEDS OWNER DECISION
+## Owner fields — decided (one gated)
 
-Every technical field below is finalized from the spec and repo. Only the following require a personal or ownership decision from the project owner before the template can be sent. Each maps to a placeholder in the template block (search for `<OWNER: …>`); nothing here is invented.
+The owner decisions are settled and filled into the template below. Decisions 1–3 are final; only the Published-specification URL remains gated on the repo/site going public.
 
-| # | Field(s) in template | What is needed | Recommended default |
+| # | Field | Value | Status |
 |---|---|---|---|
-| 1 | **Person & email address to contact** | A maintainer name and a contact email, **written as plain text — never a mailto link**. Prefer a role/project address (e.g. a `spec@…` or `maintainers@…` alias on the project domain from M0) over a personal inbox, so the registry entry survives a maintainer change. | Name = the MDC project maintainer; email = a project-domain alias once the M0 domain is acquired. |
-| 2 | **Author** | The named author/originator of the variant. May be the maintainer's own name or the project name. | "The MDC project" (or the owner's own name if a personal attribution is preferred). |
-| 3 | **Change controller** | Who controls future changes to this registration. IANA needs a durable answer, not a personal inbox that may lapse. | The MDC project's stewardship body — i.e. "The MDC project maintainers" now, updatable to a formal governance body/foundation later. |
-| 4 | **Published specification URL** | A **public, resolving** URL for MDC Specification v0.1. This is blocked on the spec repo going public (M0 repository action). The source of record is `spec/mdc-spec-v0.1.md`. | A stable URL to `spec/mdc-spec-v0.1.md` on the public repo (or on the M0 docs domain), pinned to the v0.1 tag/commit so the link is immutable. |
+| 1 | **Contact** | Tim Walsh — `spec@mdcspec.dev` (project-domain role alias, plain text, no mailto) | ✅ decided — *requires the `spec@mdcspec.dev` alias to exist once the domain is live; until then a monitored address can stand in* |
+| 2 | **Author** | Tim Walsh (GitHub: `timimsms`) | ✅ decided |
+| 3 | **Change controller** | The MDC project maintainers (the `mdcspec` project); currently stewarded by DireLabs, updatable to a governance council per [`GOVERNANCE.md`](../../GOVERNANCE.md) | ✅ decided — neutral project identity, not a personal or company namespace, so a future council inherits it with no re-registration |
+| 4 | **Published specification URL** | intended `https://mdcspec.dev/spec/v0.1`; interim `https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md` | ⏳ **gated on publishing** — must resolve before submission |
 
-Decisions 1–3 are pure ownership calls. Decision 4 is **gated on publishing the repo** — do that first, then paste the resolved URL in. See [`m0-namespace-checklist.md`](m0-namespace-checklist.md) for the ordered execution steps and blocking relationships.
+The identity is anchored on the neutral **`mdcspec`** namespace across all surfaces (GitHub org · `@mdcspec` npm scope · `mdcspec.dev` domain · this IANA contact/controller). See [`m0-namespace-checklist.md`](m0-namespace-checklist.md) for the ordered execution steps and blocking relationships.
 
 ## What is being registered
 
@@ -70,8 +70,10 @@ Interoperability considerations:
 
 Published specification:
   MDC Specification v0.1.
-  <OWNER: public URL — decision #4; must resolve before submission. Source of
-  record is spec/mdc-spec-v0.1.md in the project repository.>
+  https://mdcspec.dev/spec/v0.1  (intended stable URL)
+  <MUST resolve before submission — gated on publishing the spec repo/site.
+  Until the domain/site is live, use the tag-pinned repo URL, e.g.
+  https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md>
 
 Applications that use this media type:
   Checklist and task tooling, CI/release gating, ops runbooks, and AI coding
@@ -81,8 +83,7 @@ Fragment identifier considerations:
   See "Additional information" above.
 
 Person & email address to contact for further information:
-  <OWNER: maintainer name — decision #1> — <OWNER: contact email, plain text,
-  no mailto — decision #1>
+  Tim Walsh — spec@mdcspec.dev
 
 Intended usage:
   COMMON
@@ -91,12 +92,11 @@ Restrictions on usage:
   None.
 
 Author:
-  <OWNER: author name or project name — decision #2>
+  Tim Walsh (GitHub: timimsms)
 
 Change controller:
-  <OWNER: stewardship body — decision #3>
-  Recommended: "The MDC project maintainers" (updatable to a formal
-  governance body later).
+  The MDC project maintainers (the "mdcspec" project); currently stewarded by
+  DireLabs. Updatable to a formal governance body/council per GOVERNANCE.md.
 ```
 
 ## Submission steps

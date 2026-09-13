@@ -99,3 +99,13 @@ The new run pins `template: templates/release.mdc.md@5`, records `started`, and 
 - **[docs/adoption/agent-snippet.md](docs/adoption/agent-snippet.md)** — drop-in instructions to teach a coding agent to drive MDC files in any repo.
 - **[AGENTS.md](AGENTS.md)** — orientation for agents working in this repo.
 - **[docs/planning/mvp-definition.md](docs/planning/mvp-definition.md)** · **[docs/planning/iana-registration-draft.md](docs/planning/iana-registration-draft.md)** — the MVP scope and the namespace launch actions.
+- **[docs/planning/standardization-roadmap.md](docs/planning/standardization-roadmap.md)** — the path from "a tool with a spec" to a de-facto standard.
+
+## License and governance
+
+The license is split so independent implementations are unencumbered:
+
+- **Code and the conformance corpus** (`spec/corpus/`) — [MIT](LICENSE), so the corpus can be vendored verbatim into any implementation's test suite.
+- **Specification and documentation prose** — [CC BY 4.0](LICENSE-docs) (attribution-only, no ShareAlike).
+
+Governance ([GOVERNANCE.md](GOVERNANCE.md)) is single-maintainer for now, bound to "the conformance corpus is the arbiter," with a written, evidence-gated path to an implementers' council. Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md).

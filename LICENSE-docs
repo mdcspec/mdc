@@ -1,0 +1,32 @@
+Documentation and specification license
+========================================
+
+SPDX-License-Identifier: CC-BY-4.0
+
+The MDC **specification prose and documentation** — the normative spec
+(`spec/mdc-spec-v0.1.md`), the design/planning/vision documents under `docs/`,
+and other prose — are licensed under the
+
+    Creative Commons Attribution 4.0 International License (CC BY 4.0)
+
+Human-readable summary:  https://creativecommons.org/licenses/by/4.0/
+Full legal code:         https://creativecommons.org/licenses/by/4.0/legalcode
+
+You are free to share and adapt this material for any purpose, including
+commercially, provided you give appropriate credit, link to the license, and
+indicate if changes were made. Attribution:
+
+    "Markdown Checklists (MDC)" by Tim Walsh and the MDC project contributors,
+    licensed under CC BY 4.0.
+
+Attribution-only (no ShareAlike) is deliberate: independent implementations
+must be free to copy grammar tables, examples, and normative wording into
+their own documentation and code without any relicensing obligation.
+
+Scope note
+----------
+This CC BY 4.0 license applies ONLY to the specification prose and prose
+documentation. The reference implementation code AND the conformance corpus
+under `spec/corpus/` are licensed separately under the MIT License (see
+`LICENSE`), so the corpus can be vendored verbatim into any implementation's
+test suite in any language.

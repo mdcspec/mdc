@@ -2,6 +2,18 @@
 
 *The ordered, owner-actionable steps to secure MDC's identity before any public announcement: publish the spec repo, register the IANA `text/markdown; variant=mdc` variant, reserve the `@mdcspec` npm scope, and acquire a project domain. These are the three open items in [`../../checklists/mvp-build.mdc.md`](../../checklists/mvp-build.mdc.md) (`m0-iana`, `m0-npm`, `m0-domain`), on which public launch (`m7-launch`) is blocked.*
 
+## Decisions locked (2026-09)
+
+The identity is anchored on the neutral **`mdcspec`** namespace across every surface — deliberately *not* a personal account or the DireLabs company namespace, so a future governance council inherits it cleanly ([`GOVERNANCE.md`](../../GOVERNANCE.md)):
+
+- **GitHub org:** `mdcspec` (create the org, then **transfer the repo into it before the first public/cited URL**; add a backup account as a second org admin). DireLabs is the *current steward*, not the namespace holder.
+- **npm scope:** `@mdcspec`.
+- **Domain:** **`mdcspec.dev`** (primary — matches org + scope); also grab `mdcspec.org` (defensive) and optionally `markdownchecklists.dev` as a descriptive redirect.
+- **IANA contact:** `spec@mdcspec.dev` · **Author:** Tim Walsh (`timimsms`) · **Change controller:** the MDC project maintainers (`mdcspec`). All filled in [`iana-registration-draft.md`](iana-registration-draft.md).
+- **Licenses:** MIT (code + corpus) + CC BY 4.0 (spec prose) — committed at repo root.
+
+Prerequisite step **A0** (before A): create the `mdcspec` GitHub org + second admin, then transfer the repo.
+
 ## Dependency order at a glance
 
 ```
