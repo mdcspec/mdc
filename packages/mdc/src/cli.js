@@ -44,7 +44,7 @@ Mutations (real path required; refusals exit 2):
   unstart <file> <id>                      clears .doing
 
 Instantiate:
-  cut <template> [--out <file>] [--title <t>] [--as-version <v>] [--date YYYY-MM-DD]
+  cut <template> [--out <file>] [--title <t>] [--as-version <v>] [--template-ref <ref>] [--date YYYY-MM-DD]
                                            cut a run from a template; --out or stdout
 
 Exit codes: 0 success · 1 usage/IO/parse/not-MDC · 2 domain refusal
@@ -94,13 +94,28 @@ function itemLabel(item) {
 }
 
 /**
- * `parse --json`: L1 model to stdout. Exit 0; 1 on error/not-MDC.
+ * `parse --json`: L1 model to stdout. Exit 0; 1 on error/not-MDC. On a
+ * detection/version error the error token is emitted as JSON on stdout
+ * (`{"error":"not-mdc"|"unsupported-version"}`) so the class is observable
+ * through the CLI, not only as an exit code — a human message still goes to
+ * stderr, and the exit is 1.
  * @param {VerbContext} ctx
  * @returns {Promise<number>}
  */
 async function runParse(ctx) {
-  emitJson(parseDocument(await readInput(ctx.file)));
-  return 0;
+  const text = await readInput(ctx.file);
+  try {
+    emitJson(parseDocument(text));
+    return 0;
+  } catch (err) {
+    const code = /** @type {{ code?: string }} */ (err)?.code;
+    if (code === 'not-mdc' || code === 'unsupported-version') {
+      emitJson({ error: code });
+      process.stderr.write(`mdc: ${/** @type {Error} */ (err).message}\n`);
+      return 1;
+    }
+    throw err;
+  }
 }
 
 /**
@@ -381,8 +396,12 @@ async function runCut(ctx) {
   const src = fs.readFileSync(ctx.file, 'utf8');
   const out = /** @type {string | undefined} */ (ctx.flags.out);
   const version = /** @type {string | undefined} */ (ctx.flags['as-version']);
+  const refOverride = /** @type {string | undefined} */ (ctx.flags['template-ref']);
   const refPath = out ? path.relative(path.dirname(out), ctx.file) || path.basename(ctx.file) : ctx.file;
-  const templateRef = version ? `${refPath}@${version}` : refPath;
+  // `--template-ref` pins the run's `template:` value exactly (deterministic,
+  // path-independent — used by the conformance corpus); otherwise it is derived
+  // from the source path with `@version` appended when `--as-version` is given.
+  const templateRef = refOverride ?? (version ? `${refPath}@${version}` : refPath);
   const started = /** @type {string | undefined} */ (ctx.flags.date) ?? today();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(started)) throw usageError(`cut: --date must be YYYY-MM-DD, got '${started}'`);
 
@@ -458,7 +477,7 @@ const VERBS = {
   unstart: { flags: {}, stdin: 'never', takesId: true, run: runUnstart },
   unclaim: { flags: { from: { type: 'string' } }, stdin: 'never', takesId: true, run: runUnclaim },
   cut: {
-    flags: { out: { type: 'string' }, title: { type: 'string' }, 'as-version': { type: 'string' }, date: { type: 'string' } },
+    flags: { out: { type: 'string' }, title: { type: 'string' }, 'as-version': { type: 'string' }, 'template-ref': { type: 'string' }, date: { type: 'string' } },
     stdin: 'never',
     run: runCut,
   },

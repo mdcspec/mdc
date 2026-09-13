@@ -147,7 +147,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 | Verb | Behavior | Exit codes |
 |---|---|---|
-| `parse --json` | L1 model to stdout | 0; 1 on error/not-MDC |
+| `parse --json` | L1 model to stdout; on not-MDC / unsupported-version emits `{"error":"<token>"}` to stdout (human msg to stderr) | 0; 1 on error/not-MDC |
 | `lint [--json]` | findings report | 0 clean (warnings allowed unless `--strict`); 2 findings with severity error; 1 error |
 | `status [--json]` | totals, progress (cancelled excluded), blocked/actionable/doing lists, per-section rollup | 0; 1 |
 | `next [--json] [--as <handle>]` | ordered actionable items; `--as` keeps only that handle's own + unclaimed items | 0 (even if empty); 1 |
@@ -162,7 +162,7 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 | `edit <id> [--text …] [--needs a,b \| --add-needs x --rm-needs y] [--add-class c] [--rm-class c] [--due <date>]` | amend an existing item's text/needs/classes/due (not state, assignee, `.doing`, or id) | 0; 2 unknown id; 1 no field, conflicting needs flags, soft-class edit, or bad slug/date |
 | `unclaim <id> [--from <handle>]` | clears `@assignee`; `--from` refuses on owner mismatch | 0; 2 unknown id, no assignee, or `--from` mismatch; 1 |
 | `start <id>` / `unstart <id>` | add / remove the `.doing` class (informational; STATE-6) | 0; 2 unknown id, not open / already `.doing` (start), or not `.doing` (unstart); 1 |
-| `cut <template> [--out <file>] [--title …] [--as-version <v>] [--date …]` | instantiate a run from a template; to `--out` or stdout | 0; 2 `--out` exists (no overwrite); 1 not-MDC / not a template |
+| `cut <template> [--out <file>] [--title …] [--as-version <v>] [--template-ref <ref>] [--date …]` | instantiate a run from a template; to `--out` or stdout. `--template-ref` pins the `template:` value exactly (path-independent; used by the conformance corpus) | 0; 2 `--out` exists (no overwrite); 1 not-MDC / not a template |
 
 Exit-code law: `0` success · `1` usage / IO / parse / not-MDC errors · `2` domain refusal (lint errors, `fmt --check` drift, mutation precondition failed, `cut --out` would overwrite). Agents branch on `2`. Errors go to stderr; machine output to stdout only.
 

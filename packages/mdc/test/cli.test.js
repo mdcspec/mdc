@@ -228,7 +228,6 @@ test('report human output is non-empty and names the buckets', async () => {
 
 test('every read verb refuses a non-MDC document with exit 1', async () => {
   const invocations = [
-    ['parse', '-', '--json'],
     ['lint', '-'],
     ['status', '-'],
     ['next', '-'],
@@ -241,6 +240,16 @@ test('every read verb refuses a non-MDC document with exit 1', async () => {
     assert.match(r.stderr, /not an MDC document/, `${argv[0]} names the refusal`);
     assert.strictEqual(r.stdout, '', `${argv[0]} keeps machine output off stdout on error`);
   }
+});
+
+test('parse emits the error token as JSON on stdout (exit 1), so the class is CLI-observable', async () => {
+  const notMdc = await runCli(['parse', '-', '--json'], { input: NOT_MDC });
+  assert.strictEqual(notMdc.code, 1);
+  assert.deepStrictEqual(JSON.parse(notMdc.stdout), { error: 'not-mdc' });
+  assert.match(notMdc.stderr, /not an MDC document/, 'human message still on stderr');
+  const badVer = await runCli(['parse', '-', '--json'], { input: '---\nmdc: "0.2"\n---\n\n- [ ] x {#x}\n' });
+  assert.strictEqual(badVer.code, 1);
+  assert.deepStrictEqual(JSON.parse(badVer.stdout), { error: 'unsupported-version' });
 });
 
 test('usage errors exit 1 with usage on stderr', async () => {
