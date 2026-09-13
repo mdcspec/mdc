@@ -110,6 +110,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Run the MDC conformance corpus against a CLI.")
     ap.add_argument("--cli", default=DEFAULT_CLI, help="CLI command to drive (default: the reference JS CLI).")
     ap.add_argument("--level", choices=["L1", "L2"], help="Only run cases at this conformance level.")
+    ap.add_argument("--family", help="Only run cases in this family (parse, lint, fmt, mutate, add, note, cut).")
     ap.add_argument("--corpus", default=str(CORPUS), help="Path to spec/corpus (default: alongside this script).")
     ap.add_argument("-v", "--verbose", action="store_true", help="Print every case, not just failures.")
     args = ap.parse_args()
@@ -121,6 +122,8 @@ def main() -> int:
     cases = manifest["cases"]
     if args.level:
         cases = [c for c in cases if c["level"] == args.level]
+    if args.family:
+        cases = [c for c in cases if c["family"] == args.family]
 
     passed = failed = 0
     for case in cases:
