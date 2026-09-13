@@ -61,6 +61,23 @@ for (const c of manifest.cases) {
   });
 }
 
+test('spec citation integrity: every [family/case] and [file.mdc.md] cited in the spec resolves', () => {
+  const specPath = path.join(corpusRoot, '..', 'mdc-spec-v0.1.md');
+  const spec = fs.readFileSync(specPath, 'utf8');
+  const families = ['parse', 'lint', 'fmt', 'mutate', 'add', 'note', 'cut'];
+  const cited = new Set((spec.match(/\[[a-z0-9./-]+\]/g) ?? []).map((m) => m.slice(1, -1)));
+  const missing = [];
+  for (const ref of cited) {
+    if (families.some((f) => ref.startsWith(`${f}/`))) {
+      if (!fs.existsSync(path.join(corpusRoot, ref))) missing.push(`${ref} (corpus case dir)`);
+    } else if (ref.endsWith('.mdc.md')) {
+      if (!fs.existsSync(path.join(corpusRoot, ref))) missing.push(`${ref} (top-level fixture)`);
+    }
+    // other bracketed tokens (rule names, prose) are ignored
+  }
+  assert.deepStrictEqual(missing, [], `spec cites fixtures that do not exist: ${missing.join(', ')}`);
+});
+
 test('manifest ↔ corpus integrity: every manifest case exists, and every corpus case is listed', () => {
   const listed = new Set(manifest.cases.map((c) => c.id));
   // Every listed case directory exists with its input.
