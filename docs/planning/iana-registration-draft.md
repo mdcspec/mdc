@@ -11,7 +11,7 @@ The owner decisions are settled and filled into the template below. Decisions 1�
 | 1 | **Contact** | Tim Walsh — `spec@mdcspec.dev` (project-domain role alias, plain text, no mailto) | ✅ decided — *requires the `spec@mdcspec.dev` alias to exist once the domain is live; until then a monitored address can stand in* |
 | 2 | **Author** | Tim Walsh (GitHub: `timimsms`) | ✅ decided |
 | 3 | **Change controller** | The MDC project maintainers (the `mdcspec` project); currently stewarded by DireLabs, updatable to a governance council per [`GOVERNANCE.md`](../../GOVERNANCE.md) | ✅ decided — neutral project identity, not a personal or company namespace, so a future council inherits it with no re-registration |
-| 4 | **Published specification URL** | intended `https://mdcspec.dev/spec/v0.1`; interim `https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md` | ⏳ **gated on publishing** — must resolve before submission |
+| 4 | **Published specification URL** | `https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md` | ✅ resolved — repo is public, tag-pinned URL verified (HTTP 200) |
 
 The identity is anchored on the neutral **`mdcspec`** namespace across all surfaces (GitHub org · `@mdcspec` npm scope · `mdcspec.dev` domain · this IANA contact/controller). See [`m0-namespace-checklist.md`](m0-namespace-checklist.md) for the ordered execution steps and blocking relationships.
 
@@ -23,7 +23,7 @@ Registry: <https://www.iana.org/assignments/markdown-variants/markdown-variants.
 
 ## Registration template
 
-Per RFC 7764 Section 6. Every field is finalized except the four `<OWNER: …>` placeholders, which correspond to the numbered decisions in the "⚠️ NEEDS OWNER DECISION" block above. Fill those four in and the block is ready to send verbatim.
+Per RFC 7764 Section 6. **Every field is finalized** — the block below is ready to send verbatim.
 
 ```
 Identifier:
@@ -70,10 +70,9 @@ Interoperability considerations:
 
 Published specification:
   MDC Specification v0.1.
-  https://mdcspec.dev/spec/v0.1  (intended stable URL)
-  <MUST resolve before submission — gated on publishing the spec repo/site.
-  Until the domain/site is live, use the tag-pinned repo URL, e.g.
-  https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md>
+  https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md
+  (Tag-pinned and public; verified resolving. A mdcspec.dev/spec/v0.1 docs
+  URL may supersede this later via an updated registration.)
 
 Applications that use this media type:
   Checklist and task tooling, CI/release gating, ops runbooks, and AI coding
@@ -101,8 +100,8 @@ Change controller:
 
 ## Submission steps
 
-1. Supply the four `<OWNER: …>` values (decisions #1–#4 in the block at the top). **Decision #4 is blocked on the spec repo being public** — publish it first so the Published-specification URL resolves; a registration citing a dead link should not be sent.
-2. Send the completed template to the registry's designated contact as described on the [Markdown Variants registry page](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) (First Come First Served; no Expert Review gate).
+1. ✅ All owner fields are filled and the Published-specification URL is public and verified resolving — the template is ready to send verbatim.
+2. **Send the completed template** to the registry's designated contact as described on the [Markdown Variants registry page](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) (First Come First Served; no Expert Review gate). *(This email send is the only remaining M0 action.)*
 3. Record the assigned entry back in this file once confirmed.
 
 ## Companion namespace actions (M0)

@@ -17,8 +17,9 @@ progress; `mdc next` shows what is actionable given the `needs=` edges.
 ## M0 — Namespace (external, owner actions)
 
 - [ ] Register `text/markdown; variant=mdc` with IANA {#m0-iana @tim}
-- [ ] Secure the `@mdcspec` npm scope {#m0-npm @tim}
-- [ ] Secure the project domain {#m0-domain @tim}
+  - note @tim 2026-09-13: Registration fully drafted (all fields resolved, spec URL public + verified). Remaining: email the plain-text template to the IANA registry contact.
+- [x] Secure the `@mdcspec` npm scope {#m0-npm @tim done=2026-09-13}
+- [x] Secure the project domain {#m0-domain @tim done=2026-09-13}
 
 ## M1 — Spec and corpus
 
