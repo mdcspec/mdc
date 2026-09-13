@@ -1,0 +1,1141 @@
+{
+  "version": "0.1",
+  "note": "Machine-readable index of the MDC conformance corpus. See spec/conformance.md for the run contract and comparison law. Compare modes: json-model, json-findings, bytes, exit, error.",
+  "cases": [
+    {
+      "id": "add/after-sibling",
+      "family": "add",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "add",
+        "$FILE",
+        "New after parent",
+        "--id",
+        "newp",
+        "--after",
+        "parent"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "add/append-basic",
+      "family": "add",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "add",
+        "$FILE",
+        "Rate-limit the send endpoint",
+        "--id",
+        "rate-limit",
+        "--needs",
+        "send",
+        "--as",
+        "agent-a"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "add/generated-id",
+      "family": "add",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "add",
+        "$FILE",
+        "Write the runbook"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "add/into-section",
+      "family": "add",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "add",
+        "$FILE",
+        "Validate links",
+        "--id",
+        "links",
+        "--needs",
+        "docs",
+        "--section",
+        "Docs"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "cut/from-canonical-template",
+      "family": "cut",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "cut",
+        "$FILE",
+        "--out",
+        "$OUT",
+        "--template-ref",
+        "templates/release.mdc.md@5",
+        "--title",
+        "Release 2.4.0",
+        "--date",
+        "2026-07-24"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0,
+      "out": "$OUT"
+    },
+    {
+      "id": "cut/strips-run-state",
+      "family": "cut",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "cut",
+        "$FILE",
+        "--out",
+        "$OUT",
+        "--template-ref",
+        "onboarding.mdc.md",
+        "--date",
+        "2026-08-04"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0,
+      "out": "$OUT"
+    },
+    {
+      "id": "fmt/already-canonical",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/attr-order",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/bracket-case",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/cancelled-canonical",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/child-indent",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/drop-duplicate-sigils",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/fmt-assign-ids",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "--assign-ids",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/list-markers",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/prose-nested-indent",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/quote-brace-value",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/quote-minimization",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "fmt/spacing",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "lint/cancelled-without-reason",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/clean",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/dangling-needs",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/duplicate-id",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/invalid-date",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/invalid-date-due",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/invalid-date-started",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/invalid-repeat",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/malformed-attributes",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/multiple-assignees",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/multiple-ids",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/needs-cycle",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/non-canonical-state",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/unknown-key",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/unpinned-template",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "lint/unresolved-cross-file-ref",
+      "family": "lint",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "lint",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-findings",
+      "expect": "expected.json"
+    },
+    {
+      "id": "mutate/cancel",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "cancel",
+        "$FILE",
+        "handouts",
+        "--reason",
+        "going paperless"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/check",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "check",
+        "$FILE",
+        "water",
+        "--date",
+        "2026-07-26"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/check-clears-doing",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "check",
+        "$FILE",
+        "build",
+        "--date",
+        "2026-08-22"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/check-noncanonical",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "check",
+        "$FILE",
+        "water",
+        "--date",
+        "2026-07-26"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/claim",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "claim",
+        "$FILE",
+        "review",
+        "--as",
+        "maria"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/claim-conflict",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "claim",
+        "$FILE",
+        "review",
+        "--as",
+        "maria"
+      ],
+      "compare": "exit",
+      "exit": 2
+    },
+    {
+      "id": "mutate/edit-add-needs",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "edit",
+        "$FILE",
+        "guide",
+        "--add-needs",
+        "db"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/edit-soft-class-refused",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "edit",
+        "$FILE",
+        "t",
+        "--add-class",
+        "doing"
+      ],
+      "compare": "exit",
+      "exit": 1
+    },
+    {
+      "id": "mutate/edit-text",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "edit",
+        "$FILE",
+        "bug",
+        "--text",
+        "Fix the bug"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/start",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "start",
+        "$FILE",
+        "build"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/start-terminal-refused",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "start",
+        "$FILE",
+        "build"
+      ],
+      "compare": "exit",
+      "exit": 2
+    },
+    {
+      "id": "mutate/uncheck",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "uncheck",
+        "$FILE",
+        "water"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/unclaim",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "unclaim",
+        "$FILE",
+        "build"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "mutate/unclaim-from-mismatch",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "unclaim",
+        "$FILE",
+        "build",
+        "--from",
+        "agent-b"
+      ],
+      "compare": "exit",
+      "exit": 2
+    },
+    {
+      "id": "mutate/unstart",
+      "family": "mutate",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "unstart",
+        "$FILE",
+        "build"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "note/basic",
+      "family": "note",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "note",
+        "$FILE",
+        "ship",
+        "blocked on legal review",
+        "--as",
+        "ana",
+        "--date",
+        "2026-08-18"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "note/chronological-append",
+      "family": "note",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "note",
+        "$FILE",
+        "ship",
+        "pinged legal, awaiting reply",
+        "--as",
+        "bob",
+        "--date",
+        "2026-08-18"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
+      "id": "parse/braces-mid-line",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/cancelled-reason",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/canonical-run",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/canonical-template",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/cross-file-needs",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/dangling-needs",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/deep-nesting",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/doing-waiting",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/duplicate-ids",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/gate-anonymous",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/gate-optional",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/malformed-attributes",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/minimal",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/multi-strikethrough-done",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/multiple-ids-assignees",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/needs-cycle",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/needs-list",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/nested-children",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/no-frontmatter",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "error",
+      "error": "not-mdc",
+      "exit": 1
+    },
+    {
+      "id": "parse/no-mdc-key",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "error",
+      "error": "not-mdc",
+      "exit": 1
+    },
+    {
+      "id": "parse/noncanonical-markers",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/optional-gated-child",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/prose-nested-task",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/quoted-values",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/terminal-cycle-pair",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/unicode-text",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/unknown-vs-x-key",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/unsupported-version",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "error",
+      "error": "unsupported-version",
+      "exit": 1
+    }
+  ]
+}
