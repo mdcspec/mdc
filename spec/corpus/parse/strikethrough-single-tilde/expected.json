@@ -1,0 +1,47 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": {
+    "mdc": "0.1"
+  },
+  "items": [
+    {
+      "id": "a",
+      "text": "~single tilde~",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "line": 5,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    },
+    {
+      "id": "b",
+      "text": "~~lead~~ then tail",
+      "state": "done",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": null,
+      "line": 6,
+      "children": [],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": null
+      }
+    }
+  ],
+  "warnings": []
+}

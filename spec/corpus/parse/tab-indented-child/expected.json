@@ -1,0 +1,71 @@
+{
+  "mdc": "0.1",
+  "kind": "list",
+  "title": null,
+  "frontmatter": {
+    "mdc": "0.1"
+  },
+  "items": [
+    {
+      "id": "parent",
+      "text": "Parent",
+      "state": "open",
+      "assignee": null,
+      "classes": [],
+      "attrs": {},
+      "section": "Chores",
+      "line": 7,
+      "children": [
+        {
+          "id": null,
+          "text": "Tab child",
+          "state": "open",
+          "assignee": null,
+          "classes": [],
+          "attrs": {},
+          "section": "Chores",
+          "line": 8,
+          "children": [],
+          "computed": {
+            "blocked": false,
+            "blockedBy": [],
+            "gatedBy": [],
+            "actionable": true,
+            "progress": null
+          }
+        },
+        {
+          "id": null,
+          "text": "Second tab child",
+          "state": "done",
+          "assignee": null,
+          "classes": [],
+          "attrs": {
+            "done": "2026-07-25"
+          },
+          "section": "Chores",
+          "line": 9,
+          "children": [],
+          "computed": {
+            "blocked": false,
+            "blockedBy": [],
+            "gatedBy": [],
+            "actionable": false,
+            "progress": null
+          }
+        }
+      ],
+      "computed": {
+        "blocked": false,
+        "blockedBy": [],
+        "gatedBy": [],
+        "actionable": false,
+        "progress": {
+          "done": 1,
+          "total": 2
+        }
+      }
+    }
+  ],
+  "warnings": []
+}

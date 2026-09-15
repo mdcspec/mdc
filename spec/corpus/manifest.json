@@ -130,6 +130,20 @@
       "exit": 0
     },
     {
+      "id": "fmt/assign-ids-inline-strip",
+      "family": "fmt",
+      "level": "L2",
+      "input": "input.mdc.md",
+      "argv": [
+        "fmt",
+        "--assign-ids",
+        "$FILE"
+      ],
+      "compare": "bytes",
+      "expect": "expected.mdc.md",
+      "exit": 0
+    },
+    {
       "id": "fmt/attr-order",
       "family": "fmt",
       "level": "L2",
@@ -1069,6 +1083,34 @@
     },
     {
       "id": "parse/quoted-values",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/strikethrough-single-tilde",
+      "family": "parse",
+      "level": "L1",
+      "input": "input.mdc.md",
+      "argv": [
+        "parse",
+        "$FILE",
+        "--json"
+      ],
+      "compare": "json-model",
+      "expect": "expected.json",
+      "exit": 0
+    },
+    {
+      "id": "parse/tab-indented-child",
       "family": "parse",
       "level": "L1",
       "input": "input.mdc.md",
