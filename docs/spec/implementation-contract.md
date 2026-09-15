@@ -53,7 +53,7 @@ Recognized frontmatter keys: `mdc` (required), `kind` (`template | run | list`, 
 
 ## Attribute-block microgrammar
 
-An item line's attribute block is a trailing `{…}` at end of line, preceded by at least one space (or the whole text is the block — disallowed: an item must have text). Grammar, tokenized on whitespace outside double quotes:
+An item line's attribute block is a trailing `{…}` at end of line, preceded by at least one space (or the whole text is the block — disallowed: an item must have text). **Extraction must be quote-aware**: split at the last **top-level, unquoted** `{` — not merely the last `{` in the line. A brace inside a quoted value (`{x-path="a{b}c" #b}`) is ordinary content, and a naive "last `{`" scan mis-splits such a line, dropping the leading tokens. Scan for the opening `{` at brace-depth zero and outside double quotes; the fixture `[fmt/quote-brace-value]` pins this. Grammar, tokenized on whitespace outside double quotes:
 
 ```
 block   := "{" token (SP token)* "}"
