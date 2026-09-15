@@ -81,3 +81,5 @@ python3 spec/conformance/run.py --cli "./target/release/mdc" --level L1
 ```
 
 That a non-JavaScript process can judge any implementation against the corpus is the proof the contract is portable — the concrete artifact behind the spec's "a second-language parser is a hard gate before 1.0." A second implementation earns a conformance class by passing `run.py` pointed at its own binary.
+
+Implementations that have passed are catalogued in the [implementations registry](../docs/spec/implementations.md), keyed to the highest conformance class and spec version each passes; that page also documents how a new implementation gets listed.

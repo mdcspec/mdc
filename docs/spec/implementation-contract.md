@@ -4,6 +4,8 @@
 
 > Precedence: where this document and the [format sketch](mdc-format-sketch.md) conflict, the sketch's *intent* wins but this document's *mechanics* win — file an issue rather than silently diverging. The spec corpus (`spec/corpus/`) is authoritative over both once a fixture exists.
 
+> This contract describes the reference implementation; the [implementations registry](implementations.md) lists every implementation that has passed the conformance corpus, at what class and spec version.
+
 ## Toolchain
 
 - **Language:** Plain ESM JavaScript with JSDoc type annotations. No TypeScript, no build step. Node `>= 20`.
