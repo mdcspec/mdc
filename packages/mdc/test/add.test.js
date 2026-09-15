@@ -1,15 +1,16 @@
 /**
- * Corpus runner for spec/corpus/add/ (append a new item) driven through the
- * real CLI, plus black-box tests for id collision, empty/invalid input, the
+ * Black-box tests for `add`: id collision, empty/invalid input, the
  * canonical-by-construction guarantee, CRLF preservation, and the
- * add -> claim -> check drive that makes a freshly added item usable.
+ * add -> claim -> check drive that makes a freshly added item usable. The
+ * add/ corpus cases are driven through the CLI by conformance.test.js (from
+ * spec/corpus/manifest.json).
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { discoverCases, runCli, assertBytesEqual } from './corpus.js';
+import { runCli } from './corpus.js';
 
 /** Write `text` to a fresh temp file and return its path. */
 function tmpDoc(text) {
@@ -17,22 +18,6 @@ function tmpDoc(text) {
   const file = path.join(dir, 'input.mdc.md');
   fs.writeFileSync(file, text);
   return file;
-}
-
-for (const c of discoverCases('add')) {
-  test(`add corpus: ${c.name}`, async () => {
-    const input = c.read('input.mdc.md');
-    const argv = /** @type {string[]} */ (JSON.parse(c.read('op.json')));
-    const expected = c.read('expected.mdc.md');
-    const file = tmpDoc(input);
-
-    const result = await runCli(argv.map((t) => (t === '$FILE' ? file : t)));
-    assert.strictEqual(result.code, 0, `exit 0 — stderr: ${result.stderr}`);
-    assertBytesEqual(fs.readFileSync(file, 'utf8'), expected);
-    // Every add output must itself be canonical (fmt is a no-op) and lint-clean.
-    assert.strictEqual((await runCli(['fmt', '--check', file])).code, 0, 'add output is canonical');
-    assert.strictEqual((await runCli(['lint', file])).code, 0, 'add output is lint-clean');
-  });
 }
 
 test('add prints the new id and appends exactly one item line', async () => {

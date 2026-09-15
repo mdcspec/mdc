@@ -1,22 +1,15 @@
 /**
- * Corpus runner for spec/corpus/fmt/ cases, plus the idempotence property
- * `fmt(fmt(x)) === fmt(x)` over every corpus document.
+ * fmt properties over every corpus document: the idempotence law
+ * `fmt(fmt(x)) === fmt(x)` and the non-item-byte preservation guarantee. The
+ * fmt/ corpus cases themselves are driven through the CLI by conformance.test.js
+ * (from spec/corpus/manifest.json).
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { discoverCases, corpusDocuments, assertBytesEqual } from './corpus.js';
+import { corpusDocuments, assertBytesEqual } from './corpus.js';
 import { formatDocument } from '../src/fmt.js';
 import { parseDocument } from '../src/parse.js';
 import { flattenItems } from '../src/model.js';
-
-for (const c of discoverCases('fmt')) {
-  test(`fmt corpus: ${c.name}`, () => {
-    const input = c.read('input.mdc.md');
-    const expected = c.read('expected.mdc.md');
-    const options = c.name.includes('assign-ids') ? { assignIds: true } : {};
-    assertBytesEqual(formatDocument(input, options).text, expected);
-  });
-}
 
 for (const doc of corpusDocuments()) {
   test(`fmt idempotence: ${doc.name}`, () => {

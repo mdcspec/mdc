@@ -1,1 +1,0 @@
-["add", "$FILE", "Rate-limit the send endpoint", "--id", "rate-limit", "--needs", "send", "--as", "agent-a"]

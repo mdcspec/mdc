@@ -1,34 +1,15 @@
 /**
- * Corpus runner for spec/corpus/cut/ (template -> run instantiation) plus
- * black-box CLI tests: stdout vs --out, overwrite refusal, and the
- * not-a-template refusal.
+ * Black-box CLI tests for `cut` (template -> run instantiation): stdout vs
+ * --out, overwrite refusal, the not-a-template refusal, and driving a fresh
+ * run. The cut/ corpus cases are driven through the CLI by conformance.test.js
+ * (from spec/corpus/manifest.json), which byte-compares each run output.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { discoverCases, runCli, assertBytesEqual } from './corpus.js';
-import { cutRun } from '../src/cut.js';
-
-for (const c of discoverCases('cut')) {
-  test(`cut corpus: ${c.name}`, () => {
-    const input = c.read('input.mdc.md');
-    const args = JSON.parse(c.read('args.json'));
-    const expected = c.read('expected.mdc.md');
-    assertBytesEqual(cutRun(input, args), expected);
-  });
-}
-
-test('cut corpus outputs are valid, canonical runs', () => {
-  for (const c of discoverCases('cut')) {
-    const run = c.read('expected.mdc.md');
-    // Every cut output must itself be a parseable, canonical run — this is the
-    // property that lets a cut file be picked up by every other verb unchanged.
-    assert.doesNotThrow(() => cutRun(c.read('input.mdc.md'), JSON.parse(c.read('args.json'))));
-    assert.match(run, /^---\nmdc: "0\.1"\nkind: run\n/, `${c.name} output is a run`);
-  }
-});
+import { runCli } from './corpus.js';
 
 test('cut to stdout: writes a run, does not touch the template', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdc-cut-'));

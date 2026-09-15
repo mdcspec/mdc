@@ -1,36 +1,22 @@
 /**
- * Corpus runner for spec/corpus/note/ (attach a nested prose note) through the
- * real CLI, plus black-box tests: the note is invisible to the task model,
- * survives re-parse/lint/fmt, refuses an unknown id / empty or multiline body,
- * nests at the item's depth, and preserves CRLF.
+ * Black-box tests for `note` (attach a nested prose note): the note is
+ * invisible to the task model, survives re-parse/lint/fmt, refuses an unknown
+ * id / empty or multiline body, nests at the item's depth, and preserves CRLF.
+ * The note/ corpus cases are driven through the CLI by conformance.test.js
+ * (from spec/corpus/manifest.json).
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { discoverCases, runCli, assertBytesEqual } from './corpus.js';
+import { runCli } from './corpus.js';
 
 function tmpDoc(text) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdc-note-'));
   const file = path.join(dir, 'input.mdc.md');
   fs.writeFileSync(file, text);
   return file;
-}
-
-for (const c of discoverCases('note')) {
-  test(`note corpus: ${c.name}`, async () => {
-    const input = c.read('input.mdc.md');
-    const argv = /** @type {string[]} */ (JSON.parse(c.read('op.json')));
-    const expected = c.read('expected.mdc.md');
-    const file = tmpDoc(input);
-    const result = await runCli(argv.map((t) => (t === '$FILE' ? file : t)));
-    assert.strictEqual(result.code, 0, `exit 0 — stderr: ${result.stderr}`);
-    assertBytesEqual(fs.readFileSync(file, 'utf8'), expected);
-    // A note is prose: the result must stay canonical and lint-clean.
-    assert.strictEqual((await runCli(['fmt', '--check', file])).code, 0, 'note output is canonical');
-    assert.strictEqual((await runCli(['lint', file])).code, 0, 'note output is lint-clean');
-  });
 }
 
 test('a note is invisible to the task model — no new item, progress unchanged', async () => {

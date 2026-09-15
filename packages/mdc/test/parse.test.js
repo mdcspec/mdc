@@ -1,12 +1,11 @@
 /**
- * Corpus runner for spec/corpus/parse/ and spec/corpus/lint/ cases, plus a
- * load check of the module surface.
+ * Module-surface load check and line-anchoring unit test. The parse/ and lint/
+ * corpus cases are driven end-to-end through the CLI by conformance.test.js
+ * (from spec/corpus/manifest.json), so no in-process corpus loop lives here.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { discoverCases, deepEqualIgnoringLines } from './corpus.js';
 import { parseDocument } from '../src/parse.js';
-import { lintDocument } from '../src/lint.js';
 
 test('module stubs load and export the contract surface', async () => {
   const surfaces = {
@@ -46,35 +45,3 @@ test('line anchoring: items and warnings carry 1-based source line numbers', () 
     [['multiple-ids', 8], ['malformed-attributes', 9]],
   );
 });
-
-for (const c of discoverCases('parse')) {
-  if (c.has('error.json')) {
-    test(`parse corpus (error): ${c.name}`, () => {
-      const input = c.read('input.mdc.md');
-      const expected = JSON.parse(c.read('error.json'));
-      assert.throws(
-        () => parseDocument(input),
-        (/** @type {Error & { code?: string, exitCode?: number }} */ err) => {
-          assert.strictEqual(err.code, expected.error);
-          assert.strictEqual(err.exitCode, 1);
-          return true;
-        },
-      );
-    });
-    continue;
-  }
-  test(`parse corpus: ${c.name}`, () => {
-    const input = c.read('input.mdc.md');
-    const expected = JSON.parse(c.read('expected.json'));
-    deepEqualIgnoringLines(parseDocument(input), expected);
-  });
-}
-
-for (const c of discoverCases('lint')) {
-  test(`lint corpus: ${c.name}`, () => {
-    const input = c.read('input.mdc.md');
-    const expected = JSON.parse(c.read('expected.json'));
-    const findings = lintDocument(parseDocument(input), input);
-    deepEqualIgnoringLines(findings, expected);
-  });
-}

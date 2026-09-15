@@ -1,1 +1,0 @@
-["add", "$FILE", "Validate links", "--id", "links", "--needs", "docs", "--section", "Docs"]
