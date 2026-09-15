@@ -3,26 +3,42 @@
    dividers over heavy chrome, generous whitespace, a subtle monospace
    touch for the wordmark. Works in both light and dark. */
 
+/* Theme-independent tokens only. Starlight reuses --sl-color-black as the page
+   GROUND and --sl-color-white as the primary TEXT, swapping their meaning
+   between themes — so ground/ink overrides must be scoped per theme (below),
+   never set here, or light mode inherits a near-black background. */
 :root {
-	/* One accent — a calm indigo — for both themes. */
+	--mdc-hairline: color-mix(in srgb, currentColor 12%, transparent);
+	--sl-content-width: 48rem;
+}
+
+/* Dark (Starlight's default): near-black ground, quiet neutrals, calm indigo. */
+:root[data-theme='dark'] {
 	--sl-color-accent-low: #1c2140;
 	--sl-color-accent: #5a63d8;
 	--sl-color-accent-high: #c6cbff;
 
-	/* Near-black ground, quiet neutrals. */
 	--sl-color-black: #0d0e12;
 	--sl-color-gray-6: #14151b;
 	--sl-color-gray-5: #1c1d24;
 
 	--mdc-hairline: color-mix(in srgb, currentColor 12%, transparent);
-	--sl-content-width: 48rem;
 }
 
+/* Light: near-white ground, near-black ink, the same accent darkened for
+   contrast on light. (In light mode Starlight treats --sl-color-black as the
+   ground and --sl-color-white as the ink.) */
 :root[data-theme='light'] {
 	--sl-color-accent-low: #e2e4ff;
 	--sl-color-accent: #4b52c9;
 	--sl-color-accent-high: #23265f;
+
+	--sl-color-black: #fbfbfd;
+	--sl-color-gray-7: #f4f4f7;
+	--sl-color-gray-6: #eeeef2;
+	--sl-color-gray-5: #e3e3e9;
 	--sl-color-white: #17181d;
+
 	--mdc-hairline: color-mix(in srgb, currentColor 14%, transparent);
 }
 
