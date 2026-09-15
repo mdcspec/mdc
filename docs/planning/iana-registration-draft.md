@@ -11,7 +11,7 @@ The owner decisions are settled and filled into the template below. Decisions 1�
 | 1 | **Contact** | Tim Walsh — `spec@mdcspec.dev` (project-domain role alias, plain text, no mailto) | ✅ decided — *requires the `spec@mdcspec.dev` alias to exist once the domain is live; until then a monitored address can stand in* |
 | 2 | **Author** | Tim Walsh (GitHub: `timimsms`) | ✅ decided |
 | 3 | **Change controller** | The MDC project maintainers (the `mdcspec` project); currently stewarded by DireLabs, updatable to a governance council per [`GOVERNANCE.md`](../../GOVERNANCE.md) | ✅ decided — neutral project identity, not a personal or company namespace, so a future council inherits it with no re-registration |
-| 4 | **Published specification URL** | `https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md` | ✅ resolved — repo is public, tag-pinned URL verified (HTTP 200) |
+| 4 | **Published specification URL** | `https://github.com/mdcspec/mdc/blob/v0.1.1/spec/mdc-spec-v0.1.md` | ✅ resolved — pinned to the `v0.1.1` spec (includes the ITEM-0 CommonMark-surface clarification); public, verified resolving |
 
 The identity is anchored on the neutral **`mdcspec`** namespace across all surfaces (GitHub org · `@mdcspec` npm scope · `mdcspec.dev` domain · this IANA contact/controller). See [`m0-namespace-checklist.md`](m0-namespace-checklist.md) for the ordered execution steps and blocking relationships.
 
@@ -70,7 +70,7 @@ Interoperability considerations:
 
 Published specification:
   MDC Specification v0.1.
-  https://github.com/mdcspec/mdc/blob/v0.1.0/spec/mdc-spec-v0.1.md
+  https://github.com/mdcspec/mdc/blob/v0.1.1/spec/mdc-spec-v0.1.md
   (Tag-pinned and public; verified resolving. A mdcspec.dev/spec/v0.1 docs
   URL may supersede this later via an updated registration.)
 
