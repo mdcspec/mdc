@@ -1,0 +1,150 @@
+/* MDC — a restrained, digitally elegant theme layered over Starlight.
+   Mostly-monochrome grounds, one cool accent used sparingly, hairline
+   dividers over heavy chrome, generous whitespace, a subtle monospace
+   touch for the wordmark. Works in both light and dark. */
+
+:root {
+	/* One accent — a calm indigo — for both themes. */
+	--sl-color-accent-low: #1c2140;
+	--sl-color-accent: #5a63d8;
+	--sl-color-accent-high: #c6cbff;
+
+	/* Near-black ground, quiet neutrals. */
+	--sl-color-black: #0d0e12;
+	--sl-color-gray-6: #14151b;
+	--sl-color-gray-5: #1c1d24;
+
+	--mdc-hairline: color-mix(in srgb, currentColor 12%, transparent);
+	--sl-content-width: 48rem;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #e2e4ff;
+	--sl-color-accent: #4b52c9;
+	--sl-color-accent-high: #23265f;
+	--sl-color-white: #17181d;
+	--mdc-hairline: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+/* Elegant, slightly tightened type. */
+body {
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+/* --- Hero / wordmark ------------------------------------------------ */
+
+.hero {
+	padding-block: clamp(2rem, 8vw, 5rem);
+}
+
+.hero h1 {
+	font-family:
+		ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Menlo,
+		Consolas, monospace;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	font-size: clamp(3.5rem, 14vw, 7rem);
+	line-height: 1;
+}
+
+.hero .tagline {
+	max-width: 34ch;
+	font-size: var(--sl-text-lg);
+	color: var(--sl-color-gray-2);
+	line-height: 1.5;
+}
+
+/* Quiet, un-boxed hero buttons. */
+.hero .actions a {
+	font-size: var(--sl-text-base);
+	border-radius: 0.5rem;
+}
+
+/* --- Feature sections (quiet grid, hairline dividers) --------------- */
+
+.mdc-features {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0;
+	margin-block: clamp(2rem, 7vw, 4.5rem);
+	border-top: 1px solid var(--mdc-hairline);
+}
+
+.mdc-feature {
+	padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+	padding-inline-end: clamp(1rem, 3vw, 2.5rem);
+	border-bottom: 1px solid var(--mdc-hairline);
+}
+
+/* Hairline seam between the two columns. */
+.mdc-feature:nth-child(odd) {
+	border-inline-end: 1px solid var(--mdc-hairline);
+	padding-inline-start: 0;
+	padding-inline-end: clamp(1.5rem, 4vw, 3rem);
+}
+.mdc-feature:nth-child(even) {
+	padding-inline-start: clamp(1.5rem, 4vw, 3rem);
+}
+
+.mdc-feature h2 {
+	font-size: var(--sl-text-lg);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	margin: 0 0 0.5rem;
+	border: none;
+	padding: 0;
+}
+
+.mdc-feature p {
+	margin: 0;
+	color: var(--sl-color-gray-2);
+	line-height: 1.6;
+	font-size: var(--sl-text-base);
+}
+
+@media (max-width: 50rem) {
+	.mdc-features {
+		grid-template-columns: 1fr;
+	}
+	.mdc-feature,
+	.mdc-feature:nth-child(odd),
+	.mdc-feature:nth-child(even) {
+		padding-inline: 0;
+		border-inline-end: none;
+	}
+}
+
+/* --- Quickstart ----------------------------------------------------- */
+
+.mdc-quickstart {
+	max-width: var(--sl-content-width);
+	margin-inline: auto;
+	margin-block: clamp(2rem, 7vw, 4.5rem);
+	text-align: start;
+}
+
+.mdc-quickstart h2 {
+	font-size: var(--sl-text-xl);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	border: none;
+	margin-bottom: 1rem;
+}
+
+.mdc-caption {
+	margin-top: 1rem;
+	color: var(--sl-color-gray-3);
+	font-size: var(--sl-text-sm);
+	line-height: 1.6;
+}
+
+.mdc-caption code {
+	font-size: 0.95em;
+}
+
+/* Splash pages center content by default; keep our blocks left-read. */
+.mdc-features,
+.mdc-quickstart {
+	text-align: start;
+}

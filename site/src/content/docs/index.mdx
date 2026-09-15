@@ -1,0 +1,54 @@
+---
+title: MDC
+description: Markdown Checklists — task state that is valid Markdown, for humans and AI agents.
+template: splash
+hero:
+  title: MDC
+  tagline: Markdown Checklists — task state that is valid Markdown, for humans and AI agents.
+  actions:
+    - text: Read the spec
+      link: /spec/v0.1
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/mdcspec/mdc
+      icon: external
+      variant: minimal
+---
+
+import { Code } from '@astrojs/starlight/components';
+
+export const quickstart = `---
+mdc: "0.1"
+---
+- [x] Cut the release branch {#branch done=2026-09-15}
+- [ ] Run the test suite {#tests needs=branch}
+- [ ] Publish the package {#publish needs=tests}`;
+
+<div class="mdc-features">
+	<div class="mdc-feature">
+		<h2>Just Markdown</h2>
+		<p>Every document is valid GitHub-Flavored Markdown — ordinary checkboxes on GitHub, GitLab, VS Code, and Obsidian, with zero tooling.</p>
+	</div>
+	<div class="mdc-feature">
+		<h2>Machine-readable</h2>
+		<p>Opt-in metadata adds states, typed dependencies, gating, and reusable templates; a reference parser emits a stable JSON model.</p>
+	</div>
+	<div class="mdc-feature">
+		<h2>Deterministic edits</h2>
+		<p>A canonical form makes every change a one-line diff, so humans and agents edit the same checklist and merge cleanly under plain git.</p>
+	</div>
+	<div class="mdc-feature">
+		<h2>Proven twice</h2>
+		<p>Two independent implementations pass one portable conformance corpus; an MCP server drives MDC from any host.</p>
+	</div>
+</div>
+
+<div class="mdc-quickstart">
+
+## Quickstart
+
+<Code code={quickstart} lang="markdown" />
+
+<p class="mdc-caption">Paste it into any GitHub gist — it renders as a checklist. Feed it to the <code>mdc</code> CLI (or the MCP server) and it is a queryable, mutable task graph: <code>mdc next</code>, <code>mdc claim</code>, <code>mdc check</code>.</p>
+
+</div>
