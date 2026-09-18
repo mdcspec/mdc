@@ -18,6 +18,7 @@ progress; `mdc next` shows what is actionable given the `needs=` edges.
 
 - [ ] Register `text/markdown; variant=mdc` with IANA {#m0-iana @tim}
   - note @tim 2026-09-13: Registration fully drafted (all fields resolved, spec URL public + verified). Remaining: email the plain-text template to the IANA registry contact.
+  - note @tim 2026-09-18: Registration submitted to iana@iana.org (citing https://mdcspec.dev/spec/v0.1). Awaiting IANA confirmation; check the m0-iana item off and record the assigned entry in docs/planning/iana-registration-draft.md when it lands.
 - [x] Secure the `@mdcspec` npm scope {#m0-npm @tim done=2026-09-13}
 - [x] Secure the project domain {#m0-domain @tim done=2026-09-13}
 
