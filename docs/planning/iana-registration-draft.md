@@ -2,16 +2,16 @@
 
 *A ready-to-submit registration for the `mdc` variant of `text/markdown`, plus the companion namespace actions. This is the M0 milestone: complete it before any public announcement, so the format's identity is secured the way CommonMark's late rename taught the ecosystem to do.*
 
-## Owner fields — decided (one gated)
+## Owner fields — all decided and resolved
 
-The owner decisions are settled and filled into the template below. Decisions 1–3 are final; only the Published-specification URL remains gated on the repo/site going public.
+Every owner decision is settled and filled into the template below; the Published-specification URL is live. **The template is ready to send.**
 
 | # | Field | Value | Status |
 |---|---|---|---|
-| 1 | **Contact** | Tim Walsh — `spec@mdcspec.dev` (project-domain role alias, plain text, no mailto) | ✅ decided — *requires the `spec@mdcspec.dev` alias to exist once the domain is live; until then a monitored address can stand in* |
+| 1 | **Contact** | Tim Walsh — `spec@mdcspec.dev` (project-domain role alias, plain text, no mailto) | ✅ live — alias routes to the maintainer |
 | 2 | **Author** | Tim Walsh (GitHub: `timimsms`) | ✅ decided |
 | 3 | **Change controller** | The MDC project maintainers (the `mdcspec` project); currently stewarded by DireLabs, updatable to a governance council per [`GOVERNANCE.md`](../../GOVERNANCE.md) | ✅ decided — neutral project identity, not a personal or company namespace, so a future council inherits it with no re-registration |
-| 4 | **Published specification URL** | `https://github.com/mdcspec/mdc/blob/v0.1.1/spec/mdc-spec-v0.1.md` | ✅ resolved — pinned to the `v0.1.1` spec (includes the ITEM-0 CommonMark-surface clarification); public, verified resolving |
+| 4 | **Published specification URL** | `https://mdcspec.dev/spec/v0.1` | ✅ live — the project site serves the current v0.1 spec at a stable path (verified HTTP 200). Chosen over a tag-pinned GitHub URL so later v0.1 clarifications never require an IANA update (which needs IETF Review). |
 
 The identity is anchored on the neutral **`mdcspec`** namespace across all surfaces (GitHub org · `@mdcspec` npm scope · `mdcspec.dev` domain · this IANA contact/controller). See [`m0-namespace-checklist.md`](m0-namespace-checklist.md) for the ordered execution steps and blocking relationships.
 
@@ -70,9 +70,7 @@ Interoperability considerations:
 
 Published specification:
   MDC Specification v0.1.
-  https://github.com/mdcspec/mdc/blob/v0.1.1/spec/mdc-spec-v0.1.md
-  (Tag-pinned and public; verified resolving. A mdcspec.dev/spec/v0.1 docs
-  URL may supersede this later via an updated registration.)
+  https://mdcspec.dev/spec/v0.1
 
 Applications that use this media type:
   Checklist and task tooling, CI/release gating, ops runbooks, and AI coding
@@ -106,10 +104,11 @@ Change controller:
 
 ## Companion namespace actions (M0)
 
-Not part of the IANA registration, but secured in the same milestone so the name is whole before launch:
+Not part of the IANA registration, but secured in the same milestone so the name is whole before launch — **all complete**:
 
-- **npm scope.** Reserve the `@mdcspec` organization scope (the `mdc` package name is unrelated; the bare `mddb` package name already belongs to MarkdownDB, so any database companion must also be scoped). Check availability: <https://www.npmjs.com/org/mdcspec>.
-- **Domain.** Acquire a project domain for the spec and docs. Evaluate candidates (for example an `mdc`- or "markdown-checklists"-based name) for availability before committing; nothing is registered yet.
-- **Repository.** Publish the spec repo with the conformance corpus so the published-specification URL above resolves.
+- ✅ **GitHub org.** The neutral `mdcspec` org holds the repository (`github.com/mdcspec/mdc`, public), with a second admin for continuity.
+- ✅ **npm scope.** The `@mdcspec` organization scope is reserved.
+- ✅ **Domain.** `mdcspec.dev` is registered and serves the project site (spec at `/spec/v0.1`), with the `spec@mdcspec.dev` role alias.
+- ✅ **Repository published.** The spec and conformance corpus are public, so the Published-specification URL resolves.
 
-These are external, owner-driven actions — they appear as open, `@`-assigned items in [`../../checklists/mvp-build.mdc.md`](../../checklists/mvp-build.mdc.md), on which the public-launch item is blocked.
+The only remaining M0 action is sending the template above (see Submission steps). It is tracked as `m0-iana` in [`../../checklists/mvp-build.mdc.md`](../../checklists/mvp-build.mdc.md), on which the public-launch item is blocked.
