@@ -65,8 +65,8 @@ Contact Information:
 ## Submission steps
 
 1. ✅ Submitted 2026-09-18 to `iana@iana.org`. IANA (Amanda Baber) replied 2026-09-22: the template had merged RFC 7763 §6.1 (markdown variant) with RFC 6838 §5.6 (media type) — it carried an "Applications that use this media type" field and a duplicated fragment-identifier field — and asked for it to be edited down to a markdown-variant registration only.
-2. ✅ Corrected: the template above is now exactly the seven RFC 7763 §6.1 fields (Identifier, Name, Description, Additional Parameters, Fragment Identifiers, References, Contact Information; no Expiration Date, since this registration is permanent, not provisional).
-3. **Reply to Amanda's email** with the corrected template above (reply in-thread so it stays attached to the original request).
+2. ✅ Corrected and verified (2026-09-22): the template above is exactly the RFC 7763 §6.1 field set (Identifier, Name, Description, Additional Parameters, Fragment Identifiers, References, Contact Information; no Expiration Date — that field is provisional-only, and this registration is permanent), confirmed against the RFC text field-for-field. The References URL `https://mdcspec.dev/spec/v0.1` resolves (HTTP 200), and the repo is public.
+3. **Reply to Amanda's email** with the corrected template above (reply in-thread so it stays attached to the original request). Contact stays plain text — no mailto link.
 4. Record the assigned entry back in this file once confirmed, and tick `m0-iana` in [`../../checklists/mvp-build.mdc.md`](../../checklists/mvp-build.mdc.md).
 
 ## Companion namespace actions (M0)
