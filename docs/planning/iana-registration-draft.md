@@ -1,6 +1,8 @@
-# IANA Markdown Variant Registration — Draft
+# IANA Markdown Variant Registration — Registered ✅
 
-*A ready-to-submit registration for the `mdc` variant of `text/markdown`, plus the companion namespace actions. This is the M0 milestone: complete it before any public announcement, so the format's identity is secured the way CommonMark's late rename taught the ecosystem to do.*
+> **Registered 2026-09-24.** `mdc` is live in the [IANA Markdown Variants registry](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) (entry #13): Identifier `mdc`, Name "Markdown Checklists (MDC)", References `https://mdcspec.dev/spec/v0.1`, contact Tim Walsh. This completes the M0 milestone — the format's identity is secured the way CommonMark's late rename taught the ecosystem to do. The record below is kept for provenance.
+
+*A registration for the `mdc` variant of `text/markdown`, plus the companion namespace actions.*
 
 ## Owner fields — settled
 
@@ -65,9 +67,9 @@ Contact Information:
 ## Submission steps
 
 1. ✅ Submitted 2026-09-18 to `iana@iana.org`. IANA (Amanda Baber) replied 2026-09-22: the template had merged RFC 7763 §6.1 (markdown variant) with RFC 6838 §5.6 (media type) — it carried an "Applications that use this media type" field and a duplicated fragment-identifier field — and asked for it to be edited down to a markdown-variant registration only.
-2. ✅ Corrected and verified (2026-09-22): the template above is exactly the RFC 7763 §6.1 field set (Identifier, Name, Description, Additional Parameters, Fragment Identifiers, References, Contact Information; no Expiration Date — that field is provisional-only, and this registration is permanent), confirmed against the RFC text field-for-field. The References URL `https://mdcspec.dev/spec/v0.1` resolves (HTTP 200), and the repo is public.
-3. **Reply to Amanda's email** with the corrected template above (reply in-thread so it stays attached to the original request). Contact stays plain text — no mailto link.
-4. Record the assigned entry back in this file once confirmed, and tick `m0-iana` in [`../../checklists/mvp-build.mdc.md`](../../checklists/mvp-build.mdc.md).
+2. ✅ Corrected and verified (2026-09-22): the template was edited to exactly the RFC 7763 §6.1 field set (Identifier, Name, Description, Additional Parameters, Fragment Identifiers, References, Contact Information; no Expiration Date — that field is provisional-only, and this registration is permanent), and the correction was replied in-thread.
+3. ✅ **Registered 2026-09-24.** IANA added `mdc` to the Markdown Variants registry (entry #13). Verified live: Identifier `mdc`, Name "Markdown Checklists (MDC)", References `https://mdcspec.dev/spec/v0.1`, contact Tim Walsh.
+4. ✅ `m0-iana` checked off in [`../../checklists/mvp-build.mdc.md`](../../checklists/mvp-build.mdc.md). **M0 is complete.**
 
 ## Companion namespace actions (M0)
 

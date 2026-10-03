@@ -113,7 +113,7 @@ The MVP passes when all of the following hold:
 5. **`claim` is provably atomic** — concurrent claims on one item yield exactly one success.
 6. **Round-tripping is lossless** — all bytes outside frontmatter and task lines survive parse→serialize unchanged.
 7. **The corpus is the spec** — every normative rule in spec v0.1 has at least one executable example, and CI runs them all.
-8. **Namespace is secured** — IANA variant registered, npm scope and domain held — before any public link exists.
+8. **Namespace is secured** ✅ — IANA variant `mdc` registered (2026-09-24, Markdown Variants registry entry #13), `@mdcspec` npm scope and `mdcspec.dev` domain held, repo public under the neutral `mdcspec` org. **All eight success criteria are now met; M0 is complete.**
 
 ## Sequencing
 
