@@ -14,6 +14,7 @@ Conformance classes (see [spec §12](../../spec/mdc-spec-v0.1.md) and the [confo
 | --- | --- | --- | --- | --- |
 | [`@mdcspec/mdc`](../../packages/mdc/) | JavaScript (Node ≥ 20) | CONF-L2 | v0.1 | The reference parser and CLI. `remark` + `remark-gfm` + `remark-frontmatter`; the source of truth for the corpus's expected outputs. |
 | [`impls/mdc-py`](../../impls/mdc-py/) | Python 3 (stdlib only) | CONF-L2 | v0.1 | Second, independent implementation — a different parsing strategy, no `pip` dependencies. The pre-1.0 credibility gate: proof the spec is implementable twice from the spec + corpus rather than from the reference code. |
+| [`impls/mdc-cr`](../../impls/mdc-cr/) | Crystal (native binary) | CONF-L2 | v0.1 | Third, independent implementation — a hand-written line-oriented parser compiled to a static native binary (Crystal stdlib only). Optimized for a fast CLI: ~26× lower startup than the Node reference (~2.6 ms vs ~69 ms/invocation), which dominates in agent/CI loops. |
 
 ## Getting listed
 
