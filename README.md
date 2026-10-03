@@ -108,7 +108,13 @@ One template, many runs; each run is an ordinary reviewable file, and its git hi
 
 The spec is executable: every normative rule cites a case in the [conformance corpus](spec/corpus/), and the corpus is runnable by **any** implementation in any language through a documented CLI contract ([`spec/conformance.md`](spec/conformance.md) + [`spec/corpus/manifest.json`](spec/corpus/manifest.json)).
 
-MDC is implemented **twice** today — the JavaScript reference (`packages/mdc/`) and an independent, from-scratch Python implementation (`impls/mdc-py/`) — both passing the full conformance corpus. A language-agnostic runner drives any binary:
+MDC is implemented **three times** today, in three languages with three different parsing strategies, all passing the full conformance corpus:
+
+- **`packages/mdc/`** — the JavaScript reference (remark/unified pipeline).
+- **`impls/mdc-py/`** — an independent Python implementation (line-oriented, stdlib only).
+- **`impls/mdc-cr/`** — a Crystal implementation compiled to a **native binary**: ~26× faster startup than the Node CLI (~2.6 ms vs ~69 ms per invocation), which matters when an agent or CI loop spawns the tool repeatedly.
+
+A language-agnostic runner drives any binary against the corpus:
 
 ```bash
 python3 spec/conformance/run.py --cli "<your mdc command>"   # every case must pass
