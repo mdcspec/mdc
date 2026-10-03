@@ -50,5 +50,6 @@ progress; `mdc next` shows what is actionable given the `needs=` edges.
 
 ## M7 — Public launch
 
-- [ ] Decide killer-app sequencing: shared agent task file vs merge-gated release {#m7-sequencing .gate}
+- [x] Decide killer-app sequencing: shared agent task file vs merge-gated release {#m7-sequencing .gate done=2026-09-24}
+  - note @tim 2026-09-24: Decided: lead with the agent/human shared task file (MCP server + AGENTS.md snippet); the CI merge-gate release checklist is the first fast-follow. Full plan + pre-launch gates + pre-registered signals in docs/planning/launch-sequencing.md.
 - [ ] Public announcement {#m7-launch needs=m0-iana,m0-npm,m0-domain,m6-docs}
