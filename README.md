@@ -59,6 +59,8 @@ Node ≥ 20. Run the test suite with `npm test`. (No published npm package yet �
 
 ## Use it in your own project
 
+**Fastest path:** the **[mdcspec/getting-started](https://github.com/mdcspec/getting-started)** repo — a 60-second tour with an example board, a drop-in `AGENTS.md`, and the core CLI loop.
+
 1. **Add a checklist.** Drop a file like `TODO.mdc.md` or `docs/release.mdc.md` in your repo with `mdc: "0.1"` frontmatter. It renders on GitHub immediately; nobody needs the CLI to read it.
 2. **Drive it from the CLI** in scripts or CI — `mdc next --json` to pick work, `mdc check <id>` after, `mdc status` for progress. Exit codes are the API (below).
 3. **Teach your coding agent** by pasting [`docs/adoption/agent-snippet.md`](docs/adoption/agent-snippet.md) into your repo's `AGENTS.md`. Agents then `claim` before working and `check` after, coordinating through the file with clean git history as the audit trail.
