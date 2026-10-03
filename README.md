@@ -1,105 +1,135 @@
 # MDC — Markdown Checklists
 
-MDC is a checklist format that is **always valid GitHub-flavored markdown** — every MDC file renders as a normal checklist on GitHub, GitLab, VS Code, and Obsidian with zero tooling. On top of that, a reference parser exposes an **L1 JSON model** of the items, and a CLI applies **L2 mutations** — `check`, `claim`, `cancel` — as deterministic, one-line-diff edits that both humans and AI agents can make safely and concurrently. A file is MDC because its frontmatter says so (`mdc: "0.1"`), not because of its name; the canonical filename is `*.mdc.md`.
+**A checklist format that is always valid Markdown — and also a task graph your tools and AI agents can read and safely edit.**
 
-This repository is the MVP: an executable spec with a conformance corpus, the reference parser, and the `mdc` CLI. It targets the gap our [research](docs/README.md) surfaced — no existing format gives repos a durable, diffable, human-and-agent-shared task state — while never breaking the "renders anywhere" guarantee.
+`valid GitHub-Flavored Markdown` · `IANA-registered: text/markdown; variant=mdc` · `two conforming implementations` · code MIT / spec CC BY 4.0
 
-> **Status:** MVP built and tested; pre-launch. The namespace actions (IANA `text/markdown; variant=mdc` registration, npm scope, domain) and the public launch are the remaining milestones — tracked, dogfood-style, in [`checklists/mvp-build.mdc.md`](checklists/mvp-build.mdc.md), an MDC file this repo's own CLI checks off.
+## What it is
 
-## Quickstart
+An MDC file is a normal GFM checklist — it renders as real checkboxes on GitHub, GitLab, VS Code, and Obsidian with **zero tooling**. The `mdc` CLI then treats the same file as structured data:
 
-No published binary yet — invoke the CLI through Node from the repo root (dependencies are already vendored in `node_modules`; do not run `npm install`).
+- **Renders anywhere, degrades gracefully.** Any Markdown viewer shows it correctly; MDC metadata is just trailing text to tools that don't understand it.
+- **A queryable model.** `parse` emits a JSON item model with dependencies, states, and derived `blocked`/`actionable` status; `next` tells you what's ready to work.
+- **Safe, concurrent edits.** Every mutation (`check`, `claim`, `add`, …) rewrites exactly one line, so humans and multiple agents edit the same file and merge cleanly under plain git. `claim` is atomic — two agents can't take the same item.
 
-```
-# see the machine model of the flagship example
-node packages/mdc/src/cli.js parse spec/corpus/canonical-run.mdc.md --json
+A file is MDC because its frontmatter says so (`mdc: "0.1"`), not because of its name. The conventional filename is `*.mdc.md`.
 
-# what is actionable right now, respecting needs= and .gate edges?
-node packages/mdc/src/cli.js next spec/corpus/canonical-run.mdc.md
+## What an MDC file looks like
 
-# take an item, then complete it — each is a one-line diff you can commit
-cp spec/corpus/canonical-run.mdc.md /tmp/release.mdc.md
-node packages/mdc/src/cli.js claim /tmp/release.mdc.md ci --as agent-a
-node packages/mdc/src/cli.js check /tmp/release.mdc.md ci --date 2026-07-27
-
-# progress, and a canonical-form check
-node packages/mdc/src/cli.js status /tmp/release.mdc.md
-node packages/mdc/src/cli.js fmt   /tmp/release.mdc.md --check   # exit 0 = already canonical
-```
-
-Run the test suite with `node --test "packages/mdc/test/*.test.js"`.
-
-## What an MDC document looks like
-
-Paste this into any GitHub gist and it renders as a clean checklist; feed it to `mdc` and it is a queryable, mutable task graph.
+Paste this into any GitHub gist and it renders as a clean checklist; feed it to `mdc` and it's a queryable, mutable task graph.
 
 ```markdown
 ---
 mdc: "0.1"
 kind: run
-template: templates/release.mdc.md@5
 title: Release 2.4.0
-mode: do-confirm
 started: 2026-07-24
 ---
 
 # Release 2.4.0
 
-## Prepare
-
 - [x] Freeze `main`, cut `release/2.4` branch {#branch @tim done=2026-07-24}
-- [ ] All open P1 issues fixed or explicitly deferred {#triage .gate @maria due=2026-07-28}
-
-## Verify
-
 - [ ] CI green on `release/2.4` {#ci needs=branch verify="npm test"}
 - [ ] Smoke test on staging {#smoke .doing @maria needs=ci}
 - [x] ~~Load-test legacy PDF endpoint~~ {#pdf reason="endpoint removed in 2.4"}
-
-## Ship
-
 - [ ] Tag `v2.4.0` and push {#tag .gate @tim needs=smoke}
 ```
 
-`- [ ] item` with no brace block is already a complete MDC item — every attribute is opt-in.
+`- [ ] item` with no `{…}` block is already a complete MDC item — every attribute is opt-in. The trailing block holds an `{#id}`, `.classes`, an `@assignee`, and `key=value` metadata (`needs=`, `due=`, `done=`, `reason=`, …).
+
+## Try it in 60 seconds
+
+```bash
+git clone https://github.com/mdcspec/mdc && cd mdc
+npm install                      # fetches the parser deps (unified, remark, yaml)
+alias mdc="node $PWD/packages/mdc/src/cli.js"   # optional: a short command
+
+# inspect
+mdc parse spec/corpus/canonical-run.mdc.md --json    # the L1 model
+mdc next  spec/corpus/canonical-run.mdc.md           # what's actionable now
+
+# drive it — each change is a one-line, committable diff
+cp spec/corpus/canonical-run.mdc.md /tmp/release.mdc.md
+mdc claim /tmp/release.mdc.md ci --as agent-a
+mdc check /tmp/release.mdc.md ci
+mdc report /tmp/release.mdc.md                       # a standup view
+```
+
+Node ≥ 20. Run the test suite with `npm test`. (No published npm package yet — invoke from the repo as above.)
+
+## Use it in your own project
+
+1. **Add a checklist.** Drop a file like `TODO.mdc.md` or `docs/release.mdc.md` in your repo with `mdc: "0.1"` frontmatter. It renders on GitHub immediately; nobody needs the CLI to read it.
+2. **Drive it from the CLI** in scripts or CI — `mdc next --json` to pick work, `mdc check <id>` after, `mdc status` for progress. Exit codes are the API (below).
+3. **Teach your coding agent** by pasting [`docs/adoption/agent-snippet.md`](docs/adoption/agent-snippet.md) into your repo's `AGENTS.md`. Agents then `claim` before working and `check` after, coordinating through the file with clean git history as the audit trail.
 
 ## The CLI
 
-Exit codes are the contract: **`0` success · `1` usage/IO/parse/not-MDC · `2` domain refusal** (lint error, `fmt --check` drift, or a mutation whose precondition failed — e.g. claiming an already-claimed item). Agents branch on `2`.
+Exit codes are the contract: **`0` success · `1` usage/IO/parse/not-MDC · `2` domain refusal** (a lint error, `fmt --check` drift, or a mutation whose precondition failed — e.g. claiming an already-claimed item). Agents branch on `2`. Machine output goes to stdout; human text to stderr.
 
+**Inspect** (read-only; `-` reads stdin)
 | Verb | Behavior |
 |---|---|
-| `parse <file> --json` | L1 document model to stdout (`-` = stdin) |
+| `parse <file> --json` | the L1 document model |
 | `lint <file> [--json] [--strict]` | structural findings; exit 2 on errors |
 | `status <file> [--json]` | totals, progress, blocked/actionable/doing |
-| `next <file> [--json]` | actionable items in document order |
+| `next <file> [--json] [--as <handle>]` | actionable items in order (`--as`: just one agent's) |
+| `report <file> [--json]` | a standup view: done / in-progress / ready / blocked-with-cause |
 | `fmt <file> [--check] [--assign-ids]` | canonical form in place; `--check` never writes |
-| `check <file> <id> [--date …]` | open → done, stamps `done=` |
-| `uncheck <file> <id>` | done → open |
+
+**Change** (one-line-diff mutations; each echoes the resulting line)
+| Verb | Behavior |
+|---|---|
+| `add <file> "<text>" [--id --needs --as --due --class] [--after \| --section]` | append/place a new open item |
+| `check` / `uncheck <file> <id>` | open ↔ done (stamps/clears `done=`) |
 | `cancel <file> <id> --reason "…"` | → cancelled, records the reason |
 | `claim <file> <id> --as <handle>` | set assignee iff none set (atomic) |
+| `unclaim <file> <id> [--from <handle>]` | release the assignee |
+| `start` / `unstart <file> <id>` | mark / unmark in-progress (`.doing`) |
+| `note <file> <id> "<text>" [--as]` | attach a dated note (nested prose) |
+| `edit <file> <id> [--text --needs --add-needs --rm-needs --add-class --rm-class --due]` | amend an existing item |
+
+**Instantiate**
+| Verb | Behavior |
+|---|---|
 | `cut <template> [--out …] [--title …] [--as-version …]` | instantiate a run from a template |
 
 ## Templates and runs
 
-MDC's headline difference from a plain task list is that a checklist can be a reusable **template** (`kind: template`) that you instantiate into a **run** (`kind: run`) each time you execute it. `mdc cut` does the instantiation — copy the procedure, stamp a fresh run, start clean:
+A checklist can be a reusable **template** (`kind: template`) that you instantiate into a **run** (`kind: run`) each time you execute it — a release process, an incident runbook, an onboarding. `mdc cut` copies the procedure, pins `template: <path>@<version>`, records `started`, and resets every item to open:
 
-```
-node packages/mdc/src/cli.js cut templates/release.mdc.md \
-  --out releases/2.4.0.mdc.md --title "Release 2.4.0" --as-version 5
+```bash
+mdc cut templates/release.mdc.md --out releases/2.4.0.mdc.md --title "Release 2.4.0" --as-version 5
 ```
 
-The new run pins `template: templates/release.mdc.md@5`, records `started`, and resets every item to open — no assignees, no `done=` stamps carried over. One template, many runs; each run is an ordinary reviewable file in the repo, and its git history is the record of that execution.
+One template, many runs; each run is an ordinary reviewable file, and its git history is the record of that execution.
+
+## Conformance and implementations
+
+The spec is executable: every normative rule cites a case in the [conformance corpus](spec/corpus/), and the corpus is runnable by **any** implementation in any language through a documented CLI contract ([`spec/conformance.md`](spec/conformance.md) + [`spec/corpus/manifest.json`](spec/corpus/manifest.json)).
+
+MDC is implemented **twice** today — the JavaScript reference (`packages/mdc/`) and an independent, from-scratch Python implementation (`impls/mdc-py/`) — both passing the full conformance corpus. A language-agnostic runner drives any binary:
+
+```bash
+python3 spec/conformance/run.py --cli "<your mdc command>"   # every case must pass
+```
+
+Writing a third implementation? That's exactly the gate to a shared-governance future — see [GOVERNANCE.md](GOVERNANCE.md).
+
+## Status
+
+- ✅ **Spec v0.1, reference parser + `mdc` CLI, and the executable conformance corpus** — built, tested, dogfooded.
+- ✅ **Identity secured:** registered with IANA as `text/markdown; variant=mdc` (Markdown Variants registry, 2026-09-24); `@mdcspec` npm scope and `mdcspec.dev` held; repo public under the neutral `mdcspec` org.
+- ⬜ **Public launch** — the distribution push (an MCP server + the agent snippet) is the next milestone. Progress is tracked, dogfood-style, in [`checklists/mvp-build.mdc.md`](checklists/mvp-build.mdc.md) — an MDC file this repo's own CLI checks off.
 
 ## Documentation
 
-- **[docs/README.md](docs/README.md)** — the research and design set: prior art, naming, adoption strategy, vision, and the risk register.
 - **[spec/mdc-spec-v0.1.md](spec/mdc-spec-v0.1.md)** — the normative, example-backed spec; every rule cites a corpus case.
-- **[docs/spec/mdc-format-sketch.md](docs/spec/mdc-format-sketch.md)** · **[docs/spec/implementation-contract.md](docs/spec/implementation-contract.md)** — design intent and the mechanical contract the code implements.
-- **[docs/adoption/agent-snippet.md](docs/adoption/agent-snippet.md)** — drop-in instructions to teach a coding agent to drive MDC files in any repo.
+- **[spec/conformance.md](spec/conformance.md)** — the language-neutral conformance contract (how any implementation earns a conformance class).
+- **[docs/adoption/agent-snippet.md](docs/adoption/agent-snippet.md)** — drop-in instructions to teach a coding agent to drive MDC files.
 - **[AGENTS.md](AGENTS.md)** — orientation for agents working in this repo.
-- **[docs/planning/mvp-definition.md](docs/planning/mvp-definition.md)** · **[docs/planning/iana-registration-draft.md](docs/planning/iana-registration-draft.md)** — the MVP scope and the namespace launch actions.
-- **[docs/planning/standardization-roadmap.md](docs/planning/standardization-roadmap.md)** — the path from "a tool with a spec" to a de-facto standard.
+- **[docs/spec/implementation-contract.md](docs/spec/implementation-contract.md)** — the mechanical contract the code implements.
+- **[docs/](docs/README.md)** — research, vision, the risk register, and the [standardization roadmap](docs/planning/standardization-roadmap.md).
 
 ## License and governance
 
