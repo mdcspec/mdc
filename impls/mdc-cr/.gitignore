@@ -1,0 +1,7 @@
+# Compiled binary is a build artifact; build it with:
+#   crystal build src/mdc.cr -o bin/mdc --release
+/bin/mdc
+/bin/mdc.dwarf
+*.dwarf
+.crystal/
+lib/

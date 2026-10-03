@@ -1,0 +1,16 @@
+name: mdc
+version: 0.1.0
+description: |
+  MDC (Markdown Checklists) — a third, independent implementation in Crystal,
+  compiled to a native binary. CONF-L2 conformance.
+
+authors:
+  - Tim Walsh <tim@mims.ms>
+
+targets:
+  mdc:
+    main: src/mdc.cr
+
+crystal: ">= 1.21.0"
+
+license: MIT
