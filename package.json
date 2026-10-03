@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "node --test \"packages/mdc/test/*.test.js\""
+    "test": "node --test \"packages/*/test/*.test.js\""
   },
   "engines": {
     "node": ">=20"
