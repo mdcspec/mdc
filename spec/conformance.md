@@ -1,4 +1,4 @@
-# MDC Conformance — the language-neutral test contract
+# MDC Conformance: the language-neutral test contract
 
 *How to check any implementation of MDC against the conformance corpus, in any language. The corpus under [`corpus/`](corpus/) is a set of inert fixtures; this document is the contract for **running** them, so a second implementation can earn conformance without reverse-engineering the reference tool's JavaScript. It is the operational companion to the [spec](mdc-spec-v0.1.md) §0 (corpus conventions) and §12 (conformance classes).*
 
@@ -27,13 +27,13 @@ Each case is a directory `corpus/<family>/<case>/` containing `input.mdc.md` and
 2. Invoke the CLI per the family recipe below, substituting `$FILE` (the working copy) and, for `cut`, `$OUT` (a fresh output path).
 3. Compare the result under the family's **compare mode** (below).
 
-A machine-readable index of every case — its family, conformance level, argv, and compare mode — is provided at [`corpus/manifest.json`](corpus/manifest.json) so a runner can iterate without directory-shape heuristics.
+A machine-readable index of every case (its family, conformance level, argv, and compare mode) is provided at [`corpus/manifest.json`](corpus/manifest.json) so a runner can iterate without directory-shape heuristics.
 
 ### Family recipes
 
 | Family | argv | Expected artifact | Compare mode |
 |---|---|---|---|
-| `parse` | `parse $FILE --json` | `expected.json` **or** `error.json` | **json-model** — or, for `error.json`, exit `1` and the error token (see below) |
+| `parse` | `parse $FILE --json` | `expected.json` **or** `error.json` | **json-model**; or, for `error.json`, exit `1` and the error token (see below) |
 | `lint` | `lint $FILE --json` | `expected.json` (ordered findings) | **json-findings** |
 | `fmt` | `fmt $FILE` (or `fmt --assign-ids $FILE`) | `expected.mdc.md` | **bytes** (`$FILE` after) |
 | `mutate` | the case's argv (verb, id, flags) | `expected.mdc.md` **or** `expected-error.json` `{exit:N}` | **bytes**, or **exit** (file byte-unchanged) |
@@ -42,21 +42,21 @@ A machine-readable index of every case — its family, conformance level, argv, 
 
 The `--assign-ids` flag and every mutation flag are carried explicitly in each case's argv (in the manifest), never inferred from the case name.
 
-## Comparison law (normative — this is what "matches" means)
+## Comparison law (normative: this is what "matches" means)
 
 A second implementation gets these for free from a JS `deepStrictEqual`/string compare; stated here so a Rust/Go/Python implementation matches exactly.
 
 ### JSON comparison (`json-model`, `json-findings`)
 - **Object keys are unordered**; **arrays are ordered** (item order, `needs=` order, findings order are all significant).
 - Every **`line` key is ignored at any depth** (line numbers are volatile; fixtures omit them).
-- **Present-empty is distinct from absent.** `attrs: {}` (present, empty), `progress: null` (present, null for leaves), `blockedBy: []` (present, empty) are each required exactly as fixtured — an implementation that omits an empty `attrs` or a null `progress` does **not** conform.
+- **Present-empty is distinct from absent.** `attrs: {}` (present, empty), `progress: null` (present, null for leaves), `blockedBy: []` (present, empty) are each required exactly as fixtured; an implementation that omits an empty `attrs` or a null `progress` does **not** conform.
 - Numbers are compared by value; MDC's model has no floats (progress counts are integers).
 
 ### Byte comparison (`bytes`)
 - Compared **byte-for-byte** after a defined newline policy: a fixture and its result must agree on line endings. LF and CRLF behaviors are asserted by **distinct fixtures** (a CRLF fixture expects CRLF output); a runner MUST NOT normalize newlines before comparing.
 - A trailing newline is significant and preserved as the input had it.
 - A leading UTF-8 BOM, if present in the input, is preserved in the output and is part of the compared bytes (spec DET-6).
-- Unicode is compared as stored bytes. If a checkout's filesystem returns decomposed forms (NFD, e.g. some macOS setups), normalize to **NFC for the comparison only** — never rewrite stored fixtures. MDC tooling never changes the Unicode normalization of item text.
+- Unicode is compared as stored bytes. If a checkout's filesystem returns decomposed forms (NFD, e.g. some macOS setups), normalize to **NFC for the comparison only**; never rewrite stored fixtures. MDC tooling never changes the Unicode normalization of item text.
 
 ### The error token (`parse` error cases)
 An `error.json` case is `{"error": "<token>"}` with token ∈ `not-mdc`, `unsupported-version`. A conformant `parse` **MUST** exit `1` and emit `{"error":"<token>"}` as JSON on stdout, so the two classes are distinguishable through the CLI (not only as an internal exception). A runner that only checks the exit code still conforms at the coarse level; matching the token is the finer check.
@@ -65,9 +65,9 @@ An `error.json` case is `{"error": "<token>"}` with token ∈ `not-mdc`, `unsupp
 
 See spec [§12](mdc-spec-v0.1.md) for the normative statements. In brief, an implementation MAY claim:
 
-- **L0 — Render.** Any Markdown/GFM renderer, by construction. Verified by the paste procedure in [`rendering/README.md`](rendering/README.md).
-- **L1 — Parse.** Passes every `parse/` case (json-model, incl. error cases) and every `lint/` case (json-findings). This is the parser-credibility class — the one a second-language implementation targets first.
-- **L2 — Mutate.** L1, plus every `fmt/`, `mutate/`, `add/`, `note/`, `edit/`, and `cut/` case (bytes/exit), holding the minimal-diff and idempotence properties.
+- **L0: Render.** Any Markdown/GFM renderer, by construction. Verified by the paste procedure in [`rendering/README.md`](rendering/README.md).
+- **L1: Parse.** Passes every `parse/` case (json-model, incl. error cases) and every `lint/` case (json-findings). This is the parser-credibility class, the one a second-language implementation targets first.
+- **L2: Mutate.** L1, plus every `fmt/`, `mutate/`, `add/`, `note/`, `edit/`, and `cut/` case (bytes/exit), holding the minimal-diff and idempotence properties.
 
 ## Bootstrapping a second implementation
 
@@ -80,6 +80,6 @@ python3 spec/conformance/run.py                          # the reference JS CLI
 python3 spec/conformance/run.py --cli "./target/release/mdc" --level L1
 ```
 
-That a non-JavaScript process can judge any implementation against the corpus is the proof the contract is portable — the concrete artifact behind the spec's "a second-language parser is a hard gate before 1.0." A second implementation earns a conformance class by passing `run.py` pointed at its own binary.
+That a non-JavaScript process can judge any implementation against the corpus is the proof the contract is portable: the concrete artifact behind the spec's "a second-language parser is a hard gate before 1.0." A second implementation earns a conformance class by passing `run.py` pointed at its own binary.
 
 Implementations that have passed are catalogued in the [implementations registry](../docs/spec/implementations.md), keyed to the highest conformance class and spec version each passes; that page also documents how a new implementation gets listed.

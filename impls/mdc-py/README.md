@@ -1,26 +1,26 @@
-# mdc-py — a second, independent MDC implementation (CONF-L2)
+# mdc-py: a second, independent MDC implementation (CONF-L2)
 
 A standalone Python 3 implementation of MDC (Markdown Checklists) at conformance
 level **CONF-L2** (parse + lint + fmt + mutate + add + note + edit + cut).
-Standard library only — no `pip` dependencies.
+Standard library only, no `pip` dependencies.
 
 Its purpose is the pre-1.0 credibility gate: proving the [MDC spec](../../spec/mdc-spec-v0.1.md)
-is implementable twice — a second language, a different parsing strategy, working
+is implementable twice: a second language, a different parsing strategy, working
 from the spec + corpus rather than the JavaScript reference.
 
 ## What it is
 
 - A single file, `mdc.py`, exposing the full conformance CLI contract:
-  - `parse <file> --json` — emits the §7 L1 document model as JSON on stdout
+  - `parse <file> --json`: emits the §7 L1 document model as JSON on stdout
     (exit 0); on a non-MDC / unsupported-version document emits
     `{"error":"not-mdc"}` or `{"error":"unsupported-version"}` and exits 1.
-  - `lint <file> --json` — emits the §11 findings array as JSON on stdout.
-  - `fmt [--assign-ids] <file>` — rewrites `<file>` in place to canonical form
+  - `lint <file> --json`: emits the §11 findings array as JSON on stdout.
+  - `fmt [--assign-ids] <file>`: rewrites `<file>` in place to canonical form
     (§9); idempotent; malformed-attribute lines left byte-untouched (FMT-9).
-  - `check`/`uncheck`/`cancel`/`claim`/`unclaim`/`start`/`unstart` `<file> <id> [flags]`
-    — rewrite exactly the target line in canonical form, echo it to stdout (§10).
+  - `check`/`uncheck`/`cancel`/`claim`/`unclaim`/`start`/`unstart` `<file> <id> [flags]`:
+    rewrite exactly the target line in canonical form, echo it to stdout (§10).
   - `add <file> "<text>" [--id --needs --as --due --class] [--after <id> | --section <heading>]`.
-  - `note <file> <id> "<text>" [--as --date]` — append a nested prose note bullet.
+  - `note <file> <id> "<text>" [--as --date]`: append a nested prose note bullet.
   - `edit <file> <id> [--text --needs --add-needs --rm-needs --add-class --rm-class --due]`.
   - `cut <template> --out <file> --template-ref <ref> [--title --date]`.
 - Exit-code law: `0` success · `1` usage / IO / parse / not-MDC · `2` domain
@@ -31,7 +31,7 @@ from the spec + corpus rather than the JavaScript reference.
   depth is computed from leading indentation via an explicit stack, and the
   attribute block is extracted and tokenised by hand (a small whitespace scanner
   that respects double quotes). No Markdown library is involved. Mutations are
-  line surgery — parse, locate the item by id, regenerate only that line, copy
+  line surgery: parse, locate the item by id, regenerate only that line, copy
   every other byte through (endings and BOM preserved).
 
 ## How to run it
@@ -57,14 +57,14 @@ Current result: **79/79 passed** (44 L1: 28 parse + 16 lint; 35 L2: 18 fmt +
 
 ## Portability notes
 
-**The JavaScript reference was not consulted for any case, at either level** —
+**The JavaScript reference was not consulted for any case, at either level**:
 the spec prose (`spec/mdc-spec-v0.1.md`), the implementation contract
 (`docs/spec/implementation-contract.md`), and the corpus fixtures were together
 sufficient to reach 79/79. The task asked that any forced consult of the JS be
 recorded here; there were none.
 
 What follows are the points where the corpus was the deciding authority over the
-prose, or where a rule needed careful reading — useful spec-clarity findings for a
+prose, or where a rule needed careful reading: useful spec-clarity findings for a
 third implementer, but each resolvable from the spec+corpus alone:
 
 - **`gatedBy` values carry literal source line numbers.** The runner strips every
@@ -78,8 +78,8 @@ third implementer, but each resolvable from the spec+corpus alone:
   "children inherit gatedBy from their parent (union)", but because a gate applies
   to every later item by line regardless of nesting, computing each item's
   `gatedBy` directly (gates whose line precedes it, `.optional` ⇒ empty) reproduces
-  every fixture — including nested children (`canonical-run` smoke's children get
-  `["triage"]`) — without any explicit inheritance step. Inheritance *is* needed
+  every fixture, including nested children (`canonical-run` smoke's children get
+  `["triage"]`), without any explicit inheritance step. Inheritance *is* needed
   for `blocked`/`blockedBy`, which propagate parent→child as a set union
   (`canonical-run` smoke's children inherit `blockedBy: ["ci"]`).
 
@@ -93,7 +93,7 @@ third implementer, but each resolvable from the spec+corpus alone:
   untested mixed case (some members terminal, some open).
 
 - **The trailing-block / "item must have text" edge (`parse/braces-mid-line`).**
-  `- [ ] {#orphan}` has *no* attribute block — the braces are the whole text, so
+  `- [ ] {#orphan}` has *no* attribute block: the braces are the whole text, so
   they stay as literal text and `id` is `null`. The block is recognised only when
   it is preceded by a space **and** non-empty text remains before it. A mid-line
   `{...}` (not at end of line) is likewise plain text.
@@ -139,7 +139,7 @@ third implementer, but each resolvable from the spec+corpus alone:
   blocks.** `fmt/quote-brace-value` (`{x-path="a{b}c" #b}`) has a `{` *inside* a
   quoted value; a naive "last `{`" scan mis-splits it. The block opener is instead
   found by scanning left-to-right, tracking double-quote state and brace depth, and
-  taking the last top-level (`depth 0`, unquoted) `{` — provided the text ends with
+  taking the last top-level (`depth 0`, unquoted) `{`, provided the text ends with
   `}`, that `{` is preceded by a space, and non-empty text remains before it. But
   the *malformed* cases (`{#broken verify="npm test}`, unbalanced quote) still need
   detecting: because the opening `{` is recorded at top level *before* the stray
@@ -173,7 +173,7 @@ third implementer, but each resolvable from the spec+corpus alone:
 - **`check`/`cancel` clear the soft `.doing`/`.waiting` classes; `check`/`cancel`
   stamp `done=`/`reason=`** (MUT-1). Because every mutation re-serialises the target
   line from the parsed model, a non-canonical target is *also* canonicalised in the
-  same one-line diff (`mutate/check-noncanonical`) — no separate fmt pass needed.
+  same one-line diff (`mutate/check-noncanonical`): no separate fmt pass needed.
 
 - **Refusal vs. usage exit codes.** Domain refusals are exit **2** and leave the
   file byte-untouched: unknown id, `claim` on an already-assigned item, `start` on
@@ -191,18 +191,18 @@ third implementer, but each resolvable from the spec+corpus alone:
   next heading) at top level. The new line is one inserted line; every existing
   byte is preserved, so `fmt`/`lint` are clean immediately after.
 
-- **`note` indent is `2·(depth+1)` spaces** — one level below the item
+- **`note` indent is `2·(depth+1)` spaces**, one level below the item
   (`  - note @who date: message`). New notes append after the item's existing note
   lines, read top-to-bottom in write order (`note/chronological-append`). Without
   `--as` there is no `@author`; `--date` defaults to today.
 
-- **`cut` frontmatter is emitted in a fixed order** — `mdc`, `kind: run`,
+- **`cut` frontmatter is emitted in a fixed order**: `mdc`, `kind: run`,
   `template: <ref>`, `title`, `mode` (only if the template had one), `started`,
-  then any extra template keys — with `mdc` quoted (`mdc: "0.1"`) and every other
+  then any extra template keys, with `mdc` quoted (`mdc: "0.1"`) and every other
   value bare. `--template-ref` is written verbatim (path-independent). The body is
   copied line-for-line; each item line is reset to a pristine open state (state
   open, no assignee, drop `done=`/`due=`/`reason=` and `.doing`/`.waiting`,
-  un-cancel) and re-serialised canonically — so a well-formed template's item lines
+  un-cancel) and re-serialised canonically, so a well-formed template's item lines
   are unchanged (`cut/from-canonical-template`) and a dirty one is cleaned
   (`cut/strips-run-state`). Frontmatter is written with a hand-rolled serializer,
   not a YAML library; this is sufficient for every value shape in the corpus but is

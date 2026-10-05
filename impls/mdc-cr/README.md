@@ -1,11 +1,11 @@
-# mdc-cr — MDC (Markdown Checklists) in Crystal
+# mdc-cr: MDC (Markdown Checklists) in Crystal
 
 A third, independent implementation of [MDC](../../spec/mdc-spec-v0.1.md),
 written in [Crystal](https://crystal-lang.org) and compiled via LLVM to a
 single native binary. It joins the JavaScript reference (`packages/mdc`) and
 the Python port (`impls/mdc-py`).
 
-**Conformance: CONF-L2 — 82/82 corpus cases pass** (all families: parse, lint,
+**Conformance: CONF-L2, 82/82 corpus cases pass** (all families: parse, lint,
 fmt, mutate, add, note, edit, cut), verified by the language-neutral runner at
 `spec/conformance/run.py`.
 
@@ -16,12 +16,12 @@ invocation, where a Node process pays its interpreter/JIT warm-up every time.
 
 ## What it is
 
-- Crystal **standard library only** — `JSON` (the builder, for byte-precise
+- Crystal **standard library only**: `JSON` (the builder, for byte-precise
   model output), `Regex` (PCRE2), `File`/`Time`. No shards, no third-party deps.
 - A **line-oriented parser**: task-item lines are matched by pattern, nesting
   depth is derived from leading indentation, and the trailing attribute block is
   extracted and tokenised by hand (quote-aware). This is a genuinely different
-  parsing strategy from the JS reference's remark/unified pipeline — the same
+  parsing strategy from the JS reference's remark/unified pipeline, the same
   independence the Python port has.
 - Single source file: [`src/mdc.cr`](src/mdc.cr).
 
@@ -38,7 +38,7 @@ crystal build impls/mdc-cr/src/mdc.cr -o impls/mdc-cr/bin/mdc --release
 ```
 
 The compiled `bin/mdc` is a build artifact and is **git-ignored** (see
-`.gitignore`) — build it locally; it is not committed. Release binary is ~700 KB.
+`.gitignore`): build it locally; it is not committed. Release binary is ~700 KB.
 
 ## Run
 
@@ -79,10 +79,10 @@ produce identical model output; only the per-process cost differs.
 | **mdc-cr (native)** | `bin/mdc parse … --json` | **~2.4 ms** (50 runs / 0.12 s) |
 | Node reference | `node packages/mdc/src/cli.js parse … --json` | ~68 ms (20 runs / 1.37 s) |
 
-A single cold invocation: **~3 ms** (Crystal) vs **~69 ms** (Node) — roughly a
+A single cold invocation: **~3 ms** (Crystal) vs **~69 ms** (Node), roughly a
 **25–28x** startup advantage. The gap is almost entirely process start-up: the
 actual parse is sub-millisecond for both on a document this size. That is the
-whole argument for a native binary in an agent/CI inner loop — the cost that
+whole argument for a native binary in an agent/CI inner loop: the cost that
 dominates when a tool is spawned hundreds of times is the one this removes.
 
 Reproduce:
@@ -127,7 +127,7 @@ reference `packages/mdc/src/*.js`), plus Crystal-specific gotchas:
 - **The trailing attribute block is found quote-aware**, per the contract's
   explicit warning (and `fmt/quote-brace-value`): scan for the opening `{` at
   brace-depth zero *and outside double quotes*, taking the last such top-level
-  unquoted brace — not the textually last `{`. A brace inside a quoted value is
+  unquoted brace, not the textually last `{`. A brace inside a quoted value is
   ordinary text. I operate on a `Array(Char)` so indices are codepoint indices,
   matching the reference's Python/JS string semantics exactly rather than
   Crystal byte offsets.
@@ -150,12 +150,12 @@ reference `packages/mdc/src/*.js`), plus Crystal-specific gotchas:
   chronologically after any existing `- note` children. These are covered by
   `add/*` and `note/chronological-append`.
 
-- **Crystal gotcha — `out` is a reserved keyword** (used for C-binding output
+- **Crystal gotcha: `out` is a reserved keyword** (used for C-binding output
   parameters), so it cannot be a local variable name. Three natural
   `out`-named locals had to be renamed. Worth flagging for anyone porting from
   Python/JS where `out` is a common accumulator name.
 
-- **Crystal gotcha — regex literals interpolate `#{…}`.** `HEADING_RE`'s
+- **Crystal gotcha: regex literals interpolate `#{…}`.** `HEADING_RE`'s
   `#{1,6}` quantifier and the `#`/`{` in other patterns would be read as string
   interpolation inside a `/.../ ` literal, so the task/list/heading regexes are
   built with `Regex.new(%q{…})` (no interpolation in `%q`).

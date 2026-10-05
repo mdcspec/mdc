@@ -4,19 +4,19 @@ Thanks for your interest in Markdown Checklists (MDC). This project is small and
 
 ## The one rule that matters most
 
-**The conformance corpus is the arbiter.** Any question about how MDC *behaves* — what parses, what lints, what a mutation produces — is settled by a fixture in [`spec/corpus/`](spec/corpus/), not by discussion or by what the reference implementation happens to do. If you think MDC does the wrong thing, the productive move is a failing (or proposed) fixture, not a prose argument.
+**The conformance corpus is the arbiter.** Any question about how MDC *behaves* (what parses, what lints, what a mutation produces) is settled by a fixture in [`spec/corpus/`](spec/corpus/), not by discussion or by what the reference implementation happens to do. If you think MDC does the wrong thing, the productive move is a failing (or proposed) fixture, not a prose argument.
 
 Corollary from the spec: **a rule without a passing fixture is not normative**, and where a fixture and a sentence disagree, the fixture wins.
 
 ## Proposing a change
 
 1. **Open an issue first** for anything normative (grammar, semantics, a new verb, a lint rule). Describe the behavior and, ideally, the fixture that would demonstrate it.
-2. Normative changes are **closed-by-default**. Before proposing a feature, apply the project's standing filter: ***"would todo.txt have added this?"*** If not, it likely belongs in tooling above the format, or in the deferred `.mddb` layer — not in `.mdc`. The reserved attribute-key set is closed at six; the bracket grammar is frozen to GFM's two states.
+2. Normative changes are **closed-by-default**. Before proposing a feature, apply the project's standing filter: ***"would todo.txt have added this?"*** If not, it likely belongs in tooling above the format, or in the deferred `.mddb` layer, not in `.mdc`. The reserved attribute-key set is closed at six; the bracket grammar is frozen to GFM's two states.
 3. **Every normative change ships with a corpus fixture and a spec rule that cites it.** A PR that changes behavior without a fixture will be asked to add one.
 
 ## Working in the code
 
-- The reference implementation is **ESM JavaScript with JSDoc types** — no TypeScript, no build step. Node ≥ 20.
+- The reference implementation is **ESM JavaScript with JSDoc types**, no TypeScript, no build step. Node ≥ 20.
 - Dependencies are a closed set (`unified`, `remark-*`, `yaml`). Adding one needs a documented reason.
 - Run the whole suite from the repo root:
   ```

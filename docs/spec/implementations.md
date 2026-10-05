@@ -4,27 +4,27 @@ Known implementations of [MDC (Markdown Checklists)](../../spec/mdc-spec-v0.1.md
 
 Conformance classes (see [spec §12](../../spec/mdc-spec-v0.1.md) and the [conformance contract](../../spec/conformance.md)):
 
-- **CONF-L0 — Render.** Any Markdown/GFM renderer, by construction.
-- **CONF-L1 — Parse.** Passes every `parse/` and `lint/` case (the L1 JSON model and lint findings).
-- **CONF-L2 — Mutate.** L1, plus every `fmt/`, `mutate/`, `add/`, `note/`, `edit/`, and `cut/` case, holding the minimal-diff and idempotence properties.
+- **CONF-L0: Render.** Any Markdown/GFM renderer, by construction.
+- **CONF-L1: Parse.** Passes every `parse/` and `lint/` case (the L1 JSON model and lint findings).
+- **CONF-L2: Mutate.** L1, plus every `fmt/`, `mutate/`, `add/`, `note/`, `edit/`, and `cut/` case, holding the minimal-diff and idempotence properties.
 
 ## Registry
 
 | Implementation | Language | Conformance | Spec version | Notes |
 | --- | --- | --- | --- | --- |
 | [`@mdcspec/mdc`](../../packages/mdc/) | JavaScript (Node ≥ 20) | CONF-L2 | v0.1 | The reference parser and CLI. `remark` + `remark-gfm` + `remark-frontmatter`; the source of truth for the corpus's expected outputs. |
-| [`impls/mdc-py`](../../impls/mdc-py/) | Python 3 (stdlib only) | CONF-L2 | v0.1 | Second, independent implementation — a different parsing strategy, no `pip` dependencies. The pre-1.0 credibility gate: proof the spec is implementable twice from the spec + corpus rather than from the reference code. |
-| [`impls/mdc-cr`](../../impls/mdc-cr/) | Crystal (native binary) | CONF-L2 | v0.1 | Third, independent implementation — a hand-written line-oriented parser compiled to a static native binary (Crystal stdlib only). Optimized for a fast CLI: ~26× lower startup than the Node reference (~2.6 ms vs ~69 ms/invocation), which dominates in agent/CI loops. |
+| [`impls/mdc-py`](../../impls/mdc-py/) | Python 3 (stdlib only) | CONF-L2 | v0.1 | Second, independent implementation: a different parsing strategy, no `pip` dependencies. The pre-1.0 credibility gate: proof the spec is implementable twice from the spec + corpus rather than from the reference code. |
+| [`impls/mdc-cr`](../../impls/mdc-cr/) | Crystal (native binary) | CONF-L2 | v0.1 | Third, independent implementation: a hand-written line-oriented parser compiled to a static native binary (Crystal stdlib only). Optimized for a fast CLI: ~26× lower startup than the Node reference (~2.6 ms vs ~69 ms/invocation), which dominates in agent/CI loops. |
 
 ## Getting listed
 
-An implementation earns a row by passing the conformance corpus — nothing is taken on assertion. Point the language-agnostic runner at your binary:
+An implementation earns a row by passing the conformance corpus; nothing is taken on assertion. Point the language-agnostic runner at your binary:
 
 ```
 python3 spec/conformance/run.py --cli "<your CLI command>"          # all cases → CONF-L2
 python3 spec/conformance/run.py --cli "<your CLI command>" --level L1  # parse + lint only → CONF-L1
 ```
 
-The runner ([`spec/conformance/run.py`](../../spec/conformance/run.py)) is standard-library Python and consumes only [`spec/corpus/manifest.json`](../../spec/corpus/) plus the [CLI contract](../../spec/conformance.md) — it has no knowledge of any implementation's language. `run.py` exits `0` iff every selected case passes. The highest all-green level is the class you may claim.
+The runner ([`spec/conformance/run.py`](../../spec/conformance/run.py)) is standard-library Python and consumes only [`spec/corpus/manifest.json`](../../spec/corpus/) plus the [CLI contract](../../spec/conformance.md); it has no knowledge of any implementation's language. `run.py` exits `0` iff every selected case passes. The highest all-green level is the class you may claim.
 
 To add your implementation here, open a pull request that (1) shows `run.py` green against your binary at the claimed level and spec version, and (2) adds a row above. New implementations in any language are welcome; the corpus is MIT-licensed precisely so it can be vendored verbatim into your own test suite.
