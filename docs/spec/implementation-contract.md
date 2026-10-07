@@ -2,7 +2,7 @@
 
 *The engineering decision record that bridges the [format sketch](mdc-format-sketch.md) and the MVP code: every ambiguity an implementer would otherwise resolve ad hoc is pinned here. The [MVP definition](../planning/mvp-definition.md) says what to build; this says exactly how the pieces must behave so the corpus, parser, and CLI agree byte-for-byte.*
 
-> Precedence: where this document and the [format sketch](mdc-format-sketch.md) conflict, the sketch's *intent* wins but this document's *mechanics* win — file an issue rather than silently diverging. The spec corpus (`spec/corpus/`) is authoritative over both once a fixture exists.
+> Precedence: where this document and the [format sketch](mdc-format-sketch.md) conflict, the sketch's *intent* wins but this document's *mechanics* win; file an issue rather than silently diverging. The spec corpus (`spec/corpus/`) is authoritative over both once a fixture exists.
 
 > This contract describes the reference implementation; the [implementations registry](implementations.md) lists every implementation that has passed the conformance corpus, at what class and spec version.
 
@@ -11,7 +11,7 @@
 - **Language:** Plain ESM JavaScript with JSDoc type annotations. No TypeScript, no build step. Node `>= 20`.
 - **Tests:** `node:test` (built-in). No test-framework dependencies.
 - **Dependencies (closed set):** `unified`, `remark-parse`, `remark-gfm`, `remark-frontmatter`, `yaml`. Nothing else without a documented reason in this file.
-- **Package:** `packages/mdc/` — npm name `@mdcspec/mdc`, `"private": true` for now, `"type": "module"`, `"bin": { "mdc": "./src/cli.js" }`, version `0.1.0`. Root `package.json` is a private workspace container.
+- **Package:** `packages/mdc/`: npm name `@mdcspec/mdc`, `"private": true` for now, `"type": "module"`, `"bin": { "mdc": "./src/cli.js" }`, version `0.1.0`. Root `package.json` is a private workspace container.
 
 ## Repo layout
 
@@ -49,13 +49,13 @@ checklists/
 
 ## In-band detection
 
-A document is MDC iff it begins with a YAML frontmatter block (`---` fence on line 1) whose mapping contains the key `mdc` with a string value. Detection tolerates a leading UTF-8 BOM and CRLF line endings. `mdc: "0.1"` is the only version accepted; another string value → `unsupported-version` error naming both versions. A file without the key is **not an MDC document** (exit `1`, `not an MDC document (missing 'mdc' frontmatter key)`); a present-but-non-string value (e.g. unquoted `mdc: 0.1`, which YAML reads as a number) gets a distinct `not-mdc` message telling the author to quote it. Frontmatter is parsed with `yaml`, surfaced verbatim in the model, and **never rewritten** by any verb in v0 — `fmt` and all mutations preserve frontmatter and all prose bytes exactly; only task-item lines are ever rewritten.
+A document is MDC iff it begins with a YAML frontmatter block (`---` fence on line 1) whose mapping contains the key `mdc` with a string value. Detection tolerates a leading UTF-8 BOM and CRLF line endings. `mdc: "0.1"` is the only version accepted; another string value → `unsupported-version` error naming both versions. A file without the key is **not an MDC document** (exit `1`, `not an MDC document (missing 'mdc' frontmatter key)`); a present-but-non-string value (e.g. unquoted `mdc: 0.1`, which YAML reads as a number) gets a distinct `not-mdc` message telling the author to quote it. Frontmatter is parsed with `yaml`, surfaced verbatim in the model, and **never rewritten** by any verb in v0; `fmt` and all mutations preserve frontmatter and all prose bytes exactly; only task-item lines are ever rewritten.
 
 Recognized frontmatter keys: `mdc` (required), `kind` (`template | run | list`, default `list`), `title`, `template`, `mode` (`read-do | do-confirm`), `started`. Unknown keys are preserved and surfaced, never an error.
 
 ## Attribute-block microgrammar
 
-An item line's attribute block is a trailing `{…}` at end of line, preceded by at least one space (or the whole text is the block — disallowed: an item must have text). **Extraction must be quote-aware**: split at the last **top-level, unquoted** `{` — not merely the last `{` in the line. A brace inside a quoted value (`{x-path="a{b}c" #b}`) is ordinary content, and a naive "last `{`" scan mis-splits such a line, dropping the leading tokens. Scan for the opening `{` at brace-depth zero and outside double quotes; the fixture `[fmt/quote-brace-value]` pins this. Grammar, tokenized on whitespace outside double quotes:
+An item line's attribute block is a trailing `{…}` at end of line, preceded by at least one space (or the whole text is the block, which is disallowed: an item must have text). **Extraction must be quote-aware**: split at the last **top-level, unquoted** `{`, not merely the last `{` in the line. A brace inside a quoted value (`{x-path="a{b}c" #b}`) is ordinary content, and a naive "last `{`" scan mis-splits such a line, dropping the leading tokens. Scan for the opening `{` at brace-depth zero and outside double quotes; the fixture `[fmt/quote-brace-value]` pins this. Grammar, tokenized on whitespace outside double quotes:
 
 ```
 block   := "{" token (SP token)* "}"
@@ -72,12 +72,12 @@ quoted  := '"' *(any char except '"') '"'    # no escape sequences in v0
 slug    := 1*(a-z A-Z 0-9 - _ /)             # needs= values may also contain "," and cross-file refs "." "#"; template paths "." "@"
 ```
 
-- `needs=` value is a comma-separated ID list, no spaces (`needs=a,b`). Parsed to an array. A target containing `#` is a cross-file reference (`path#id`): opaque to v0 — preserved verbatim, excluded from blocked/dangling (never a blocking edge, never `dangling-needs`), lint warns `unresolved-cross-file-ref`.
+- `needs=` value is a comma-separated ID list, no spaces (`needs=a,b`). Parsed to an array. A target containing `#` is a cross-file reference (`path#id`): opaque to v0, preserved verbatim, excluded from blocked/dangling (never a blocking edge, never `dangling-needs`), lint warns `unresolved-cross-file-ref`.
 - Dates (`due`, `done`, `started`) are `YYYY-MM-DD`; violations → lint `invalid-date` (error).
-- `repeat=` must match `(done|due)\+<n><unit>` with unit `d|w|m`; else lint `invalid-repeat` (error). Data only — nothing executes recurrence.
+- `repeat=` must match `(done|due)\+<n><unit>` with unit `d|w|m`; else lint `invalid-repeat` (error). Data only; nothing executes recurrence.
 - A block that does not tokenize (unbalanced quote/brace, empty `{}`) is **not** treated as attributes: the braces stay part of the item text (L0 safety), the parser records a document-level warning, and lint reports `malformed-attributes` (error) at that line.
 
-**Canonical serialization** (used by `fmt` and by every mutation when it rewrites a line): `{#id .class-a .class-b @assignee key=value}` — order: id, classes (alphabetical), assignee, then keys alphabetical; single spaces; a value is quoted iff it contains whitespace or a brace (`{`/`}`) or is empty, else bare (a value containing `"` is unrepresentable in v0); `needs` list comma-joined in source order (not sorted — order may be meaningful to readers).
+**Canonical serialization** (used by `fmt` and by every mutation when it rewrites a line): `{#id .class-a .class-b @assignee key=value}`. Order: id, classes (alphabetical), assignee, then keys alphabetical; single spaces; a value is quoted iff it contains whitespace or a brace (`{`/`}`) or is empty, else bare (a value containing `"` is unrepresentable in v0); `needs` list comma-joined in source order (not sorted: order may be meaningful to readers).
 
 ## Item grammar and states
 
@@ -133,15 +133,15 @@ An item line is: `<indent>- [<mark>] <text>[ <attribute-block>]` where `<mark>` 
 
 ## Derived semantics (computed, never stored)
 
-- **blocked**: any *local* `needs=` target is non-terminal, dangling (unknown ID → also lint error), or the item is a **non-terminal** member of a `needs` cycle (deadlock; cycle → lint `needs-cycle` error). A terminal cycle member — and a dependent whose only unmet target has become terminal — is not blocked. Cross-file targets (`path#id`) are excluded: never a blocking edge, so an item whose only unmet need is cross-file is actionable.
+- **blocked**: any *local* `needs=` target is non-terminal, dangling (unknown ID → also lint error), or the item is a **non-terminal** member of a `needs` cycle (deadlock; cycle → lint `needs-cycle` error). A terminal cycle member (and a dependent whose only unmet target has become terminal) is not blocked. Cross-file targets (`path#id`) are excluded: never a blocking edge, so an item whose only unmet need is cross-file is actionable.
 - **gates**: for each `.gate` item G, every item *after* G in document order (by line) that is not `.optional` is gated (`gatedBy` includes G's id or `"<line N>"` if G has no id) until G is terminal. Gates apply document-wide regardless of nesting. A gate item itself is gated only by *earlier* gates.
-- **parent/child**: children inherit `blocked`/`gatedBy` from their parent (union), **except** an `.optional` item is exempt from gating entirely — its `gatedBy` is always empty, direct or inherited. A parent with at least one non-terminal child is not actionable — its children are the work.
+- **parent/child**: children inherit `blocked`/`gatedBy` from their parent (union), **except** an `.optional` item is exempt from gating entirely; its `gatedBy` is always empty, direct or inherited. A parent with at least one non-terminal child is not actionable; its children are the work.
 - **actionable**: `state == open` ∧ not blocked ∧ not gated ∧ all children terminal. `.doing` / `.waiting` are informational only and do not affect actionability.
 - **next**: actionable items in document order. `mdc next --json` emits the full ordered array (agents pick); `mdc next` human form shows the first with the rest summarized.
 
 ## Lint rules (closed set for v0)
 
-`duplicate-id`, `dangling-needs`, `needs-cycle`, `malformed-attributes`, `multiple-ids`, `multiple-assignees`, `invalid-date`, `invalid-repeat`, `unknown-key` (warning), `non-canonical-state` (warning: `[X]`, `*`/`+` markers, non-canonical attribute order/spacing — i.e. "fmt would change this line"), `cancelled-without-reason` (warning), `unpinned-template` (warning: a `kind: run` whose `template:` value has no `@version` suffix — token after the final `@` — so it may drift when the template changes), `unresolved-cross-file-ref` (warning: a `needs=` target of the form `path#id` — opaque to v0, not resolved). Findings JSON: `[{ "rule", "severity": "error"|"warning", "line", "id": null|"…", "message" }]`.
+`duplicate-id`, `dangling-needs`, `needs-cycle`, `malformed-attributes`, `multiple-ids`, `multiple-assignees`, `invalid-date`, `invalid-repeat`, `unknown-key` (warning), `non-canonical-state` (warning: `[X]`, `*`/`+` markers, non-canonical attribute order/spacing, i.e. "fmt would change this line"), `cancelled-without-reason` (warning), `unpinned-template` (warning: a `kind: run` whose `template:` value has no `@version` suffix, the token after the final `@`, so it may drift when the template changes), `unresolved-cross-file-ref` (warning: a `needs=` target of the form `path#id`, opaque to v0, not resolved). Findings JSON: `[{ "rule", "severity": "error"|"warning", "line", "id": null|"…", "message" }]`.
 
 ## CLI contract
 
@@ -172,28 +172,28 @@ Every mutating verb (`add`/`check`/`uncheck`/`cancel`/`claim`/`unclaim`/`start`/
 
 ## Cut algorithm (template → run)
 
-`cut` reads a `kind: template` (not stdin — it needs the source path for the `template:` reference) and emits a `kind: run`:
+`cut` reads a `kind: template` (not stdin: it needs the source path for the `template:` reference) and emits a `kind: run`:
 
 1. Parse the source; refuse a non-template with exit 1.
-2. Write fresh run frontmatter in canonical order — `mdc`, `kind: run`, `template: <ref>`, `title` (override or the template's), `mode` (from the template if present), `started` (`--date` or today) — preserving any extra template keys. `<ref>` is the source path relative to `--out`'s directory (or as given when writing to stdout), with `@<version>` appended when `--as-version` is passed. Frontmatter is serialized with the `yaml` library so `mdc` stays a quoted string.
+2. Write fresh run frontmatter in canonical order (`mdc`, `kind: run`, `template: <ref>`, `title` (override or the template's), `mode` (from the template if present), `started` (`--date` or today)), preserving any extra template keys. `<ref>` is the source path relative to `--out`'s directory (or as given when writing to stdout), with `@<version>` appended when `--as-version` is passed. Frontmatter is serialized with the `yaml` library so `mdc` stays a quoted string.
 3. Copy the body byte-for-byte; on each item line, reset to a pristine open state (clear assignee, `done=`/`due=`/`reason=`, `.doing`/`.waiting`, un-cancel) and re-serialize canonically, preserving the line ending. A well-formed template's item lines are unchanged.
 4. With `--out`, write with `wx` (exit 2 rather than overwrite); otherwise stdout. The template is never modified.
 
 ## Mutation algorithm (L2)
 
-Every mutation is line surgery — never a full re-serialize:
+Every mutation is line surgery, never a full re-serialize:
 
-0. Resolve the path with `realpathSync` so the lock, tmp, and rename all act on the real inode — a mutation through a symlink writes the real document and leaves the link a link. (Missing file → ENOENT → exit 1.)
+0. Resolve the path with `realpathSync` so the lock, tmp, and rename all act on the real inode: a mutation through a symlink writes the real document and leaves the link a link. (Missing file → ENOENT → exit 1.)
 1. Acquire lockfile `<file>.lock` with `wx`, writing a unique ownership token (pid + time + nonce). A lock older than 10 s is stale and is reaped by **rename** (not unlink) so exactly one contender wins the takeover; two parallel unlinks could otherwise both proceed to `wx`-create. All mutations, including `fmt`, take the lock.
 2. Read the file, parse, locate the target item by ID (never by text or line number).
 3. Regenerate **only that item's line** in canonical form with the mutation applied, re-attaching that line's original CR so a CRLF document stays CRLF. All other bytes are copied through untouched.
 4. Re-verify lock ownership, then write to `<file>.tmp-<pid>`, restore the target's file mode, and atomically `rename` over the original; the tmp is unlinked on any failure after it is created. Release the lock only while it is still ours (never unlink a rival's lock that legitimately reaped ours).
 
-Consequences: on canonical-form documents every mutation is a one-line diff and byte-deterministic; on a non-canonical target line the mutation also canonicalizes that line (still one line — documented behavior, covered by a corpus case). `claim`'s check-and-set inside the lock is the atomicity guarantee; the race test spawns ≥5 concurrent `claim` processes and asserts exactly one exit 0, rest exit 2, including a variant that plants a stale lock all contenders must reap.
+Consequences: on canonical-form documents every mutation is a one-line diff and byte-deterministic; on a non-canonical target line the mutation also canonicalizes that line (still one line, documented behavior, covered by a corpus case). `claim`'s check-and-set inside the lock is the atomicity guarantee; the race test spawns ≥5 concurrent `claim` processes and asserts exactly one exit 0, rest exit 2, including a variant that plants a stale lock all contenders must reap.
 
 ## Slug generation (`fmt --assign-ids`)
 
-For each item lacking an ID: lowercase the text, strip inline markdown syntax, take the first three words, join with `-`, strip chars outside `[a-z0-9-]`, collapse repeats. On collision with any existing or previously generated ID in the file, append `-2`, `-3`, …. Deterministic — same input file always yields the same IDs.
+For each item lacking an ID: lowercase the text, strip inline markdown syntax, take the first three words, join with `-`, strip chars outside `[a-z0-9-]`, collapse repeats. On collision with any existing or previously generated ID in the file, append `-2`, `-3`, …. Deterministic: same input file always yields the same IDs.
 
 ## Testing requirements (CI = `npm test` at root)
 
@@ -206,4 +206,4 @@ For each item lacking an ID: lowercase the text, strip inline markdown syntax, t
 
 ## Style
 
-Code comments follow repo norms: only for constraints the code can't express. No timeline language anywhere. The CLI's `--help` text is part of the agent-facing API — keep it accurate and terse.
+Code comments follow repo norms: only for constraints the code can't express. No timeline language anywhere. The CLI's `--help` text is part of the agent-facing API; keep it accurate and terse.
