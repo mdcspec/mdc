@@ -54,7 +54,7 @@ The spec is executable: every normative rule cites a case in the [conformance co
 - **[spec/mdc-spec-v0.1.md](spec/mdc-spec-v0.1.md)**: the normative, example-backed spec.
 - **[spec/conformance.md](spec/conformance.md)** and **[docs/spec/implementations.md](docs/spec/implementations.md)**: how any implementation earns a conformance class, and who's done it.
 - **[docs/adoption/agent-snippet.md](docs/adoption/agent-snippet.md)**: drop-in instructions to teach a coding agent to drive MDC files.
-- **[docs/](docs/README.md)**: research, vision, the risk register, and the [standardization roadmap](docs/planning/standardization-roadmap.md).
+- **[Project wiki](https://github.com/mdcspec/mdc/wiki)**: research, vision, the risk register, and the [standardization roadmap](https://github.com/mdcspec/mdc/wiki/Standardization-Roadmap).
 
 ## Status
 

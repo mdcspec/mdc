@@ -2,25 +2,25 @@
 
 *A working sketch (explicitly not a spec) of the MDC (Markdown Checklists) document format: its design principles, canonical example, item states, metadata syntax, conformance levels, and the alternatives we considered and rejected.*
 
-> **Status: sketch.** Everything here is a decision record on the way to a v0.1 spec, which will ship as an executable, example-based test corpus (see [MVP definition](../planning/mvp-definition.md)). Nothing below is normative until it exists as a passing fixture.
+> **Status: sketch.** Everything here is a decision record on the way to a v0.1 spec, which will ship as an executable, example-based test corpus (see [MVP definition](https://github.com/mdcspec/mdc/wiki/MVP-Definition)). Nothing below is normative until it exists as a passing fixture.
 
 ## Identity and naming, in one paragraph
 
-The format is **MDC: Markdown Checklists**. The canonical filename is the double extension `*.mdc.md`, following [RFC 7764](https://www.rfc-editor.org/rfc/rfc7764)'s variant-prefix pattern (`example.pandoc.markdown`). But the extension is an affordance, never the protocol: **a file is an MDC document if and only if its YAML frontmatter contains the `mdc:` version key.** A `TODO.md` with that key is exactly as valid as `release.mdc.md`. We cede the bare `.mdc` extension permanently: Cursor mandates it for rules files, Nuxt's VS Code extension registers it, and GitHub Linguist assigns it no language, so bare-`.mdc` files render as nothing on GitHub. `.mdb` is never an option (thirty years of Microsoft Access). The database companion is reserved as `.mddb` but deliberately unspecified (see the [mddb concept sketch](mddb-concept-sketch.md)). We will register `text/markdown; variant=mdc` in the [IANA Markdown Variants registry](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) before any public announcement. Full collision analysis lives in [extension naming conflicts](../research/extension-naming-conflicts.md).
+The format is **MDC: Markdown Checklists**. The canonical filename is the double extension `*.mdc.md`, following [RFC 7764](https://www.rfc-editor.org/rfc/rfc7764)'s variant-prefix pattern (`example.pandoc.markdown`). But the extension is an affordance, never the protocol: **a file is an MDC document if and only if its YAML frontmatter contains the `mdc:` version key.** A `TODO.md` with that key is exactly as valid as `release.mdc.md`. We cede the bare `.mdc` extension permanently: Cursor mandates it for rules files, Nuxt's VS Code extension registers it, and GitHub Linguist assigns it no language, so bare-`.mdc` files render as nothing on GitHub. `.mdb` is never an option (thirty years of Microsoft Access). The database companion is reserved as `.mddb` but deliberately unspecified (see the [mddb concept sketch](https://github.com/mdcspec/mdc/wiki/MDDB-Concept-Sketch)). We will register `text/markdown; variant=mdc` in the [IANA Markdown Variants registry](https://www.iana.org/assignments/markdown-variants/markdown-variants.xhtml) before any public announcement. Full collision analysis lives in [extension naming conflicts](https://github.com/mdcspec/mdc/wiki/Extension-Naming-Conflicts).
 
 ## Design principles
 
 1. **Radical compatibility is the definition of validity.** Every MDC document is a byte-for-byte valid, pleasant GFM file that renders correctly on GitHub, GitLab, VS Code, and Obsidian with zero tooling. L0 conformance is guaranteed by construction, not tested after the fact.
 2. **Identity is in-band.** The `mdc:` frontmatter key is the magic number. Tools dispatch on content, never filename: the only rule that survives stdin, gists, API payloads, and agent context windows.
-3. **Exactly one metadata serialization.** One optional trailing attribute block per item line. No emoji dialect, no `[key:: value]`, no bare trailing tokens. Incumbent dialects ([prior art](../research/prior-art-checklist-formats.md)) are handled by importers, never as alternative syntaxes.
+3. **Exactly one metadata serialization.** One optional trailing attribute block per item line. No emoji dialect, no `[key:: value]`, no bare trailing tokens. Incumbent dialects ([prior art](https://github.com/mdcspec/mdc/wiki/Prior-Art-Checklist-Formats)) are handled by importers, never as alternative syntaxes.
 4. **Three conformance levels** (Render, Parse, Mutate) sketched below.
-5. **Derived state is never stored.** Blocked flags, progress counts, and rollups are always computed (the Jupyter/nbdime and org-mode-cookie lesson from [standards adoption lessons](../research/standards-adoption-lessons.md)). Execution output never goes in the file.
+5. **Derived state is never stored.** Blocked flags, progress counts, and rollups are always computed (the Jupyter/nbdime and org-mode-cookie lesson from [standards adoption lessons](https://github.com/mdcspec/mdc/wiki/Standards-Adoption-Lessons)). Execution output never goes in the file.
 6. **Template-vs-run is the load-bearing abstraction**, expressed entirely in frontmatter: zero new syntax.
 7. **Progressive disclosure.** `- [ ] item` with no attributes is a complete, valid MDC item. Every feature is opt-in; complexity is paid only by documents that use it.
 8. **Explicit semantics where incumbents are ambiguous.** Recurrence anchors are mandatory, cancelled is distinct from done, blocked is derived from typed dependencies.
 9. **IDs are optional, visible, human-scale slugs**, never UUIDs (the [JEP 62](https://jupyter.org/enhancement-proposals/62-cell-id/cell-id.html) diff-noise lesson), required only where referenced.
-10. **Tooling is the product.** The spec ships as an executable test corpus with a reference parser and CLI; AI agents are the first-class consumer. See [what MDC could unlock](../vision/what-mdc-could-unlock.md).
-11. **Scope discipline.** Relational needs graduate to the [.mddb layer](mddb-concept-sketch.md) rather than growing .mdc syntax. Outgrowing .mdc is graduation, not failure.
+10. **Tooling is the product.** The spec ships as an executable test corpus with a reference parser and CLI; AI agents are the first-class consumer. See [what MDC could unlock](https://github.com/mdcspec/mdc/wiki/What-MDC-Could-Unlock).
+11. **Scope discipline.** Relational needs graduate to the [.mddb layer](https://github.com/mdcspec/mdc/wiki/MDDB-Concept-Sketch) rather than growing .mdc syntax. Outgrowing .mdc is graduation, not failure.
 
 ## The canonical example
 
@@ -79,18 +79,18 @@ byte-for-byte through any conforming tool.
 | `mdc: "0.1"` | frontmatter | The format signature and version. Required; the only thing that makes this an MDC document. |
 | `kind: run` | frontmatter | `template \| run \| list` (default `list`). This document is an instance of a template. |
 | `template: …@5` | frontmatter | The template path and version this run was cut from (runs only). The `@version` token is opaque to v0 tools (preserved, never resolved); its blessed interpretation is a git commit-ish (see [The `@version` token](#the-version-token)). |
-| `mode: do-confirm` | frontmatter | Checklist-science execution mode: `read-do` or `do-confirm` ([Degani & Wiener's distinction](../research/prior-art-checklist-formats.md#family-0-what-checklist-science-demands-of-a-format)). |
+| `mode: do-confirm` | frontmatter | Checklist-science execution mode: `read-do` or `do-confirm` ([Degani & Wiener's distinction](https://github.com/mdcspec/mdc/wiki/Prior-Art-Checklist-Formats#family-0-what-checklist-science-demands-of-a-format)). |
 | `started:` | frontmatter | Run metadata. ISO 8601. |
 | Free prose | intro paragraph, headings, nested notes | Opaque to tools; round-trips byte-for-byte. |
 | `- [ ]` / `- [x]` | every item | The only bracket states, strictly per [GFM §5.3](https://github.github.com/gfm/#task-list-items-extension-). |
 | `{#branch @tim done=…}` | Prepare section | The trailing attribute block: ID, assignee, completion date. |
 | `.gate` | `#triage`, `#tag` | Reserved class: this item must be terminal before any later item is actionable. |
-| Pause-point blockquote | after Prepare | Convention, not syntax: a blockquote starting `**Pause point**`, lintable, renders as an ordinary quote ([why pause points](../research/prior-art-checklist-formats.md#family-0-what-checklist-science-demands-of-a-format)). |
+| Pause-point blockquote | after Prepare | Convention, not syntax: a blockquote starting `**Pause point**`, lintable, renders as an ordinary quote ([why pause points](https://github.com/mdcspec/mdc/wiki/Prior-Art-Checklist-Formats#family-0-what-checklist-science-demands-of-a-format)). |
 | `needs=branch` | `#ci` | Typed dependency edge; blocked status is *derived* from it, never declared. |
 | `verify="npm test"` | `#ci`, `#publish` | Machine-verifiability hook: exit 0 means checkable. Data in v0; execution is tool behavior. |
 | `.doing` | `#smoke` | Reserved soft-state class for in-progress, never a bracket character. |
 | Nested `- [ ]` children | under `#smoke` | Children belong to the parent; rollups are computed, never stored. |
-| `- [x] ~~text~~ … reason=` | `#pdf` | The cancelled state: struck through, not outstanding, with a machine-readable reason, the [anti-box-ticking affordance](../research/prior-art-checklist-formats.md#family-0-what-checklist-science-demands-of-a-format). |
+| `- [x] ~~text~~ … reason=` | `#pdf` | The cancelled state: struck through, not outstanding, with a machine-readable reason, the [anti-box-ticking affordance](https://github.com/mdcspec/mdc/wiki/Prior-Art-Checklist-Formats#family-0-what-checklist-science-demands-of-a-format). |
 | `.optional` | `#notes` | Reserved class: excluded from gating. |
 | `repeat=done+90d` | `#drill` | Completion-anchored recurrence; the anchor token is mandatory. |
 
@@ -125,11 +125,11 @@ The brace delimiter is what makes the text/metadata boundary deterministic (requ
 
 ## IDs
 
-IDs are human-readable slugs, unique per file, author-chosen or generated by `mdc fmt --assign-ids`. They are **required only when something references them**. Duplicate IDs and dangling `needs=` references are lint errors. Conforming tools address items by ID, never by line number or text match. A `needs=` target containing `#` is a cross-file reference (`path#id`): reserved syntax, opaque to v0, preserved verbatim but never a blocking edge and never a dangling error (lint warns `unresolved-cross-file-ref`), with resolution routed to `.mddb`. See [open question #3](../vision/risks-critiques-open-questions.md).
+IDs are human-readable slugs, unique per file, author-chosen or generated by `mdc fmt --assign-ids`. They are **required only when something references them**. Duplicate IDs and dangling `needs=` references are lint errors. Conforming tools address items by ID, never by line number or text match. A `needs=` target containing `#` is a cross-file reference (`path#id`): reserved syntax, opaque to v0, preserved verbatim but never a blocking edge and never a dangling error (lint warns `unresolved-cross-file-ref`), with resolution routed to `.mddb`. See [open question #3](https://github.com/mdcspec/mdc/wiki/Risks-Critiques-and-Open-Questions).
 
 ## Template vs. instance
 
-The clearest differentiation from GFM task lists and todo.txt (see the [landscape map](../research/landscape-map.md)) costs zero new syntax. A `kind: template` document is the reusable procedure; a `kind: run` document pins `template: path@version` and carries run metadata (`started`, and per-item `done=` stamps as work proceeds). One template, many runs. Cross-run history, rollups, and analytics are inherently relational and belong to [.mddb](mddb-concept-sketch.md), never to .mdc syntax.
+The clearest differentiation from GFM task lists and todo.txt (see the [landscape map](https://github.com/mdcspec/mdc/wiki/Landscape-Map)) costs zero new syntax. A `kind: template` document is the reusable procedure; a `kind: run` document pins `template: path@version` and carries run metadata (`started`, and per-item `done=` stamps as work proceeds). One template, many runs. Cross-run history, rollups, and analytics are inherently relational and belong to [.mddb](https://github.com/mdcspec/mdc/wiki/MDDB-Concept-Sketch), never to .mdc syntax.
 
 ### The template it was cut from
 
@@ -179,7 +179,7 @@ A template carries the *procedure*: item text, IDs, `.gate`/`.optional` classes,
 
 ### The `@version` token
 
-The `@5` in `template: templates/release.mdc.md@5` pins the template revision a run was cut from, so later template edits never reinterpret an in-flight run. The token is the substring after the **final** `@`, and it is **opaque to v0 tools**: they preserve it verbatim and never resolve it. Its blessed interpretation is a **git commit-ish**: a tag, branch, or SHA resolvable in the repository that holds the template. Two alternatives were considered and rejected ([open questions register](../vision/risks-critiques-open-questions.md), OQ #10): a **content hash** is an opaque identifier in source text, which the format rejects for the same reason it rejects opaque item IDs; a **frontmatter version counter** reintroduces the per-file increment-and-merge machinery that ruled out a counter for IDs. A run MAY be unpinned (bare path), but `mdc lint` warns `unpinned-template` because an unpinned run can silently drift when the template changes.
+The `@5` in `template: templates/release.mdc.md@5` pins the template revision a run was cut from, so later template edits never reinterpret an in-flight run. The token is the substring after the **final** `@`, and it is **opaque to v0 tools**: they preserve it verbatim and never resolve it. Its blessed interpretation is a **git commit-ish**: a tag, branch, or SHA resolvable in the repository that holds the template. Two alternatives were considered and rejected ([open questions register](https://github.com/mdcspec/mdc/wiki/Risks-Critiques-and-Open-Questions), OQ #10): a **content hash** is an opaque identifier in source text, which the format rejects for the same reason it rejects opaque item IDs; a **frontmatter version counter** reintroduces the per-file increment-and-merge machinery that ruled out a counter for IDs. A run MAY be unpinned (bare path), but `mdc lint` warns `unpinned-template` because an unpinned run can silently drift when the template changes.
 
 ## Degradation in plain renderers
 
@@ -200,7 +200,7 @@ One known hazard: `@assignee` tokens autolink (and can notify real users) when M
 | **L1** | Parse | Extract the document to the canonical JSON item model: frontmatter, items with state/text/id/assignee/classes/attributes, hierarchy, and computed fields (blocked, actionable, rollups). L1 is the interchange contract for all tooling and the future .mddb. |
 | **L2** | Mutate | Apply the normative mutation vocabulary (`check`, `uncheck`, `cancel`, `claim`, `set-attr`, `assign-id`) such that each mutation touches exactly the target item's line. `claim` is atomic (fails if an assignee is already set). On canonical-form documents (`mdc fmt`: attribute order id, classes, assignee, then keys alphabetically), mutations are byte-deterministic across implementations, enforced by a shared cross-implementation test corpus. |
 
-A minimal implementation is L1: parse to JSON. A full implementation is L2: the item line is the merge unit, which is what makes plain git merges and multi-agent concurrent writes tractable, the property no incumbent format specifies. The [MVP CLI](../planning/mvp-definition.md) ships `check` and `claim` as the first L2 mutations; how we validate all of this against real usage is in the [experiment plan](../planning/experiment-plan.md).
+A minimal implementation is L1: parse to JSON. A full implementation is L2: the item line is the merge unit, which is what makes plain git merges and multi-agent concurrent writes tractable, the property no incumbent format specifies. The [MVP CLI](https://github.com/mdcspec/mdc/wiki/MVP-Definition) ships `check` and `claim` as the first L2 mutations; how we validate all of this against real usage is in the [experiment plan](https://github.com/mdcspec/mdc/wiki/Experiment-Plan).
 
 ## Appendix: considered alternatives
 

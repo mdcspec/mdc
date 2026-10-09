@@ -1,6 +1,6 @@
 # Assignees, mentions, and notifications
 
-*Authoring guidance for the `@assignee` token. Resolves [open question #1](../vision/risks-critiques-open-questions.md) (assignee autolink hazard). Normative backing: [spec §4, ATTR-2 note](../../spec/mdc-spec-v0.1.md).*
+*Authoring guidance for the `@assignee` token. Resolves [open question #1](https://github.com/mdcspec/mdc/wiki/Risks-Critiques-and-Open-Questions) (assignee autolink hazard). Normative backing: [spec §4, ATTR-2 note](../../spec/mdc-spec-v0.1.md).*
 
 ## What `@assignee` means in MDC
 
@@ -39,4 +39,4 @@ Inside a code fence nothing autolinks: `@alex` renders as literal text, no notif
 
 ## Why there is no lint rule or "safe-mentions" flag for this
 
-MDC deliberately ships **no** mechanical guard here, and that is a decision, not an omission. The check you would want — "warn when an assignee could notify a real account" — is not decidable: there is no syntactic difference between `@qa` (a role) and `@maria` (a person), and MDC has no roster to check either against. A lint rule would either cry wolf on every assignee or miss the real ones. A frontmatter "no-mention profile" flag would carry the same undecidability while adding closed-set surface the format is [constitutionally reluctant](../vision/risks-critiques-open-questions.md) to grow (*"would todo.txt have added this?"* — no). The honest, cheap, and complete answer is the guidance above: choose handles deliberately, and fence the paste when you need silence.
+MDC deliberately ships **no** mechanical guard here, and that is a decision, not an omission. The check you would want — "warn when an assignee could notify a real account" — is not decidable: there is no syntactic difference between `@qa` (a role) and `@maria` (a person), and MDC has no roster to check either against. A lint rule would either cry wolf on every assignee or miss the real ones. A frontmatter "no-mention profile" flag would carry the same undecidability while adding closed-set surface the format is [constitutionally reluctant](https://github.com/mdcspec/mdc/wiki/Risks-Critiques-and-Open-Questions) to grow (*"would todo.txt have added this?"* — no). The honest, cheap, and complete answer is the guidance above: choose handles deliberately, and fence the paste when you need silence.

@@ -1,6 +1,6 @@
 # MDC Governance
 
-*How decisions about the MDC (Markdown Checklists) format are made, who holds its assets, and how stewardship will hand off as the project grows. Pre-committed at v0.1: the honest model for a young format, with the mechanical preconditions for graduation already in place. This resolves [open question #6](docs/vision/risks-critiques-open-questions.md).*
+*How decisions about the MDC (Markdown Checklists) format are made, who holds its assets, and how stewardship will hand off as the project grows. Pre-committed at v0.1: the honest model for a young format, with the mechanical preconditions for graduation already in place. This resolves [open question #6](https://github.com/mdcspec/mdc/wiki/Risks-Critiques-and-Open-Questions).*
 
 ## Model: single-maintainer, corpus-arbitrated
 
@@ -36,7 +36,7 @@ If the maintainer becomes inactive for a sustained dormancy window with no counc
 
 ## Change policy
 
-MDC's durability depends on resisting feature growth (see [risks and open questions](docs/vision/risks-critiques-open-questions.md), #7). Normative changes are **closed-by-default**:
+MDC's durability depends on resisting feature growth (see [risks and open questions](https://github.com/mdcspec/mdc/wiki/Risks-Critiques-and-Open-Questions), #7). Normative changes are **closed-by-default**:
 
 - The v0 reserved attribute-key set is **closed at six** (`due done repeat needs verify reason`); extension keys use an `x-` prefix.
 - The bracket grammar is frozen to GFM's two task-list states; MDC adds only the struck-through cancelled convention.

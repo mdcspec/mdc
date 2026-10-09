@@ -1,6 +1,6 @@
 # Implementation Contract (v0)
 
-*The engineering decision record that bridges the [format sketch](mdc-format-sketch.md) and the MVP code: every ambiguity an implementer would otherwise resolve ad hoc is pinned here. The [MVP definition](../planning/mvp-definition.md) says what to build; this says exactly how the pieces must behave so the corpus, parser, and CLI agree byte-for-byte.*
+*The engineering decision record that bridges the [format sketch](mdc-format-sketch.md) and the MVP code: every ambiguity an implementer would otherwise resolve ad hoc is pinned here. The [MVP definition](https://github.com/mdcspec/mdc/wiki/MVP-Definition) says what to build; this says exactly how the pieces must behave so the corpus, parser, and CLI agree byte-for-byte.*
 
 > Precedence: where this document and the [format sketch](mdc-format-sketch.md) conflict, the sketch's *intent* wins but this document's *mechanics* win; file an issue rather than silently diverging. The spec corpus (`spec/corpus/`) is authoritative over both once a fixture exists.
 
