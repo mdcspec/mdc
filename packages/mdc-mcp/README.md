@@ -14,24 +14,24 @@ Every tool takes a `file` path (resolved from the host's working directory), mir
 
 ## Configure it in an MCP host
 
-The server command is `node <repo>/packages/mdc-mcp/src/server.js` (or the `mdc-mcp` bin once the package is installed). Add an entry to your host's MCP config, e.g.:
+Nothing to install first: point your host at `npx -y @mdcspec/mdc-mcp`, which fetches the server (and its one dependency, `@mdcspec/mdc`) on first run and keeps it cached.
 
 ```json
 {
   "mcpServers": {
     "mdc": {
-      "command": "node",
-      "args": ["/absolute/path/to/mdc/packages/mdc-mcp/src/server.js"]
+      "command": "npx",
+      "args": ["-y", "@mdcspec/mdc-mcp"]
     }
   }
 }
 ```
 
-- **Claude Code:** put this in `.mcp.json` at your project root (or `claude mcp add mdc -- node /abs/path/.../server.js`).
+- **Claude Code:** `claude mcp add mdc -- npx -y @mdcspec/mdc-mcp` (or put the block above in `.mcp.json` at your project root).
 - **Claude Desktop:** add it under `mcpServers` in `claude_desktop_config.json`.
 - **Cursor / Windsurf / Zed:** the same `mcpServers` shape in their respective MCP settings.
 
-No install step is required; the server has no dependencies beyond the MDC reference package in this repo.
+To run from a clone instead of the registry, use `"command": "node"` with `"args": ["/absolute/path/to/mdc/packages/mdc-mcp/src/server.js"]`.
 
 ## The coordination loop, as tools
 
