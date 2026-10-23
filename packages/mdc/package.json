@@ -1,15 +1,20 @@
 {
   "name": "@mdcspec/mdc",
-  "private": true,
   "version": "0.1.0",
-  "description": "Reference parser and CLI for MDC — Markdown Checklists. Every MDC document is valid GFM; this adds the L1 JSON model and L2 deterministic mutations.",
+  "description": "Reference parser and CLI for MDC (Markdown Checklists). Every MDC document is valid GFM; this adds the L1 JSON model and L2 deterministic mutations.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "mdc": "./src/cli.js"
   },
   "exports": {
-    ".": "./src/parse.js"
+    ".": "./src/index.js"
   },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --test \"test/*.test.js\""
   },

@@ -19,11 +19,13 @@ import path from 'node:path';
 import process from 'node:process';
 import { createRequire } from 'node:module';
 
-import { parseDocument } from '../../mdc/src/parse.js';
-import { statusReport, nextItems, reportData } from '../../mdc/src/model.js';
-import { lintDocument } from '../../mdc/src/lint.js';
-import { check, uncheck, cancel, claim, unclaim, start, unstart, note, edit, addItem } from '../../mdc/src/mutate.js';
-import { cutRun } from '../../mdc/src/cut.js';
+import {
+  parseDocument,
+  statusReport, nextItems, reportData,
+  lintDocument,
+  check, uncheck, cancel, claim, unclaim, start, unstart, note, edit, addItem,
+  cutRun,
+} from '@mdcspec/mdc';
 
 const require = createRequire(import.meta.url);
 const VERSION = require('../package.json').version;

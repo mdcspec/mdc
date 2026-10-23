@@ -1,7 +1,8 @@
 {
   "name": "@mdcspec/mdc-mcp",
   "version": "0.1.0",
-  "description": "Model Context Protocol server for MDC (Markdown Checklists) — drive shared checklist state from any MCP host.",
+  "description": "Model Context Protocol server for MDC (Markdown Checklists): drive shared checklist state from any MCP host.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "mdc-mcp": "src/server.js"
@@ -12,9 +13,12 @@
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "@mdcspec/mdc": "^0.1.0"
+  },
   "files": [
     "src",
-    "README.md"
-  ],
-  "license": "MIT"
+    "README.md",
+    "LICENSE"
+  ]
 }
