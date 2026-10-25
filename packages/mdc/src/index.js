@@ -29,3 +29,4 @@ export {
   PreconditionError,
 } from './mutate.js';
 export { cutRun } from './cut.js';
+export { mergeMdc, itemId } from './merge.js';

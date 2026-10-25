@@ -17,6 +17,8 @@ import { statusReport, nextItems, reportData } from './model.js';
 import { formatDocument } from './fmt.js';
 import { check, uncheck, cancel, claim, addItem, edit, start, unstart, unclaim, note, withFileLock, atomicReplace } from './mutate.js';
 import { cutRun } from './cut.js';
+import { mergeMdc } from './merge.js';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
 const USAGE = `Usage: mdc <verb> <file> [flags]
@@ -46,6 +48,10 @@ Mutations (real path required; refusals exit 2):
 Instantiate:
   cut <template> [--out <file>] [--title <t>] [--as-version <v>] [--template-ref <ref>] [--date YYYY-MM-DD]
                                            cut a run from a template; --out or stdout
+
+Git merge integration:
+  merge-install                            register an id-aware merge driver for *.mdc.md in this repo
+  merge-driver <base> <ours> <theirs>      the driver itself (git calls this; not for direct use)
 
 Exit codes: 0 success · 1 usage/IO/parse/not-MDC · 2 domain refusal
 `;
@@ -503,6 +509,80 @@ function usageErrorWithCode(message, code) {
 }
 
 /**
+ * Git merge-driver entry point: `mdc merge-driver %O %A %B`. Try an id-aware
+ * resolution of the three versions; on success write the merge into `ours`
+ * (`%A`) and exit 0. Otherwise fall back to git's own 3-way line merge, which
+ * writes `ours` in place and leaves conflict markers if any remain — exactly
+ * today's behavior. Exit 0 = merged clean, 1 = conflicts remain.
+ *
+ * @param {string} base
+ * @param {string} ours
+ * @param {string} theirs
+ * @returns {number}
+ */
+function runMergeDriver(base, ours, theirs) {
+  let baseText, ourText, theirText;
+  try {
+    baseText = fs.readFileSync(base, 'utf8');
+    ourText = fs.readFileSync(ours, 'utf8');
+    theirText = fs.readFileSync(theirs, 'utf8');
+  } catch (err) {
+    throw usageError(`merge-driver: ${/** @type {Error} */ (err).message}`);
+  }
+  const result = mergeMdc(baseText, ourText, theirText);
+  if (result.clean) {
+    atomicReplace(ours, result.text);
+    return 0;
+  }
+  // Defer to git's standard merge: `git merge-file <ours> <base> <theirs>`
+  // rewrites <ours> in place and exits with the number of remaining conflicts.
+  try {
+    execFileSync('git', ['merge-file', ours, base, theirs], { stdio: 'ignore' });
+    return 0;
+  } catch (err) {
+    const status = /** @type {{ status?: number }} */ (err).status;
+    if (typeof status === 'number' && status > 0) return 1; // conflicts remain
+    throw usageError(`merge-driver: git merge-file failed: ${/** @type {Error} */ (err).message}`);
+  }
+}
+
+/**
+ * Install the merge driver into the current git repository: register the
+ * driver command and point `*.mdc.md` at it via `.gitattributes`.
+ *
+ * @returns {number}
+ */
+function runMergeInstall() {
+  try {
+    execFileSync('git', ['rev-parse', '--git-dir'], { stdio: 'ignore' });
+  } catch {
+    throw usageError('merge-install: not inside a git repository');
+  }
+  execFileSync('git', ['config', 'merge.mdc.name', 'MDC id-aware merge']);
+  execFileSync('git', ['config', 'merge.mdc.driver', 'mdc merge-driver %O %A %B']);
+  const attrLine = '*.mdc.md merge=mdc';
+  const attrPath = '.gitattributes';
+  let existing = '';
+  try {
+    existing = fs.readFileSync(attrPath, 'utf8');
+  } catch {
+    existing = '';
+  }
+  const hasLine = existing.split('\n').some((l) => l.trim() === attrLine);
+  if (!hasLine) {
+    const sep = existing === '' || existing.endsWith('\n') ? '' : '\n';
+    fs.writeFileSync(attrPath, `${existing}${sep}${attrLine}\n`);
+  }
+  process.stdout.write(
+    `Installed the MDC merge driver.\n` +
+      `  git config merge.mdc.driver = "mdc merge-driver %O %A %B"\n` +
+      `  ${attrPath}: ${hasLine ? 'already had' : 'added'} "${attrLine}"\n` +
+      `Requires the \`mdc\` CLI on PATH during merges. Commit .gitattributes so collaborators share it.\n`,
+  );
+  return 0;
+}
+
+/**
  * @param {string[]} argv Arguments after the program name (no node, no script path).
  * @returns {Promise<number>} Exit code per the law above.
  */
@@ -516,6 +596,19 @@ async function dispatch(argv) {
     return 0;
   }
   const verb = argv[0];
+
+  // Merge integration verbs take a non-standard positional shape (three paths,
+  // or none), so they are handled before the file/id/text machinery below.
+  if (verb === 'merge-driver') {
+    const rest = argv.slice(1);
+    if (rest.length !== 3) throw usageError('merge-driver: expects <base> <ours> <theirs>');
+    return runMergeDriver(rest[0], rest[1], rest[2]);
+  }
+  if (verb === 'merge-install') {
+    if (argv.length > 1) throw usageError(`merge-install: unexpected argument '${argv[1]}'`);
+    return runMergeInstall();
+  }
+
   const spec = VERBS[verb];
   if (!spec) throw usageError(`unknown verb '${verb}'`);
 
