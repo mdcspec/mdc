@@ -44,7 +44,7 @@ node packages/mdc/src/cli.js <verb> <file> [flags]
 ## Conventions when an MDC file is shared work
 
 - Before doing an item's work, `claim <id> --as <your-handle>`. If it exits `2`, someone else owns it; pick another via `next --json`.
-- After the work, `check <id>`. Each mutation rewrites exactly one line, so concurrent edits to different items merge cleanly under plain git.
+- After the work, `check <id>`. Each mutation rewrites exactly one line, so concurrent edits to different items stay small and merge with minimal conflicts under git; `mdc merge-install` resolves them automatically.
 - Skip a step with `cancel <id> --reason "…"`, never by deleting it: the reason is the audit record.
 - Never hand-edit an item's state where the CLI has a verb for it; the verbs keep the file canonical and the diff minimal.
 

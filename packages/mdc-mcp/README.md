@@ -43,4 +43,4 @@ mdc_note(file, id, "…", as="…")  → leave context for the other agent
 mdc_check(file, id)              → done; clears .doing; one-line diff
 ```
 
-Because each mutation is a one-line diff and `claim` is atomic, two agents (or an agent and a human) editing the same board merge cleanly under plain git, the same guarantee the CLI provides, now available to any MCP client.
+Because each mutation is a one-line diff and `claim` is atomic, two agents (or an agent and a human) editing the same board never clobber each other, and their work merges under plain git with minimal conflicts (conflict-free across branches with the MDC merge driver installed, via `mdc merge-install`), the same guarantee the CLI provides, now available to any MCP client.

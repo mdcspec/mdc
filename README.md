@@ -27,7 +27,7 @@ Open that on GitHub and it renders as a normal checklist. Feed it to `mdc` and i
 
 - **Renders anywhere, zero tooling.** It's just GFM: real checkboxes on GitHub, GitLab, VS Code, and Obsidian. The `{…}` metadata is plain text to anything that doesn't understand it.
 - **A model your tools can query.** Ids, `@assignees`, typed `needs=` dependencies, and `.gate`s, so `mdc next` answers "what's actionable right now," honoring the whole graph.
-- **Edits that are safe to share.** Every change rewrites exactly one line, so humans and multiple AI agents edit the same file and merge cleanly under plain git. `claim` is atomic, so two agents can't take the same item.
+- **Edits that are safe to share.** Every change rewrites exactly one line, so humans and multiple AI agents edit the same file with small, local diffs. On one file, writes are lock-serialized and `claim` is atomic, so two agents can't take the same item; across branches, `mdc merge-install` adds an id-aware git merge driver that resolves concurrent edits to different items automatically.
 
 A file is MDC because its frontmatter says `mdc: "0.1"`, not because of its name (conventionally `*.mdc.md`).
 
@@ -54,6 +54,7 @@ The spec is executable: every normative rule cites a case in the [conformance co
 - **[spec/mdc-spec-v0.1.md](spec/mdc-spec-v0.1.md)**: the normative, example-backed spec.
 - **[spec/conformance.md](spec/conformance.md)** and **[docs/spec/implementations.md](docs/spec/implementations.md)**: how any implementation earns a conformance class, and who's done it.
 - **[docs/adoption/agent-snippet.md](docs/adoption/agent-snippet.md)**: drop-in instructions to teach a coding agent to drive MDC files.
+- **[docs/adoption/git-integration.md](docs/adoption/git-integration.md)**: the id-aware merge driver for conflict-free concurrent editing.
 - **[Project wiki](https://github.com/mdcspec/mdc/wiki)**: research, vision, the risk register, and the [standardization roadmap](https://github.com/mdcspec/mdc/wiki/Standardization-Roadmap).
 
 ## Status

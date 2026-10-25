@@ -14,6 +14,7 @@ This directory holds the **implementer-facing companions** to the spec. The proj
 
 - [`agent-snippet.md`](adoption/agent-snippet.md): drop-in instructions to teach a coding agent to drive MDC files.
 - [`mentions-and-notifications.md`](adoption/mentions-and-notifications.md): authoring guidance for the `@assignee` token and the paste-autolink hazard.
+- [`git-integration.md`](adoption/git-integration.md): the id-aware merge driver (`mdc merge-install`) for conflict-free concurrent editing, and the `.gitignore` snippet for transient artifacts.
 
 ## In the wiki
 

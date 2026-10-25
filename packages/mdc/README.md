@@ -29,7 +29,7 @@ mdc fmt    <file> --check           # canonical formatting
 mdc cut <template> --out <run> --title "…"   # instantiate a template
 ```
 
-Full verb surface: `parse lint status next report` (reads); `check uncheck cancel claim unclaim start unstart add edit note` (mutations); `fmt cut`. Every mutation rewrites exactly one line and prints the resulting canonical line, so concurrent edits merge cleanly under plain git.
+Full verb surface: `parse lint status next report` (reads); `check uncheck cancel claim unclaim start unstart add edit note` (mutations); `fmt cut`; `merge-install` (git integration). Every mutation rewrites exactly one line and prints the resulting canonical line, so concurrent edits make small, local diffs; `mdc merge-install` adds an id-aware git merge driver so edits to different items merge without conflict across branches.
 
 ## Programmatic API
 
